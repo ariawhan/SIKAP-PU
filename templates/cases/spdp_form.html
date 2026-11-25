@@ -1,0 +1,168 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+
+{% block title %}{% if is_edit %}Edit{% else %}Tambah{% endif %} SPDP{% endblock %}
+{% block page_name %}{% if is_edit %}Edit{% else %}Tambah{% endif %} SPDP{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/spdp-form.css' %}?v=20260915-9">
+{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="kicker text-red-700">Penerimaan SPDP</p>
+    <h1>{% if is_edit %}Edit Data{% else %}Tambah{% endif %} Perkara / SPDP</h1>
+    <p>{% if is_edit %}Perbarui data perkara sesuai dokumen terbaru.{% else %}Lengkapi data sesuai Surat Pemberitahuan Dimulainya Penyidikan.{% endif %}</p>
+  </div>
+  <a class="secondary-btn" href="{% url 'cases:spdp_list' %}">Kembali</a>
+</section>
+
+{% if form.non_field_errors or formset.non_form_errors or victim_formset.non_form_errors or receipt_formset.non_form_errors %}
+<div class="form-error-summary">{{ form.non_field_errors }}{{ formset.non_form_errors }}{{ victim_formset.non_form_errors }}{{ receipt_formset.non_form_errors }}</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="spdp-form" data-spdp-form>
+  {% csrf_token %}
+
+  <article class="panel">
+    <div class="panel-head case-section-head">
+      <div>
+        <span>01</span>
+        <h3>Data Sprindik &amp; SPDP</h3>
+        <p>Instansi penyidik, nomor dokumen, tanggal, prioritas, dan unggahan PDF.</p>
+      </div>
+    </div>
+    <div class="case-form-grid three">
+      {% include 'cases/field.html' with field=form.directorate %}
+      {% include 'cases/field.html' with field=form.case_type %}
+      {% include 'cases/field.html' with field=form.investigator_agency %}
+      {% include 'cases/field.html' with field=form.investigating_unit %}
+      {% include 'cases/field.html' with field=form.work_area %}
+      {% include 'cases/field.html' with field=form.investigation_order_number %}
+      {% include 'cases/field.html' with field=form.investigation_order_date %}
+      {% include 'cases/field.html' with field=form.letter_number %}
+      {% include 'cases/field.html' with field=form.letter_date %}
+      {% include 'cases/field.html' with field=form.received_date %}
+      <label class="case-check">
+        {{ form.is_high_priority }}
+        <span><b>{{ form.is_high_priority.label }}</b><small>Tandai sebagai perkara penting.</small></span>
+      </label>
+      <div class="span-all">
+        <div class="upload-field">{{ form.document }}<span>Upload dokumen SPDP. PDF maksimal 3 MB.</span>{{ form.document.errors }}</div>
+      </div>
+    </div>
+  </article>
+
+  <article class="panel">
+    <div class="panel-head case-section-head">
+      <div>
+        <span>02</span>
+        <h3>Peristiwa &amp; Perkara</h3>
+        <p>Waktu kejadian, uraian, dan ketentuan pidana.</p>
+      </div>
+    </div>
+    <div class="case-form-grid two">
+      {% include 'cases/field.html' with field=form.incident_at %}
+      {% include 'cases/field.html' with field=form.legal_subject %}
+      <div class="span-all">{% include 'cases/field.html' with field=form.incident_place %}</div>
+      <div class="span-all">{% include 'cases/field.html' with field=form.case_summary %}</div>
+      <div class="span-all">{% include 'cases/field.html' with field=form.laws_and_articles %}</div>
+    </div>
+  </article>
+
+  <article class="panel suspects-panel">
+    <div class="panel-head case-section-head">
+      <div>
+        <span>03</span>
+        <h3>Data Pelaku</h3>
+        <p>Tambahkan satu atau lebih pelaku perkara. Data pelaku bersifat opsional.</p>
+      </div>
+      <button type="button" class="secondary-btn suspect-add-button" data-add-suspect>+ Tambah Data Pelaku</button>
+    </div>
+    {{ formset.management_form }}
+    <div class="suspect-summary" data-suspect-summary>
+      <div class="suspect-summary-empty" data-suspect-empty>Belum ada data pelaku. Klik "Tambah Data Pelaku" untuk mengisi.</div>
+    </div>
+  </article>
+
+  <article class="panel suspects-panel">
+    <div class="panel-head case-section-head">
+      <div>
+        <span>04</span>
+        <h3>Data Korban</h3>
+        <p>Tambahkan satu atau lebih korban perkara. Data korban bersifat opsional.</p>
+      </div>
+      <button type="button" class="secondary-btn suspect-add-button" data-add-victim>+ Tambah Data Korban</button>
+    </div>
+    {{ victim_formset.management_form }}
+    <div class="suspect-summary" data-victim-summary>
+      <div class="suspect-summary-empty" data-victim-empty>Belum ada data korban. Klik "Tambah Data Korban" untuk mengisi.</div>
+    </div>
+  </article>
+
+  <article class="panel suspects-panel">
+    <div class="panel-head case-section-head">
+      <div>
+        <span>05</span>
+        <h3>Tanda Terima</h3>
+        <p>Tambahkan satu atau lebih data pengantar dan tanda terima SPDP.</p>
+      </div>
+      <button type="button" class="secondary-btn suspect-add-button" data-add-receipt>+ Tambah Tanda Terima</button>
+    </div>
+    {{ receipt_formset.management_form }}
+    <div class="suspect-summary" data-receipt-summary>
+      <div class="suspect-summary-empty" data-receipt-empty>Belum ada tanda terima. Klik "Tambah Tanda Terima" untuk mengisi.</div>
+    </div>
+  </article>
+
+  <div class="form-actions">
+    <p>Pastikan seluruh data sudah sesuai dengan dokumen SPDP.</p>
+    <div>
+      <a class="secondary-btn" href="{% url 'cases:spdp_list' %}">Batal</a>
+      <button class="primary-btn" type="submit" data-submit-spdp>{% if is_edit %}Simpan Perubahan{% else %}Simpan SPDP{% endif %}</button>
+    </div>
+  </div>
+
+  <dialog class="suspect-dialog" data-suspect-dialog aria-labelledby="suspect-dialog-title">
+    <div class="suspect-dialog-shell">
+      <header class="suspect-dialog-head">
+        <div><span>DATA PERKARA</span><h2 id="suspect-dialog-title">Data Pelaku</h2><p>Lengkapi identitas pelaku. Anda dapat menambahkan lebih dari satu.</p></div>
+        <button type="button" data-cancel-suspect-dialog aria-label="Tutup popup">&times;</button>
+      </header>
+      <div class="suspect-dialog-body"><div class="suspect-list" data-suspect-list>{% for suspect_form in formset %}{% include 'cases/suspect_form.html' with suspect_form=suspect_form number=forloop.counter %}{% endfor %}</div></div>
+      <footer class="suspect-dialog-actions"><span>Data masuk ke daftar setelah tombol Selesai ditekan.</span><button type="button" class="primary-btn" data-finish-suspect-dialog>Selesai</button></footer>
+    </div>
+  </dialog>
+
+  <dialog class="suspect-dialog" data-victim-dialog aria-labelledby="victim-dialog-title">
+    <div class="suspect-dialog-shell">
+      <header class="suspect-dialog-head">
+        <div><span>DATA PERKARA</span><h2 id="victim-dialog-title">Data Korban</h2><p>Lengkapi identitas korban. Anda dapat menambahkan lebih dari satu.</p></div>
+        <button type="button" data-cancel-victim-dialog aria-label="Tutup popup">&times;</button>
+      </header>
+      <div class="suspect-dialog-body"><div class="suspect-list" data-victim-list>{% for victim_form in victim_formset %}{% include 'cases/victim_form.html' with victim_form=victim_form number=forloop.counter %}{% endfor %}</div></div>
+      <footer class="suspect-dialog-actions"><span>Data masuk ke daftar setelah tombol Selesai ditekan.</span><button type="button" class="primary-btn" data-finish-victim-dialog>Selesai</button></footer>
+    </div>
+  </dialog>
+
+  <dialog class="suspect-dialog" data-receipt-dialog aria-labelledby="receipt-dialog-title">
+    <div class="suspect-dialog-shell">
+      <header class="suspect-dialog-head">
+        <div><span>DATA PERKARA</span><h2 id="receipt-dialog-title">Tanda Terima</h2><p>Lengkapi data pengantar, penerima, dan penyidik. Anda dapat menambahkan lebih dari satu.</p></div>
+        <button type="button" data-cancel-receipt-dialog aria-label="Tutup popup">&times;</button>
+      </header>
+      <div class="suspect-dialog-body"><div class="suspect-list" data-receipt-list>{% for receipt_form in receipt_formset %}{% include 'cases/receipt_form.html' with receipt_form=receipt_form number=forloop.counter %}{% endfor %}</div></div>
+      <footer class="suspect-dialog-actions"><span>Data masuk ke daftar setelah tombol Selesai ditekan.</span><button type="button" class="primary-btn" data-finish-receipt-dialog>Selesai</button></footer>
+    </div>
+  </dialog>
+</form>
+
+<template id="empty-suspect-form">{% include 'cases/suspect_form.html' with suspect_form=formset.empty_form number='__number__' %}</template>
+<template id="empty-victim-form">{% include 'cases/victim_form.html' with victim_form=victim_formset.empty_form number='__number__' %}</template>
+<template id="empty-receipt-form">{% include 'cases/receipt_form.html' with receipt_form=receipt_formset.empty_form number='__number__' %}</template>
+{{ case_types_by_directorate|json_script:"case-types-by-directorate" }}
+{{ investigator_units_by_institution|json_script:"investigator-units-by-institution" }}
+{{ receipt_prosecutor_profiles|json_script:"receipt-prosecutor-profiles" }}
+<script src="{% static 'js/spdp-form.js' %}?v=20261018-1"></script>
+{% endblock %}

@@ -1,0 +1,5 @@
+<ol>
+  <li>Bahwa pada tanggal {{ spdp.received_date|date:'d F Y' }}, {{ institution.work_unit|default:'Kejaksaan Negeri' }} telah menerima SPDP dari Penyidik {{ spdp.investigating_unit|default:spdp.investigator_agency }} terkait perkara a quo.</li>
+  <li>Bahwa terhitung sejak tanggal diterimanya SPDP (Tanggal {{ spdp.received_date|date:'d F Y' }}) sampai dengan tanggal laporan ini dibuat (Tanggal {{ p17_draft.letter_date|date:'d F Y' }}), telah melewati jangka waktu {{ elapsed_days }} ({{ elapsed_days_words }}) hari.</li>
+  <li>Bahwa hingga saat ini, Penyidik belum menyerahkan berkas perkara (Tahap I) kepada Penuntut Umum.</li>
+</ol>

@@ -1,0 +1,77 @@
+<section class="suspect-card" data-suspect-form>
+  <div class="suspect-head"><div><span data-suspect-number>{{ number }}</span><b>Data Pelaku</b></div></div>
+  {{ suspect_form.id }}
+  <div class="suspect-fieldsets">
+    <div class="suspect-fieldset">
+      <h4>Penetapan</h4>
+      <div class="case-form-grid two">
+        {% include 'cases/field.html' with field=suspect_form.decree_number %}
+        {% include 'cases/field.html' with field=suspect_form.decree_date %}
+      </div>
+    </div>
+    <div class="suspect-fieldset">
+      <h4>Identitas Utama</h4>
+      <div class="case-form-grid three">
+        {% include 'cases/field.html' with field=suspect_form.suspect_type %}
+        {% include 'cases/field.html' with field=suspect_form.front_title %}
+        {% include 'cases/field.html' with field=suspect_form.back_title %}
+        <div class="span-all">{% include 'cases/field.html' with field=suspect_form.name %}</div>
+        {% include 'cases/field.html' with field=suspect_form.alias %}
+        {% include 'cases/field.html' with field=suspect_form.father_name %}
+        {% include 'cases/field.html' with field=suspect_form.mother_name %}
+        <div data-corporate-position>{% include 'cases/field.html' with field=suspect_form.corporate_position %}</div>
+      </div>
+    </div>
+    <div class="suspect-fieldset">
+      <h4>Kelahiran & Identitas</h4>
+      <div class="case-form-grid three">
+        {% include 'cases/field.html' with field=suspect_form.birth_place %}
+        {% include 'cases/field.html' with field=suspect_form.birth_date %}
+        {% include 'cases/field.html' with field=suspect_form.age %}
+        {% include 'cases/field.html' with field=suspect_form.nationality %}
+        {% include 'cases/field.html' with field=suspect_form.ethnicity %}
+        {% include 'cases/field.html' with field=suspect_form.gender %}
+        {% include 'cases/field.html' with field=suspect_form.marital_status %}
+        {% include 'cases/field.html' with field=suspect_form.identity_type %}
+        {% include 'cases/field.html' with field=suspect_form.identity_number %}
+      </div>
+    </div>
+    <div class="suspect-fieldset">
+      <h4>Alamat & Kontak</h4>
+      <div class="case-form-grid three">
+        <div class="span-all">{% include 'cases/field.html' with field=suspect_form.address %}</div>
+        {% include 'cases/field.html' with field=suspect_form.religion %}
+        {% include 'cases/field.html' with field=suspect_form.phone %}
+      </div>
+    </div>
+    <div class="suspect-fieldset">
+      <h4>Pendidikan, Pekerjaan & Disabilitas</h4>
+      <div class="case-form-grid two">
+        {% include 'cases/field.html' with field=suspect_form.education %}
+        {% include 'cases/field.html' with field=suspect_form.occupation %}
+        {% include 'cases/field.html' with field=suspect_form.occupation_other %}
+        <div class="case-choice-group">
+          <b>{{ suspect_form.disability_types.label }}</b>
+          {{ suspect_form.disability_types }}
+          {{ suspect_form.disability_types.errors }}
+        </div>
+      </div>
+    </div>
+    <div class="suspect-fieldset suspect-corporation-fields" data-corporation-fields>
+      <h4>Data Korporasi</h4>
+      <div class="case-form-grid two">
+        <div class="span-all">{% include 'cases/field.html' with field=suspect_form.corporation_deed_number %}</div>
+        {% include 'cases/field.html' with field=suspect_form.corporation_founding_decision_number %}
+        {% include 'cases/field.html' with field=suspect_form.corporation_change_decision_number %}
+        {% include 'cases/field.html' with field=suspect_form.corporation_crime_deed_number %}
+        {% include 'cases/field.html' with field=suspect_form.corporation_crime_deed_date %}
+        {% include 'cases/field.html' with field=suspect_form.corporation_home_affairs_number %}
+        {% include 'cases/field.html' with field=suspect_form.corporation_business_type %}
+        {% include 'cases/field.html' with field=suspect_form.corporation_tax_number %}
+        {% include 'cases/field.html' with field=suspect_form.corporation_registration_number %}
+        <div class="span-all">{% include 'cases/field.html' with field=suspect_form.corporation_other_identity %}</div>
+      </div>
+    </div>
+  </div>
+  <span class="delete-field">{{ suspect_form.DELETE }}</span>
+</section>

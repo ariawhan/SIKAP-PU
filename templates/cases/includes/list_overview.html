@@ -1,0 +1,41 @@
+<section class="case-overview-grid">
+  <article class="case-summary-card">
+    <div class="case-summary-head">
+      <span>Data {{ document_label }}</span>
+      <h2>Total {{ document_label }}</h2>
+    </div>
+    <strong>{{ case_stats.total }}</strong>
+    <div class="case-summary-breakdown">
+      <div><span>Tahun {{ current_period|date:'Y' }}</span><b>{{ case_stats.year }}</b></div>
+      <div><span>Bulan {{ current_period|date:'F' }}</span><b>{{ case_stats.month }}</b></div>
+      <div><span>Hari Ini</span><b>{{ case_stats.day }}</b></div>
+    </div>
+  </article>
+
+  <article class="case-priority-card">
+    <div class="case-priority-head">
+      <div>
+        <span>Aktivitas</span>
+        <h2>Harus Diselesaikan</h2>
+      </div>
+      <b>{{ priority_cases|length }} prioritas</b>
+    </div>
+    <div class="case-priority-list">
+      {% for item in priority_cases %}
+      <div class="case-priority-item case-priority-{{ item.activity_deadline.color_class }}">
+        <span class="deadline-badge {{ item.activity_deadline.color_class }}">{{ item.activity_deadline.remaining_title }} {{ item.activity_deadline.remaining_value }}</span>
+        <a href="{{ item.activity_url }}" class="case-priority-link">
+          <b>{{ item.letter_number }}</b>
+          <small>{{ item.activity_deadline.stage_label }} · batas {{ item.activity_deadline.due_date|date:'d M Y' }} · {{ item.activity_deadline.status_text }}</small>
+        </a>
+        <div class="case-priority-quick-actions"><form method="post" action="{% url 'dashboard:send_reminder' item.pk %}" class="case-priority-notify">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button type="submit" title="Kirim reminder ke WhatsApp dan Telegram">🔔 <span>Notif</span></button></form>{% include 'cases/includes/workflow_action_menu.html' with item=item detail_url_name=item.workflow_detail_url_name document_label=document_label %}</div>
+      </div>
+      {% empty %}
+      <div class="case-priority-empty">
+        <b>Tidak ada aktivitas mendesak</b>
+        <small>Perkara dengan sisa hari {{ document_label }} aktif akan muncul di sini.</small>
+      </div>
+      {% endfor %}
+    </div>
+  </article>
+</section>

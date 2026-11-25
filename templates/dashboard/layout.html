@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+<div class="min-h-screen flex">
+  <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 z-40 w-[250px] text-red-50 flex flex-col p-4" aria-label="Menu utama">
+    <div class="sidebar-brand flex items-center gap-3 px-2 pb-6 border-b border-white/10">
+      <span class="brand-symbol small logo"><img src="{% static 'img/Logo-Pidum.png' %}" alt="Logo PIDUM"></span>
+      <div><b class="font-display tracking-[.12em]">{{ APP_NAME }}</b><p class="text-[10px] text-white/40">Kejaksaan RI</p></div>
+      <button type="button" class="sidebar-close" data-sidebar-close aria-label="Tutup menu" title="Tutup menu">x</button>
+    </div>
+    <nav class="sidebar-nav flex-1 pt-4">
+      <p class="nav-label">Menu utama</p>
+      <a class="nav-link {% if request.resolver_match.namespace == 'dashboard' and request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'dashboard:index' %}"><span>□</span>Dashboard</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'spdp_list' or request.resolver_match.url_name == 'spdp_create' or request.resolver_match.url_name == 'spdp_edit' or request.resolver_match.url_name == 'spdp_detail' %}active{% endif %}" href="{% url 'cases:spdp_list' %}"><span>▤</span>Data Perkara</a>
+
+      <div class="config-nav sidebar-dropdown pra-nav" data-sidebar-dropdown>
+        <button type="button" class="nav-link config-title sidebar-dropdown-toggle {% if request.resolver_match.url_name == 'p16_list' or request.resolver_match.url_name == 'p16_draft_detail' or request.resolver_match.url_name == 'p17_list' or request.resolver_match.url_name == 'p17_create' or request.resolver_match.url_name == 'p17_draft_detail' or request.resolver_match.url_name == 'p21_list' or request.resolver_match.url_name == 'p21_create' or request.resolver_match.url_name == 'p21_draft_detail' or 'sop_form_02' in request.resolver_match.url_name or 'sop_form_03' in request.resolver_match.url_name or 'stage_one' in request.resolver_match.url_name or 'coordination_' in request.resolver_match.url_name or request.resolver_match.url_name == 'p18_list' or request.resolver_match.url_name == 'p18_create' or request.resolver_match.url_name == 'p18_detail' or request.resolver_match.url_name == 'p19_list' or request.resolver_match.url_name == 'p19_create' or request.resolver_match.url_name == 'p19_detail' or request.resolver_match.url_name == 'p20_list' or request.resolver_match.url_name == 'p20_create' or request.resolver_match.url_name == 'p20_detail' or 'sop_form_07' in request.resolver_match.url_name %}active{% endif %}" data-sidebar-dropdown-toggle aria-expanded="false">
+          <span>⌁</span><b>Pra Penuntutan</b><i>⌄</i>
+        </button>
+        <div class="sidebar-submenu" data-sidebar-submenu>
+          <a class="config-link pra-submenu-link {% if request.resolver_match.url_name == 'p16_list' or request.resolver_match.url_name == 'p16_draft_detail' %}active{% endif %}" href="{% url 'cases:p16_list' %}"><b>P-16</b></a>
+          <a class="config-link pra-submenu-link {% if request.resolver_match.url_name == 'p17_list' or request.resolver_match.url_name == 'p17_create' or request.resolver_match.url_name == 'p17_draft_detail' %}active{% endif %}" href="{% url 'cases:p17_list' %}"><b>P-17</b></a>
+          <a class="config-link pra-submenu-link {% if 'sop_form_02' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'cases:sop_form_02_list' %}"><b>SOP Form 2</b></a>
+          <a class="config-link pra-submenu-link {% if 'sop_form_03' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'cases:sop_form_03_list' %}"><b>SOP Form 3</b></a>
+          <a class="config-link pra-submenu-link {% if 'stage_one' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'cases:stage_one_list' %}"><b>Tahap 1</b></a>
+          <a class="config-link pra-submenu-link {% if request.resolver_match.url_name == 'p18_list' or request.resolver_match.url_name == 'p18_create' or request.resolver_match.url_name == 'p18_detail' %}active{% endif %}" href="{% url 'cases:p18_list' %}"><b>P-18</b></a>
+          <a class="config-link pra-submenu-link {% if request.resolver_match.url_name == 'p19_list' or request.resolver_match.url_name == 'p19_create' or request.resolver_match.url_name == 'p19_detail' %}active{% endif %}" href="{% url 'cases:p19_list' %}"><b>P-19</b></a>
+          <a class="config-link pra-submenu-link {% if request.resolver_match.url_name == 'p20_list' or request.resolver_match.url_name == 'p20_create' or request.resolver_match.url_name == 'p20_detail' %}active{% endif %}" href="{% url 'cases:p20_list' %}"><b>P-20</b></a>
+          <a class="config-link pra-submenu-link {% if request.resolver_match.url_name == 'p21_list' or request.resolver_match.url_name == 'p21_create' or request.resolver_match.url_name == 'p21_draft_detail' %}active{% endif %}" href="{% url 'cases:p21_list' %}"><b>P-21</b></a>
+          <a class="config-link pra-submenu-link {% if 'sop_form_07' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'cases:sop_form_07_list' %}"><b>SOP Form 7</b></a>
+        </div>
+      </div>
+
+      <p class="nav-label mt-5">Settings</p>
+      {% if user.is_super_admin %}
+      <div class="config-nav sidebar-dropdown" data-sidebar-dropdown>
+        <button type="button" class="nav-link config-title sidebar-dropdown-toggle {% if request.resolver_match.url_name == 'institution' or request.resolver_match.url_name == 'investigators' or request.resolver_match.url_name == 'letter_number' or request.resolver_match.url_name == 'letter_number_create' or request.resolver_match.url_name == 'letter_number_detail' or request.resolver_match.url_name == 'document_layout' or request.resolver_match.url_name == 'document_template_settings' %}active{% endif %}" data-sidebar-dropdown-toggle aria-expanded="false">
+          <span>⚙</span><b>Konfigurasi</b><i>⌄</i>
+        </button>
+        <div class="sidebar-submenu" data-sidebar-submenu>
+          <a class="config-link {% if request.resolver_match.url_name == 'institution' %}active{% endif %}" href="{% url 'configurations:institution' %}">Konfigurasi Instansi</a>
+          <a class="config-link {% if request.resolver_match.url_name == 'investigators' %}active{% endif %}" href="{% url 'configurations:investigators' %}">Konfigurasi Penyidik</a>
+          <a class="config-link {% if request.resolver_match.url_name == 'letter_number' %}active{% endif %}" href="{% url 'configurations:letter_number' %}">Konfigurasi Nomor Surat</a>
+          <a class="config-link {% if request.resolver_match.url_name == 'document_template_settings' %}active{% endif %}" href="{% url 'configurations:document_template_settings' %}">Template Dokumen</a>
+        </div>
+      </div>
+      {% endif %}
+      <div class="config-nav sidebar-dropdown integration-nav" data-sidebar-dropdown>
+        <button type="button" class="nav-link config-title sidebar-dropdown-toggle {% if request.resolver_match.url_name == 'sipede_integration' %}active{% endif %}" data-sidebar-dropdown-toggle aria-expanded="false">
+          <span>⇄</span><b>Integrasi</b><i>⌄</i>
+        </button>
+        <div class="sidebar-submenu" data-sidebar-submenu>
+          <a class="config-link integration-submenu-link {% if request.resolver_match.url_name == 'sipede_integration' %}active{% endif %}" href="{% url 'configurations:sipede_integration' %}"><span><img src="{% static 'img/sipede-color.png' %}" alt=""></span><b>Integrasi SIPede</b></a>
+        </div>
+      </div>
+      {% if user.is_super_admin %}
+      <a class="nav-link {% if request.resolver_match.url_name == 'index' and request.resolver_match.namespace == 'notifications' %}active{% endif %}" href="{% url 'notifications:index' %}"><span>✉</span>Notifikasi</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'template_settings' or request.resolver_match.url_name == 'menu_settings' %}active{% endif %}" href="{% url 'notifications:template_settings' %}" title="Konfigurasi dan template notifikasi"><span>⚙</span>Konfigurasi Notifikasi</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'users' %}active{% endif %}" href="{% url 'dashboard:users' %}"><span>♙</span>Pengguna</a>
+      {% endif %}
+    </nav>
+    <div class="help-card"><span>?</span><div><b>Pusat Bantuan</b><p>Panduan & dukungan</p></div></div>
+  </aside>
+
+  <div class="content-frame lg:ml-[250px] w-full min-w-0">
+    <header class="top-header h-[74px] bg-white border-b border-slate-200 flex items-center justify-between px-5 lg:px-8 sticky top-0 z-30">
+      <div class="flex items-center gap-4">
+        <button type="button" data-menu-toggle class="menu-toggle text-xl" aria-label="Buka atau tutup menu" aria-expanded="true" aria-controls="sidebar">☰</button>
+        <div><b class="font-display text-sm">{% block page_name %}Dashboard{% endblock %}</b><p class="text-[11px] text-slate-400 hidden sm:block">Direktorat Tindak Pidana Umum</p></div>
+      </div>
+      <div class="flex items-center gap-3 sm:gap-4">
+        <div class="web-notification" data-web-notification data-read-url="{% url 'notifications:mark_web_notifications_read' %}">
+          <button type="button" class="web-notification-toggle" data-web-notification-toggle aria-label="Buka notifikasi aplikasi" aria-haspopup="true" aria-expanded="false">
+            <span class="web-notification-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" focusable="false"><path d="M12 22a2.4 2.4 0 0 0 2.27-1.63H9.73A2.4 2.4 0 0 0 12 22Zm7.05-5.55-1.49-1.72V10a5.58 5.58 0 0 0-4.24-5.43V3.9a1.32 1.32 0 0 0-2.64 0v.67A5.58 5.58 0 0 0 6.44 10v4.73l-1.49 1.72A1.35 1.35 0 0 0 5.97 18.7h12.06a1.35 1.35 0 0 0 1.02-2.25ZM8.24 10a3.76 3.76 0 0 1 7.52 0v4.95l1.65 1.91H6.59l1.65-1.91V10Z"/></svg>
+            </span>
+            <span class="web-notification-badge" data-web-notification-count{% if not web_notification_unread_count %} hidden{% endif %}>{{ web_notification_unread_count }}</span>
+          </button>
+          <section class="web-notification-panel" data-web-notification-panel aria-label="Daftar notifikasi aplikasi" hidden>
+            <header>
+              <div>
+                <span>Notifikasi Aplikasi</span>
+                <h2>Aktivitas terbaru</h2>
+              </div>
+              <button type="button" data-web-notification-read{% if not web_notification_unread_count %} disabled{% endif %}>Tandai dibaca</button>
+            </header>
+            <div class="web-notification-list">
+              {% for notification_item in web_notifications %}
+              <a href="{{ notification_item.target_url|default:'#' }}" class="web-notification-item{% if not notification_item.is_read %} unread{% endif %}">
+                <i>P16</i>
+                <span>
+                  <b>{{ notification_item.title }}</b>
+                  <small>{{ notification_item.message }}</small>
+                  <em>{{ notification_item.created_at|timesince }} lalu</em>
+                </span>
+              </a>
+              {% endfor %}
+            </div>
+            <div class="web-notification-empty"{% if web_notifications %} hidden{% endif %}>
+              <b>Belum ada notifikasi</b>
+              <small>Nanti pemberitahuan aplikasi akan muncul di sini.</small>
+            </div>
+          </section>
+        </div>
+        <div class="h-8 border-l border-slate-200 hidden sm:block"></div>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Aktifkan mode gelap" title="Ganti tema"><span class="theme-sun">☀</span><span class="theme-moon">☾</span></button>
+        <div class="header-profile" data-header-profile>
+          <button type="button" class="header-profile-toggle" data-header-profile-toggle aria-label="Buka menu profil {{ user.display_name }}" aria-haspopup="true" aria-expanded="false">
+            <span class="header-profile-avatar">
+              {% if user.photo %}
+              <img src="{{ user.photo.url }}" alt="Foto {{ user.display_name }}" style="object-position: {{ user.photo_position_x }}% {{ user.photo_position_y }}%;">
+              {% else %}
+              <b>{{ user.display_name|slice:':2'|upper }}</b>
+              {% endif %}
+            </span>
+            <span class="header-profile-copy">
+              <b>{{ user.display_name }}</b>
+              <small>{{ user.role_labels }}</small>
+            </span>
+            <svg class="header-profile-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5.8 7.6 4.2 4.2 4.2-4.2"/></svg>
+          </button>
+          <div class="header-profile-menu" data-header-profile-menu hidden>
+            <div class="header-profile-summary">
+              <span class="header-profile-avatar large">
+                {% if user.photo %}
+                <img src="{{ user.photo.url }}" alt="" style="object-position: {{ user.photo_position_x }}% {{ user.photo_position_y }}%;">
+                {% else %}
+                <b>{{ user.display_name|slice:':2'|upper }}</b>
+                {% endif %}
+              </span>
+              <span><b>{{ user.display_name }}</b><small>@{{ user.username }}</small></span>
+            </div>
+            <a href="{% url 'accounts:profile' %}" class="header-profile-action">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0"/></svg>
+              <span><b>Edit Profil</b><small>Perbarui data dan foto Anda</small></span>
+            </a>
+            <form method="post" action="{% url 'accounts:logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="header-profile-action logout">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4m5-4 3-3-3-3m3 3H9"/></svg>
+                <span><b>Logout</b><small>Keluar dari aplikasi</small></span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="p-4 sm:p-6 lg:p-8 max-w-[1550px] mx-auto">
+      {% for message in messages %}<div class="message">{{ message }}</div>{% endfor %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="app-footer">
+      <div>
+        <b>{{ APP_NAME }}</b>
+        <span>{{ APP_FULL_NAME }}</span>
+      </div>
+      <div>
+        <span>Kejaksaan Republik Indonesia</span>
+        <strong>Versi {{ APP_VERSION }}</strong>
+      </div>
+    </footer>
+  </div>
+</div>
+{% endblock %}

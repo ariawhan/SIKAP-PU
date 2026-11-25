@@ -1,0 +1,190 @@
+{% extends 'dashboard/layout.html' %}
+{% block title %}{% if instance %}Edit{% else %}Tambah{% endif %} Nomor Surat{% endblock %}
+{% block page_name %}Konfigurasi Nomor Surat{% endblock %}
+
+{% block content %}
+<section class="page-heading letter-number-heading">
+  <div>
+    <p class="kicker text-red-700">Settings</p>
+    <h1>{% if instance %}Edit{% else %}Tambah{% endif %} Nomor Surat</h1>
+    <p>{% if instance %}Perbarui direktorat, kode surat, dan kelola jenis perkaranya.{% else %}Lengkapi direktorat dan kode surat terlebih dahulu.{% endif %}</p>
+  </div>
+  <a class="secondary-btn" href="{% url 'configurations:letter_number' %}">Kembali</a>
+</section>
+
+<article class="panel">
+  <div class="panel-head config-section-head">
+    <div>
+      <h3>Nomor Surat</h3>
+      <p>Direktorat dan kode yang dipakai pada format nomor surat.</p>
+    </div>
+    <span>01</span>
+  </div>
+  <form method="post" class="config-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="save_letter_number">
+    <div class="form-grid two">
+      <label>{{ form.directorate.label }}{{ form.directorate }}{{ form.directorate.errors }}</label>
+      <label>{{ form.code.label }}{{ form.code }}{{ form.code.errors }}</label>
+    </div>
+    {{ form.non_field_errors }}
+    <div class="form-actions">
+      <p>{% if instance %}Terakhir diperbarui {{ instance.updated_at|date:'d M Y, H:i' }}{% else %}Jenis perkara dapat ditambahkan setelah nomor surat ini disimpan.{% endif %}</p>
+      <button class="primary-btn" type="submit">{% if instance %}Simpan Perubahan{% else %}Simpan &amp; Lanjutkan{% endif %}</button>
+    </div>
+  </form>
+</article>
+
+{% if instance %}
+<section class="panel letter-number-panel">
+  <div class="letter-number-toolbar">
+    <div>
+      <h3>Daftar Jenis Perkara</h3>
+      <p>{{ case_types_page_obj.paginator.count }} jenis perkara untuk {{ instance.directorate }}</p>
+    </div>
+    <button type="button" class="primary-btn" data-open-case-type-modal>+ Tambah Jenis Perkara</button>
+  </div>
+
+  <div class="table-wrap case-type-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Jenis Perkara</th>
+          <th class="letter-number-action-heading">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for case_type in case_types_page %}
+        <tr>
+          <td><b>{{ case_type.name }}</b></td>
+          <td>
+            <div class="letter-number-actions">
+              <button type="button" class="letter-number-action edit" data-edit-case-type data-id="{{ case_type.pk }}" data-name="{{ case_type.name }}">Edit</button>
+              <button type="button" class="letter-number-action delete" data-delete-case-type data-id="{{ case_type.pk }}" data-label="{{ case_type.name }}">Hapus</button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="2">
+            <div class="empty-table">
+              <b>Belum ada jenis perkara.</b>
+              <p>Gunakan tombol Tambah Jenis Perkara untuk menambahkan data pertama.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'includes/pagination.html' with page_obj=case_types_page_obj %}
+</section>
+
+<dialog class="letter-number-modal" id="case-type-modal" aria-modal="true" aria-labelledby="case-type-modal-title">
+  <form method="post" id="case-type-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="{{ case_type_action }}" data-case-type-action>
+    <input type="hidden" name="case_type_id" value="{{ case_type_edit_id }}" data-case-type-id>
+    <header class="letter-number-modal-head">
+      <div>
+        <p>Jenis Perkara</p>
+        <h2 id="case-type-modal-title">{% if case_type_action == 'edit_case_type' %}Edit{% else %}Tambah{% endif %} Jenis Perkara</h2>
+      </div>
+      <button type="button" data-close-case-type-modal aria-label="Tutup popup">&times;</button>
+    </header>
+    <div class="letter-number-modal-body">
+      <label>
+        <span>{{ case_type_form.name.label }}</span>
+        {{ case_type_form.name }}
+        {{ case_type_form.name.errors }}
+      </label>
+      {{ case_type_form.non_field_errors }}
+    </div>
+    <footer class="letter-number-modal-actions">
+      <button type="button" class="secondary-btn" data-close-case-type-modal>Batal</button>
+      <button type="submit" class="primary-btn" data-case-type-submit>{% if case_type_action == 'edit_case_type' %}Simpan Perubahan{% else %}Simpan Jenis Perkara{% endif %}</button>
+    </footer>
+  </form>
+</dialog>
+
+<dialog class="letter-number-modal letter-number-delete-modal" id="case-type-delete-modal" aria-modal="true" aria-labelledby="case-type-delete-title">
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="delete_case_type">
+    <input type="hidden" name="case_type_id" value="" data-delete-case-type-id>
+    <header class="letter-number-modal-head danger">
+      <div>
+        <p>Konfirmasi</p>
+        <h2 id="case-type-delete-title">Hapus Jenis Perkara?</h2>
+      </div>
+      <button type="button" data-close-case-type-delete-modal aria-label="Tutup popup">&times;</button>
+    </header>
+    <div class="letter-number-modal-body">
+      <div class="letter-number-delete-warning">
+        <b data-delete-case-type-label></b>
+        <p>Data yang sudah dihapus tidak dapat dikembalikan.</p>
+      </div>
+    </div>
+    <footer class="letter-number-modal-actions">
+      <button type="button" class="secondary-btn" data-close-case-type-delete-modal>Batal</button>
+      <button type="submit" class="primary-btn danger-btn">Ya, Hapus</button>
+    </footer>
+  </form>
+</dialog>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% if instance %}
+<script>
+(function () {
+  const modal = document.getElementById('case-type-modal');
+  const opener = document.querySelector('[data-open-case-type-modal]');
+  const form = document.getElementById('case-type-form');
+  if (!modal || !opener) return;
+
+  const openModal = function (mode, data) {
+    if (mode) {
+      form.reset();
+      const editing = mode === 'edit';
+      form.querySelector('[data-case-type-action]').value = editing ? 'edit_case_type' : 'add_case_type';
+      form.querySelector('[data-case-type-id]').value = editing ? data.id : '';
+      form.querySelector('[name="name"]').value = editing ? data.name : '';
+      modal.querySelector('#case-type-modal-title').textContent = editing ? 'Edit Jenis Perkara' : 'Tambah Jenis Perkara';
+      modal.querySelector('[data-case-type-submit]').textContent = editing ? 'Simpan Perubahan' : 'Simpan Jenis Perkara';
+    }
+    modal.showModal();
+    requestAnimationFrame(function () { modal.querySelector('input:not([type="hidden"])')?.focus(); });
+  };
+
+  opener.addEventListener('click', function () { openModal('add', {}); });
+  document.querySelectorAll('[data-edit-case-type]').forEach(function (button) {
+    button.addEventListener('click', function () { openModal('edit', button.dataset); });
+  });
+  modal.querySelectorAll('[data-close-case-type-modal]').forEach(function (button) {
+    button.addEventListener('click', function () { modal.close(); });
+  });
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) modal.close();
+  });
+
+  const deleteModal = document.getElementById('case-type-delete-modal');
+  document.querySelectorAll('[data-delete-case-type]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      deleteModal.querySelector('[data-delete-case-type-id]').value = button.dataset.id;
+      deleteModal.querySelector('[data-delete-case-type-label]').textContent = button.dataset.label;
+      deleteModal.showModal();
+    });
+  });
+  deleteModal.querySelectorAll('[data-close-case-type-delete-modal]').forEach(function (button) {
+    button.addEventListener('click', function () { deleteModal.close(); });
+  });
+  deleteModal.addEventListener('click', function (event) {
+    if (event.target === deleteModal) deleteModal.close();
+  });
+
+  {% if case_type_form.errors %}openModal();{% endif %}
+})();
+</script>
+{% endif %}
+{% endblock %}

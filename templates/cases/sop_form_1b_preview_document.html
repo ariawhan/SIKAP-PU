@@ -1,0 +1,49 @@
+{% load static %}
+<section class="sop1b-page-content" data-sop1b-page>
+  <div class="sop1b-report-title">
+    <strong>LAPORAN PENUNTUT UMUM</strong>
+    <strong>PERKEMBANGAN HASIL PENYIDIKAN</strong>
+  </div>
+
+  <dl class="sop1b-meta">
+    <div><dt>Kepada Yth.</dt><dd>:</dd><p data-sop1b-output="recipient">{{ sop_draft.recipient }}</p></div>
+    <div><dt>Dari</dt><dd>:</dd><p data-sop1b-output="sender">{{ sop_draft.sender }}</p></div>
+    <div><dt>Tanggal</dt><dd>:</dd><p data-sop1b-output="date">{{ sop_draft.report_date|date:'d F Y' }}</p></div>
+    <div><dt>Lampiran</dt><dd>:</dd><p data-sop1b-output="attachment">{{ sop_draft.attachment }}</p></div>
+    <div><dt>Perihal</dt><dd>:</dd><p data-sop1b-output="subject">{{ sop_draft.subject }}</p></div>
+  </dl>
+
+  <section class="sop1b-section">
+    <h3><span>I.</span> <b>DASAR</b></h3>
+    <div data-sop1b-section="legal-basis">{{ sop_draft.legal_basis_html|safe }}</div>
+  </section>
+  <section class="sop1b-section">
+    <h3><span>II.</span> <b>FAKTA DAN DATA</b></h3>
+    <div data-sop1b-section="facts">{{ sop_draft.facts_html|safe }}</div>
+  </section>
+  <section class="sop1b-section">
+    <h3><span>III.</span> <b>ANALISIS YURIDIS</b></h3>
+    <div data-sop1b-section="legal-analysis">{{ sop_draft.legal_analysis_html|safe }}</div>
+  </section>
+  <section class="sop1b-section">
+    <h3><span>IV.</span> <b>KESIMPULAN DAN SARAN</b></h3>
+    <div data-sop1b-section="conclusion">{{ sop_draft.conclusion_html|safe }}</div>
+  </section>
+
+  <p class="sop1b-closing" data-sop1b-output="closing">{{ sop_draft.closing }}</p>
+  <div class="sop1b-signature">
+    <p>Penuntut Umum,</p>
+    <span class="sop1b-signature-space"><img src="{% static 'img/tte.png' %}" alt="Tanda tangan elektronik"></span>
+    <strong><u data-sop1b-output="prosecutor-name">{{ sop_draft.prosecutor_name|default:'Nama Penuntut Umum belum diisi' }}</u></strong>
+    <b><span data-sop1b-output="prosecutor-rank">{{ sop_draft.prosecutor_rank|default:'Pangkat belum diisi' }}</span>{% if sop_draft.prosecutor_nip %} NIP. <span data-sop1b-output="prosecutor-nip">{{ sop_draft.prosecutor_nip }}</span>{% else %} NIP. <span data-sop1b-output="prosecutor-nip">---</span>{% endif %}</b>
+  </div>
+
+  <table class="sop1b-disposition">
+    <thead><tr><th>Pendapat Kasipidum</th><th>Petunjuk Kajari</th></tr></thead>
+    <tbody><tr>
+      <td data-sop1b-section="kasi-opinion">{{ sop_draft.kasi_opinion_html|safe }}</td>
+      <td data-sop1b-section="leader-instruction">{{ sop_draft.leader_instruction_html|safe }}</td>
+    </tr></tbody>
+  </table>
+  <div class="sop1b-verification-mark{% if sop_draft.barcode_image %} has-barcode{% endif %}" data-sop1b-barcode-mark aria-label="Barcode verifikasi SOP Form-1B">{% if sop_draft.barcode_image %}<img src="{{ sop_draft.barcode_image.url }}" alt="Barcode verifikasi SOP Form-1B">{% else %}{% include 'cases/includes/verification_code_placeholder.html' %}{% endif %}</div>
+</section>

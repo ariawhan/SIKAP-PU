@@ -1,0 +1,16 @@
+<p>Berdasarkan Surat Perintah Penunjukan Penuntut Umum untuk Mengikuti Perkembangan Penyidikan Perkara Tindak Pidana (P-16) Nomor: <strong>{% if p16 %}{{ p16.draft_number }}{% else %}---{% endif %}</strong> tanggal {% if p16 %}{{ p16.letter_date|date:'d F Y' }}{% else %}---{% endif %}, terkait SPDP Nomor: <strong>{{ spdp.letter_number }}</strong> tanggal {{ spdp.letter_date|date:'d F Y' }}, telah dilakukan koordinasi dan konsultasi substantif untuk memastikan kelengkapan formil dan materiil perkara sebelum berkas dilimpahkan pada Tahap I.</p>
+<p>Adapun materi koordinasi yang dibahas dan disepakati adalah sebagai berikut:</p>
+<ol>
+  <li><p><strong><u>Penentuan Tempus Delicti</u></strong></p><p>Berdasarkan data perkara, peristiwa pidana terjadi pada {% if spdp.incident_at %}{{ spdp.incident_at|date:'d F Y H:i' }} WITA{% else %}waktu yang masih perlu dilengkapi{% endif %}. Unsur waktu terjadinya tindak pidana perlu dipastikan secara jelas dan tegas.</p></li>
+  <li><p><strong><u>Penentuan Locus Delicti</u></strong></p><p>Tindak pidana terjadi di {{ spdp.incident_place|default:'lokasi yang masih perlu dilengkapi' }}. Kewenangan relatif penanganan perkara ditentukan berdasarkan lokasi tersebut.</p></li>
+  <li><p><strong><u>Pertanggungjawaban Pidana</u></strong></p><p>Pelaku {{ suspect_names }} diduga melakukan tindak pidana sebagaimana diatur dalam {{ spdp.laws_and_articles }}. Kemampuan bertanggung jawab, alasan pembenar, alasan pemaaf, serta bentuk kesalahan perlu diteliti berdasarkan fakta hukum.</p></li>
+  <li><p><strong><u>Nilai Kerugian Akibat Tindak Pidana dan Rencana Pemulihan</u></strong></p><p>Nilai kerugian dan rencana pemulihan disesuaikan dengan hasil penyidikan dan data korban.</p></li>
+  <li><p><strong><u>Penelusuran Hasil Aset Tindak Pidana</u></strong></p><p>Penelusuran aset yang diduga berasal dari tindak pidana dilakukan sesuai kebutuhan perkara.</p></li>
+  <li><p><strong><u>Penetapan Pelaku sebagai Saksi Mahkota</u></strong></p><p>Kebutuhan saksi mahkota ditentukan berdasarkan konstruksi perkara dan ketentuan hukum yang berlaku.</p></li>
+  <li><p><strong><u>Penerimaan Pengakuan Bersalah dari Pelaku</u></strong></p><p>Penerimaan pengakuan bersalah dicatat apabila diajukan dan memenuhi ketentuan hukum acara pidana.</p></li>
+  <li><p><strong><u>Pemberkasan Perkara</u></strong></p><p>Berkas perkara disusun secara sistematis meliputi administrasi penyidikan, berita acara pemeriksaan, daftar barang bukti, dan resume perkara.</p></li>
+  <li><p><strong><u>Pengelolaan Benda Sitaan atau Barang Bukti</u></strong></p><p>Barang bukti dicatat, didokumentasikan, diamankan, dan dikelola sesuai prosedur untuk menjaga keutuhan serta keabsahannya.</p></li>
+  <li><p><strong><u>Kelengkapan Aspek Formal dan Materiil Berkas Perkara</u></strong></p><p>Penelitian meliputi kesesuaian prosedur penyidikan, kecukupan alat bukti, penerapan pasal, dan konsistensi konstruksi hukum.</p></li>
+  <li><p><strong><u>Tindakan Lain yang Diperlukan</u></strong></p><p>Disepakati koordinasi tambahan, pelengkapan administrasi, serta persiapan tahapan penanganan perkara berikutnya sesuai hasil penelitian.</p></li>
+</ol>
+<p>Demikian Berita Acara Koordinasi ini dibuat dengan sebenarnya atas kekuatan sumpah jabatan untuk mengikat langkah penanganan perkara selanjutnya.</p>

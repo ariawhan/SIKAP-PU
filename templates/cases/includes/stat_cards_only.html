@@ -1,0 +1,6 @@
+<section class="case-stat-grid">
+  <article><span>01</span><div><small>Total {{ document_label }}</small><b>{{ case_stats.total }}</b></div></article>
+  <article class="green"><span>Y</span><div><small>Tahun {{ current_period|date:'Y' }}</small><b>{{ case_stats.year }}</b></div></article>
+  <article class="amber"><span>M</span><div><small>Bulan {{ current_period|date:'F' }}</small><b>{{ case_stats.month }}</b></div></article>
+  <article class="blue"><span>H</span><div><small>Hari Ini</small><b>{{ case_stats.day }}</b></div></article>
+</section>

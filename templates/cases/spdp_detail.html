@@ -1,0 +1,79 @@
+{% extends 'dashboard/layout.html' %}
+{% block title %}Detail SPDP{% endblock %}
+{% block page_name %}Detail SPDP{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="kicker text-red-700">Detail perkara</p>
+    <h1>{{ spdp.letter_number }}</h1>
+    <p>Diterima pada {{ spdp.received_date|date:'d F Y' }} oleh {{ spdp.created_by.display_name|default:'Sistem' }}.</p>
+  </div>
+  <div><a class="secondary-btn" href="{% url 'cases:spdp_list' %}">Kembali ke Daftar SPDP</a>{% if can_edit %} <a class="primary-btn" href="{% url 'cases:spdp_edit' spdp.pk %}">Edit Data Perkara</a>{% endif %}</div>
+</section>
+
+<div class="detail-grid">
+  <article class="panel">
+    <div class="panel-head">
+      <div><h3>Informasi SPDP</h3><p>Dokumen penyidikan dan instansi</p></div>
+      <span class="badge {{ spdp.workflow_status.badge_class }}">{{ spdp.workflow_status.label }}</span>
+    </div>
+    <dl class="detail-list">
+      <div><dt>Instansi Penyidik</dt><dd>{{ spdp.investigator_agency }}</dd></div>
+      <div><dt>Pelaksana Penyidik</dt><dd>{{ spdp.investigating_unit }}</dd></div>
+      <div><dt>Nomor Sprindik</dt><dd>{{ spdp.investigation_order_number }}</dd></div>
+      <div><dt>Tanggal Sprindik</dt><dd>{{ spdp.investigation_order_date|date:'d M Y' }}</dd></div>
+      <div><dt>Tanggal SPDP</dt><dd>{{ spdp.letter_date|date:'d M Y' }}</dd></div>
+    </dl>
+  </article>
+
+  <article class="panel">
+    <div class="panel-head">
+      <div><h3>Ringkasan Perkara</h3><p>Uraian dan ketentuan pidana</p></div>
+      {% if spdp.is_high_priority %}<span class="badge amber">PK-Ting</span>{% endif %}
+    </div>
+    <div class="case-narrative">
+      <b>Tempat & waktu kejadian</b>
+      <p>{{ spdp.incident_place|default:'-' }}{% if spdp.incident_at %} - {{ spdp.incident_at|date:'d M Y, H:i' }}{% endif %}</p>
+      <b>Uraian singkat</b>
+      <p>{{ spdp.case_summary }}</p>
+      <b>Undang-undang dan pasal</b>
+      <p>{{ spdp.laws_and_articles }}</p>
+    </div>
+  </article>
+</div>
+
+<article class="panel mt-4">
+  <div class="panel-head"><div><h3>Riwayat Perkara</h3><p>Alur dokumen pra penuntutan yang sudah diterbitkan</p></div></div>
+  <ol class="case-flow">
+    {% for item in history %}
+    <li class="case-flow-step{% if item.url %} is-linked{% endif %}">
+      <div class="case-flow-marker"><span>{{ item.icon }}</span></div>
+      <div class="case-flow-body">
+        {% if item.url %}<a href="{{ item.url }}">{% endif %}
+          <div class="case-flow-head"><b>{{ item.title }}</b><time>{{ item.date|date:'d M Y' }}</time></div>
+          <p class="case-flow-subtitle">{{ item.subtitle }}</p>
+        {% if item.url %}</a>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+</article>
+
+<article class="panel mt-4">
+  <div class="panel-head">
+    <div><h3>Data Pelaku</h3><p>{{ spdp.suspects.count }} orang tercatat</p></div>
+    {% if spdp.document %}<a class="row-action" href="{{ spdp.document.url }}" target="_blank" rel="noopener">Buka PDF</a>{% endif %}
+  </div>
+  <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama</th><th>Tempat/Tanggal Lahir</th><th>Jenis Kelamin</th><th>Identitas</th><th>Pekerjaan</th></tr></thead><tbody>{% for suspect in spdp.suspects.all %}<tr><td>{{ suspect.sequence }}</td><td><b>{{ suspect.name }}</b><small>{{ suspect.alias|default:'Tanpa alias' }}</small></td><td>{{ suspect.birth_place|default:'-' }}{% if suspect.birth_date %}, {{ suspect.birth_date|date:'d M Y' }}{% endif %}</td><td>{{ suspect.get_gender_display|default:'-' }}</td><td>{{ suspect.identity_type|default:'-' }}<small>{{ suspect.identity_number }}</small></td><td>{{ suspect.occupation|default:'-' }}</td></tr>{% empty %}<tr><td colspan="6"><div class="empty-table"><b>Belum ada data pelaku yang dicatat.</b></div></td></tr>{% endfor %}</tbody></table></div>
+</article>
+
+<article class="panel mt-4">
+  <div class="panel-head"><div><h3>Data Korban</h3><p>{{ spdp.victims.count }} orang tercatat</p></div></div>
+  <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama</th><th>Tempat/Tanggal Lahir</th><th>Jenis Kelamin</th><th>Hubungan</th><th>Pekerjaan</th></tr></thead><tbody>{% for victim in spdp.victims.all %}<tr><td>{{ victim.sequence }}</td><td><b>{{ victim.name }}</b><small>{{ victim.alias|default:'Tanpa alias' }}</small></td><td>{{ victim.birth_place|default:'-' }}{% if victim.birth_date %}, {{ victim.birth_date|date:'d M Y' }}{% endif %}</td><td>{{ victim.get_gender_display|default:'-' }}</td><td>{{ victim.relationship|default:'-' }}</td><td>{{ victim.occupation|default:'-' }}</td></tr>{% empty %}<tr><td colspan="6"><div class="empty-table"><b>Belum ada korban yang dicatat.</b></div></td></tr>{% endfor %}</tbody></table></div>
+</article>
+
+<article class="panel mt-4">
+  <div class="panel-head"><div><h3>Tanda Terima</h3><p>{{ spdp.receipts.count }} data tercatat</p></div></div>
+  <div class="table-wrap"><table><thead><tr><th>No.</th><th>Jenis</th><th>Tanggal Diterima</th><th>Penerima</th><th>Penyidik</th><th>NRP</th></tr></thead><tbody>{% for receipt in spdp.receipts.all %}<tr><td>{{ receipt.sequence }}</td><td>{{ receipt.get_receipt_type_display }}</td><td>{{ receipt.received_at|date:'d M Y, H:i'|default:'-' }}</td><td><b>{{ receipt.recipient_name|default:'-' }}</b><small>{{ receipt.recipient_rank }}{% if receipt.recipient_position %} - {{ receipt.recipient_position }}{% endif %}</small></td><td>{{ receipt.investigator_name|default:'-' }}<small>{{ receipt.investigator_rank }}{% if receipt.investigator_position %} - {{ receipt.investigator_position }}{% endif %}</small></td><td>{{ receipt.investigator_nrp|default:'-' }}</td></tr>{% empty %}<tr><td colspan="6"><div class="empty-table"><b>Belum ada tanda terima yang dicatat.</b></div></td></tr>{% endfor %}</tbody></table></div>
+</article>
+{% endblock %}

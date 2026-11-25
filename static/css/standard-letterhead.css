@@ -1,0 +1,182 @@
+/* Kop standar semua dokumen PIDUM, mengikuti tata letak kop P-16. */
+.verification-code-placeholder {
+  position: relative;
+  width: 36pt;
+  height: 36pt;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #777;
+  background:
+    linear-gradient(90deg, transparent 45%, #777 45% 55%, transparent 55%),
+    linear-gradient(transparent 45%, #777 45% 55%, transparent 55%);
+  color: #555;
+  font: 700 8pt/1 Arial, sans-serif;
+  opacity: .72;
+  text-align: center;
+}
+
+.verification-code-placeholder small {
+  position: absolute;
+  right: 0;
+  bottom: 1pt;
+  left: 0;
+  background: #fff;
+  font: 5pt/1 Arial, sans-serif;
+}
+
+.p16-standard-letterhead { margin: 0 0 9pt; }
+
+.p16-standard-letterhead-main {
+  display: grid;
+  grid-template-columns: 17.36% 82.64%;
+  min-height: calc(2.68cm - 0.35cm);
+  align-items: center;
+  border-bottom: 0;
+  text-align: center;
+}
+
+.p16-standard-letterhead-main > .p16-standard-letterhead-copy {
+  position: relative;
+  z-index: 1;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 100%;
+  padding: 0;
+  transform: translate(0.8cm, 0);
+}
+
+.p16-standard-letterhead-main > .p16-standard-letterhead-logo {
+  position: relative;
+  z-index: 3;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  width: calc(3.35cm - 0.70cm);
+  height: calc(2.68cm - 0.70cm);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  transform: translate(-0.08cm, -0.55cm);
+}
+
+.dark .p16-standard-letterhead-main > .p16-standard-letterhead-logo { background: transparent; }
+.p16-standard-letterhead-logo img { width: 100%; height: 100%; object-fit: contain; }
+
+.p16-standard-letterhead-main .p16-standard-letterhead-copy b,
+.p16-standard-letterhead-main .p16-standard-letterhead-copy strong,
+.p16-standard-letterhead-main .p16-standard-letterhead-copy p {
+  display: block;
+  margin: 0;
+  line-height: 1.08;
+}
+
+.p16-standard-letterhead-main .p16-standard-letterhead-copy b { font-size: 10pt; }
+.p16-standard-letterhead-main .p16-standard-letterhead-copy strong { font-size: 12pt; }
+.p16-standard-letterhead-main .p16-standard-letterhead-copy p {
+  margin-top: 4pt;
+  font-size: 8pt;
+  line-height: 1.1;
+}
+
+.p16-standard-letterhead > :last-child {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 43.18% 56.82%;
+  align-items: center;
+  margin: -7pt 0 0;
+  border-top: 3pt solid #111;
+  border-bottom: 0;
+  text-align: center;
+}
+
+.p16-standard-letterhead > :last-child > :first-child {
+  width: auto;
+  padding: 4pt 3pt;
+  font-size: 8pt;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.p16-standard-letterhead > :last-child > strong {
+  width: auto;
+  align-self: center;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 2pt;
+  border: 0;
+  font-size: 10pt;
+  line-height: 1.1;
+}
+
+@media print {
+  .p16-standard-letterhead { margin: 0 0 9pt !important; }
+  .p16-standard-letterhead-main {
+    display: grid !important;
+    grid-template-columns: 17.36% 82.64% !important;
+    min-height: calc(2.68cm - 0.35cm) !important;
+    align-items: center !important;
+    border-bottom: 0 !important;
+    text-align: center !important;
+  }
+  .p16-standard-letterhead-main > .p16-standard-letterhead-copy {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    padding: 0 !important;
+    transform: translate(0.8cm, 0) !important;
+  }
+  .p16-standard-letterhead-main > .p16-standard-letterhead-logo {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    justify-self: start !important;
+    width: calc(3.35cm - 0.70cm) !important;
+    height: calc(2.68cm - 0.70cm) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    transform: translate(-0.08cm, -0.55cm) !important;
+  }
+  .p16-standard-letterhead-main .p16-standard-letterhead-copy b {
+    font-size: 10pt !important;
+  }
+  .p16-standard-letterhead-main .p16-standard-letterhead-copy strong {
+    margin: 0 !important;
+    font-size: 12pt !important;
+  }
+  .p16-standard-letterhead-main .p16-standard-letterhead-copy p {
+    margin: 4pt 0 0 !important;
+    font-size: 8pt !important;
+  }
+  .p16-standard-letterhead > :last-child {
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: 43.18% 56.82% !important;
+    align-items: center !important;
+    margin: -7pt 0 0 !important;
+    border-top: 3pt solid #111 !important;
+    border-bottom: 0 !important;
+    text-align: center !important;
+  }
+  .p16-standard-letterhead > :last-child > :first-child {
+    padding: 4pt 3pt !important;
+    font-size: 8pt !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+  }
+  .p16-standard-letterhead > :last-child > strong {
+    display: flex !important;
+    justify-content: flex-end !important;
+    padding: 0 2pt 0 0 !important;
+    border: 0 !important;
+    font-size: 10pt !important;
+    line-height: 1.1 !important;
+  }
+}

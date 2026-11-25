@@ -1,0 +1,658 @@
+/* P-17 memakai ukuran kertas, margin, kop, dan tipografi yang sama dengan P-16. */
+.p17-paper-frame {
+  width: 100%;
+  overflow: hidden;
+}
+
+.p17-preview-pages {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.p17-paper-frame + .p17-paper-frame {
+  margin-top: 18px;
+}
+
+.p17-subject-field {
+  display: block;
+  color: #3f4b45;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.p17-subject-field > span,
+.p17-subject-field > small {
+  display: block;
+}
+
+.p17-subject-field textarea,
+.p17-subject-field input {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 7px;
+  padding: 10px 12px;
+  border: 1px solid #dce3df;
+  border-radius: 9px;
+  background: #fff;
+  color: #202b26;
+  font-size: 12px;
+  outline: 0;
+}
+
+.p17-subject-field textarea:focus,
+.p17-subject-field input:focus {
+  border-color: #b4232f;
+  box-shadow: 0 0 0 3px rgba(180, 35, 47, .09);
+}
+
+.p17-subject-field > small {
+  margin-top: 6px;
+  color: #929c97;
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.p17-subject-field .errorlist {
+  margin: 6px 0 0;
+  padding: 0;
+  color: #b4232f;
+  font-size: 9px;
+  list-style: none;
+}
+
+.dark .p17-subject-field {
+  color: #d9d7d3;
+}
+
+.dark .p17-subject-field textarea,
+.dark .p17-subject-field input {
+  border-color: #393c40;
+  background: #222428;
+  color: #eeeae5;
+}
+
+.p17-field-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #3f4b45;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.p17-barcode-uploader {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 11px;
+  align-items: center;
+  min-height: 86px;
+  padding: 10px;
+  border: 1px dashed #d9c2c5;
+  border-radius: 10px;
+  background: #fffafa;
+  cursor: pointer;
+  transition: border-color .18s, box-shadow .18s, transform .18s, background .18s;
+}
+
+.p17-barcode-uploader:hover,
+.p17-barcode-uploader.dragging {
+  border-color: #b4232f;
+  background: #fff6f7;
+  box-shadow: 0 12px 24px rgba(116, 31, 39, .08);
+  transform: translateY(-1px);
+}
+
+.p17-barcode-preview {
+  width: 62px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #ead7da;
+  border-radius: 8px;
+  background: #fff;
+  color: #a92330;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.p17-barcode-preview img {
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  object-fit: contain;
+}
+
+.p17-barcode-copy b,
+.p17-barcode-copy small {
+  display: block;
+}
+
+.p17-barcode-copy b {
+  color: #2f3a35;
+  font-size: 11px;
+}
+
+.p17-barcode-copy small {
+  margin-top: 4px;
+  color: #7d8983;
+  font-size: 9px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.p17-barcode-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.p17-barcode-native input[type="file"] {
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.dark .p17-field-label {
+  color: #dad7d3;
+}
+
+.dark .p17-barcode-uploader {
+  border-color: #54343a;
+  background: linear-gradient(135deg, #222428, #2a2226);
+}
+
+.dark .p17-barcode-uploader:hover,
+.dark .p17-barcode-uploader.dragging {
+  border-color: #c94854;
+  background: #2d2226;
+  box-shadow: none;
+}
+
+.dark .p17-barcode-preview {
+  border-color: #493239;
+  background: #1b1d20;
+  color: #ff9ca6;
+}
+
+.dark .p17-barcode-copy b {
+  color: #eeeae5;
+}
+
+.dark .p17-barcode-copy small {
+  color: #989d99;
+}
+
+.p17-paper {
+  --p17-margin-top: 1cm;
+  --p17-margin-right: 2.09cm;
+  --p17-margin-bottom: 2cm;
+  --p17-margin-left: 2cm;
+  --p17-verification-height: 43.3pt;
+  --p17-content-center-offset: -0.045cm;
+  width: 8.5in;
+  min-width: 8.5in;
+  max-width: 8.5in;
+  height: 13in;
+  min-height: 13in;
+  max-height: 13in;
+  aspect-ratio: 8.5 / 13;
+  margin: 0;
+  padding: var(--p17-margin-top) var(--p17-margin-right) var(--p17-margin-bottom) var(--p17-margin-left);
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  font-size: 10pt;
+  line-height: 1.15;
+  transform-origin: top left;
+}
+
+.p17-paper::after {
+  content: "Halaman " attr(data-page-number);
+  position: absolute;
+  right: 14px;
+  bottom: 8px;
+  color: #999;
+  font: 7pt/1 Arial, sans-serif;
+}
+
+.p17-page-flow {
+  position: relative;
+}
+
+.p17-paper *,
+.p17-paper p,
+.p17-paper li,
+.p17-paper b,
+.p17-paper strong,
+.p17-paper span {
+  font-family: Arial, sans-serif;
+}
+
+.p17-letterhead {
+  margin: 0 0 9pt;
+}
+
+.p17-letterhead-main {
+  display: grid;
+  grid-template-columns: 17.36% 82.64%;
+  min-height: 66pt;
+  align-items: center;
+  border-bottom: 0;
+  text-align: center;
+}
+
+.p17-letterhead-main > span {
+  width: 110%;
+  height: auto;
+  aspect-ratio: 1.25 / 1;
+  transform: translateX(-3%);
+  padding: 0;
+  border-radius: 0;
+}
+
+.p17-letterhead-main > span img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.p17-letterhead-main b,
+.p17-letterhead-main strong,
+.p17-letterhead-main p {
+  display: block;
+  margin: 0;
+  line-height: 1.08;
+}
+
+.p17-letterhead-main b,
+.p17-letterhead-main strong {
+  font-size: 10pt;
+  font-weight: 700;
+}
+
+.p17-letterhead-main p {
+  margin: 4pt 0 0;
+  font-size: 8pt;
+  line-height: 1.1;
+}
+
+.p17-letterhead-rule {
+  display: grid;
+  grid-template-columns: 43.18% 56.82%;
+  align-items: center;
+  min-height: 0;
+  margin: 3pt 0 0;
+  border-top: 3pt double #111;
+  border-bottom: 0;
+  text-align: center;
+}
+
+.p17-letterhead-rule b {
+  width: auto;
+  padding: 4pt 3pt;
+  font-size: 8pt;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.p17-letterhead-rule strong {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 2pt;
+  border-left: 0;
+  font-size: 10pt;
+  line-height: 1.1;
+}
+
+.p17-meta {
+  position: relative;
+  padding-right: 41.8%;
+  font-size: 10pt;
+}
+
+.p17-meta > div {
+  grid-template-columns: 12.1% 3% minmax(0, 1fr);
+  margin-bottom: 1px;
+}
+
+.p17-meta b,
+.p17-meta span,
+.p17-meta p,
+.p17-subject-row > div {
+  font-size: 10pt;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.p17-meta .p17-subject-row {
+  margin-top: 1px;
+}
+
+.p17-subject-row > div,
+.p17-subject-row > div p {
+  margin: 0;
+  text-align: justify;
+}
+
+.p17-place-date {
+  /* Posisi awal di kanan atas; isi dibatasi di kolom tanggal. */
+  position: absolute;
+  top: 0;
+  right: auto;
+  left: 76%;
+  width: 24%;
+  max-width: 24%;
+  margin: 0;
+  font-size: 10pt;
+  text-align: left;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.p17-recipient {
+  margin-top: 14px;
+  margin-left: 0;
+  font-size: 10pt;
+  line-height: 1.5;
+}
+
+.p17-recipient > p {
+  margin: 0 0 15px;
+  text-align: left;
+  text-indent: 0;
+  line-height: 1.5;
+}
+
+.p17-recipient-list > p {
+  margin: 0 0 2px;
+  line-height: 1.5;
+}
+
+.p17-recipient-single,
+.p17-recipient-numbered {
+  margin: 0;
+  padding: 0;
+}
+
+.p17-recipient-numbered {
+  padding-left: 20px;
+  list-style: decimal outside;
+}
+
+.p17-recipient-single > div,
+.p17-recipient-numbered > li {
+  margin: 0 0 3px;
+  padding-left: 5px;
+  line-height: 1.5;
+}
+
+.p17-recipient-single strong,
+.p17-recipient-numbered strong,
+.p17-recipient-place span,
+.p17-recipient-place u {
+  display: block;
+  font-weight: 400;
+}
+
+.p17-recipient-place {
+  margin-top: 3px;
+}
+
+.p17-recipient-place span,
+.p17-recipient-place u {
+  margin-left: 1cm;
+}
+
+.p17-letter-body {
+  /* Satu baris kosong antara "Di / Tempat" dan isi surat. */
+  margin-top: 1.5em;
+  max-width: 100%;
+  font-size: 10pt;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.p17-letter-body > p,
+.p17-letter-body > div {
+  position: static !important;
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 0;
+  margin-left: 0;
+  text-align: justify;
+  /* Tab hanya pada awal paragraf; blok Isi tetap sejajar dengan Yth. */
+  text-indent: 1.25cm;
+  line-height: 1.5;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+
+.p17-letter-body img,
+.p17-letter-body table {
+  max-width: 100% !important;
+}
+
+.p17-letter-body img {
+  height: auto !important;
+}
+
+.p17-letter-body table {
+  width: 100% !important;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.p17-letter-body td,
+.p17-letter-body th {
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+
+.p17-signature {
+  width: 61.9%;
+  margin: 12px 0 0 auto;
+  font-size: 10pt;
+  line-height: 1.15;
+}
+
+.p17-signature p {
+  margin: 0;
+  line-height: 1.15;
+}
+
+.p17-signature-space {
+  height: 66px;
+  display: grid;
+  place-items: center;
+}
+
+.p17-signature-space img {
+  width: 3cm;
+  max-width: 82%;
+  max-height: 55px;
+  object-fit: contain;
+}
+
+.p17-copies {
+  margin-top: 13px;
+  font-size: 10pt;
+  line-height: 1.15;
+}
+
+.p17-copies > p {
+  margin: 0 0 2px;
+}
+
+.p17-copies ol {
+  margin: 0;
+  padding-left: 20px;
+  list-style: decimal outside;
+}
+
+.p17-copies li {
+  margin: 0;
+  padding-left: 5px;
+  line-height: 1.15;
+}
+
+.p17-signature,
+.p17-copies,
+.p17-recipient {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.p17-oversized-block {
+  outline: 1px dashed #c88a28;
+  outline-offset: 3px;
+}
+
+.p17-verification-mark {
+  position: absolute;
+  bottom: calc(((var(--p17-margin-bottom) - var(--p17-verification-height)) / 2) + 1.5mm);
+  left: calc(50% + var(--p17-content-center-offset));
+  width: 38.4pt;
+  height: var(--p17-verification-height);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  transform: translateX(-50%);
+  border: 1px solid #777;
+  background:
+    linear-gradient(90deg, transparent 45%, #777 45% 55%, transparent 55%),
+    linear-gradient(transparent 45%, #777 45% 55%, transparent 55%);
+  color: #555;
+  opacity: .72;
+  text-align: center;
+}
+
+.p17-verification-mark span {
+  padding: 2pt;
+  background: #fff;
+  font: 700 9pt/1 Arial, sans-serif;
+}
+
+.p17-verification-mark small {
+  position: absolute;
+  right: 1pt;
+  bottom: 1pt;
+  left: 1pt;
+  padding: 1pt 0;
+  background: #fff;
+  font: 700 5pt/1 Arial, sans-serif;
+  letter-spacing: .08em;
+}
+
+.p17-verification-mark.has-barcode {
+  border: 0;
+  background: #fff;
+  opacity: 1;
+}
+
+.p17-verification-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+@page {
+  size: 8.5in 13in;
+  margin: 0;
+}
+
+@media print {
+  .p17-preview-pages {
+    width: 8.5in !important;
+    overflow: visible !important;
+  }
+
+  .p17-paper-frame {
+    width: 8.5in !important;
+    height: auto !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .p17-paper-frame:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .p17-paper {
+    box-sizing: border-box !important;
+    width: 8.5in !important;
+    height: 13in !important;
+    min-height: 13in !important;
+    max-height: 13in !important;
+    margin: 0 !important;
+    padding: 1cm 2.09cm 2cm 2cm !important;
+    transform: none !important;
+    font: 10pt/1.15 Arial, sans-serif !important;
+  }
+
+  .p17-paper::after {
+    display: none !important;
+  }
+
+  .p17-letterhead-main {
+    grid-template-columns: 3.09cm 14.5cm !important;
+    min-height: 2.68cm !important;
+  }
+
+  .p17-letterhead-main > span {
+    width: 3.35cm !important;
+    height: 2.68cm !important;
+    transform: translateX(-0.09cm) !important;
+  }
+
+  .p17-letterhead-main b,
+  .p17-letterhead-main strong,
+  .p17-meta b,
+  .p17-meta span,
+  .p17-meta p,
+  .p17-subject-row > div,
+  .p17-recipient,
+  .p17-letter-body,
+  .p17-signature,
+  .p17-copies {
+    font-size: 10pt !important;
+  }
+
+  .p17-letterhead-main p,
+  .p17-letterhead-rule b {
+    font-size: 8pt !important;
+  }
+
+  .p17-letterhead-rule strong {
+    font-size: 10pt !important;
+  }
+
+  .p17-letter-body > p,
+  .p17-letter-body > div {
+    margin-left: 0 !important;
+    text-indent: 1.25cm !important;
+    line-height: 1.5 !important;
+  }
+
+  .p17-signature-space {
+    height: 2.35cm !important;
+  }
+
+  .p17-signature-space img {
+    width: 3cm !important;
+    max-height: 1.7cm !important;
+  }
+
+  .p17-verification-mark {
+    bottom: calc(((2cm - var(--p17-verification-height)) / 2) + 1.5mm);
+    height: var(--p17-verification-height);
+  }
+}

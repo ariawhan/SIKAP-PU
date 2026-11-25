@@ -1,0 +1,34 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+
+{% block title %}Buat P-17{% endblock %}
+{% block page_name %}Pra Penuntutan / P-17 / Baru{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/p17-editor.css' %}?v=20261124-1">{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="kicker text-red-700">Pra Penuntutan</p>
+    <h1>Buat Draf P-17</h1>
+    <p>Pilih perkara yang akan dimintakan perkembangan hasil penyidikannya.</p>
+  </div>
+  <a class="secondary-btn" href="{% url 'cases:p17_list' %}">← Daftar P-17</a>
+</section>
+
+<section class="p17-create-shell">
+  <article class="p17-create-card">
+    <div class="p17-create-mark"><span>P-17</span></div>
+    <div class="p17-create-copy">
+      <span>BUAT SURAT BARU</span>
+      <h2>Permintaan Perkembangan Penyidikan</h2>
+      <p>Sistem akan membuat nomor draf, tanggal surat, isi, dan tembusan awal secara otomatis. Semua bagian tetap bisa disunting.</p>
+    </div>
+    <form method="post" class="p17-create-form">
+      {% csrf_token %}
+      <label>{{ form.spdp.label }}{{ form.spdp }}<small>Pilih SPDP yang sudah memiliki P-16.</small>{{ form.spdp.errors }}</label>
+      {{ form.non_field_errors }}
+      <div><a class="secondary-btn" href="{% url 'cases:p17_list' %}">Batal</a><button class="primary-btn" type="submit">Buat dan Buka Editor</button></div>
+    </form>
+  </article>
+</section>
+{% endblock %}

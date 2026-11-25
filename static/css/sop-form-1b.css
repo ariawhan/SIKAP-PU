@@ -1,0 +1,261 @@
+.sop1b-meta-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.sop1b-meta-fields.three-columns{grid-template-columns:1fr 1fr 1fr}.sop1b-meta-fields label,.sop1b-rich-grid>label,.sop1b-disposition-editors>label{min-width:0;color:#3f4b45;font-size:10px;font-weight:700}.sop1b-meta-fields label.wide{grid-column:1/-1}.sop1b-meta-fields input,.sop1b-meta-fields textarea,.sop1b-rich-grid>label>textarea{display:block;width:100%;margin-top:7px;padding:10px 11px;border:1px solid #dce3df;border-radius:9px;background:#fff;color:#202b26;outline:0;font-size:12px;line-height:1.45}.sop1b-meta-fields input{height:42px}.sop1b-meta-fields textarea{min-height:70px;resize:vertical}.sop1b-meta-fields input:focus,.sop1b-meta-fields textarea:focus,.sop1b-rich-grid>label>textarea:focus{border-color:#b4232f;box-shadow:0 0 0 3px rgba(180,35,47,.09)}.sop1b-rich-grid{display:grid;gap:18px}.sop1b-rich-grid>label>span,.sop1b-disposition-editors>label>span{display:block;margin-bottom:7px;color:#81202a;font-size:9px;font-weight:900;letter-spacing:.08em}.sop1b-rich-grid .jodit-wysiwyg{min-height:170px!important}.sop1b-disposition-editors{display:grid;grid-template-columns:1fr 1fr;gap:14px}.sop1b-disposition-editors .jodit-wysiwyg{min-height:115px!important}.sop1b-meta-fields .errorlist,.sop1b-rich-grid .errorlist,.sop1b-disposition-editors .errorlist{margin:6px 0 0;padding:0;color:#b4232f;font-size:9px;list-style:none}
+
+.sop1b-paper{padding:3.8% 5.9% 2.3% 5.6%;font-size:9px;line-height:1.25}.sop1b-letterhead{margin-bottom:14px}.sop1b-letterhead-main{display:grid;grid-template-columns:70px 1fr;align-items:center;min-height:77px;text-align:center}.sop1b-letterhead-main>span{width:62px;height:73px;display:grid;place-items:center;padding:2px}.sop1b-letterhead-main img{width:100%;height:100%;object-fit:contain}.sop1b-letterhead-main b,.sop1b-letterhead-main strong{display:block;line-height:1.2}.sop1b-letterhead-main b{font-size:13px}.sop1b-letterhead-main strong{margin-top:2px;font-size:12px}.sop1b-letterhead-main p{margin:4px 0 0;font-size:7.5px}.sop1b-letterhead-rule{display:grid;grid-template-columns:1fr 96px;align-items:stretch;margin-top:5px;border-top:3px double #111;border-bottom:1px solid #111;text-align:center}.sop1b-letterhead-rule>b{padding:4px;font-size:8px;line-height:1.2}.sop1b-letterhead-rule>strong{display:grid;place-items:center;border-left:1px solid #111;font-size:10px}.sop1b-page-content{color:#050505}.sop1b-report-title{display:grid;gap:2px;margin:13px 0 15px;text-align:center;font-size:10px}.sop1b-meta{display:grid;gap:3px;margin:0 0 14px}.sop1b-meta>div{display:grid;grid-template-columns:76px 8px minmax(0,1fr);align-items:start}.sop1b-meta dt,.sop1b-meta dd,.sop1b-meta p{margin:0;font:inherit}.sop1b-meta p{text-align:justify}.sop1b-section{margin:0 0 11px}.sop1b-section h3{margin:0 0 5px;font-size:9px;font-weight:800}.sop1b-section p{margin:0 0 5px;text-align:justify}.sop1b-section ol,.sop1b-section ul{margin:0;padding-left:27px}.sop1b-section li{margin:0 0 5px;padding-left:3px;text-align:justify}.sop1b-closing{margin:8px 0 0;text-align:justify}.sop1b-signature{width:49%;margin:12px 0 14px auto;text-align:center}.sop1b-signature p,.sop1b-signature b{display:block;margin:0}.sop1b-signature>span{display:block;height:50px}.sop1b-signature strong,.sop1b-signature b{font-size:9px}.sop1b-disposition{width:100%;border-collapse:collapse;table-layout:fixed}.sop1b-disposition th,.sop1b-disposition td{border:1px solid #111}.sop1b-disposition th{padding:5px;font-size:9px;text-align:center}.sop1b-disposition td{height:82px;padding:5px;vertical-align:top}.sop1b-disposition td p{margin:0 0 4px}.sop1b-flow-block{font-size:9px;line-height:1.25}.sop1b-paper.p17-overflowing{box-shadow:0 0 0 2px #d69b35,0 10px 34px rgba(28,35,32,.14)}
+
+.dark .p17-document-tabs{border-color:#353b38;background:#1c201e}.dark .p17-document-tabs button.active{background:#292d2b;color:#ffadb4}.dark .sop1b-meta-fields label,.dark .sop1b-rich-grid>label,.dark .sop1b-disposition-editors>label{color:#dedbd7}.dark .sop1b-meta-fields input,.dark .sop1b-meta-fields textarea,.dark .sop1b-rich-grid>label>textarea{border-color:#393d3b;background:#222624;color:#eee}
+
+@media(max-width:700px){.sop1b-meta-fields,.sop1b-meta-fields.three-columns,.sop1b-disposition-editors{grid-template-columns:1fr}.sop1b-meta-fields label.wide{grid-column:auto}}
+
+@media print{.sop1b-paper{padding:1.25cm 1.5875cm .75cm 1.5cm!important;font-size:10pt!important}.sop1b-letterhead-main b{font-size:14pt}.sop1b-letterhead-main strong{font-size:13pt}.sop1b-letterhead-main p,.sop1b-letterhead-rule>b{font-size:8pt}.sop1b-letterhead-rule>strong,.sop1b-report-title{font-size:10pt}.sop1b-meta,.sop1b-section,.sop1b-flow-block,.sop1b-closing,.sop1b-signature strong,.sop1b-signature b,.sop1b-disposition th,.sop1b-disposition td{font-size:10pt}}
+.sop1b-meta,
+.sop1b-meta *,
+.sop1b-signature,
+.sop1b-signature * {
+  font-family: Arial, sans-serif !important;
+  font-weight: 700 !important;
+}
+
+.sop1b-page-content .sop1b-section h3 {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 4px;
+  align-items: baseline;
+  margin: 0 0 7px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+}
+
+.sop1b-page-content .sop1b-section h3 span,
+.sop1b-page-content .sop1b-section h3 b {
+  font: inherit;
+}
+
+.sop1b-section > div > ol,
+.sop1b-section > ol {
+  margin: 0;
+  padding-left: 24px;
+  list-style-position: outside;
+}
+
+.sop1b-section > div > ol > li,
+.sop1b-section > ol > li {
+  margin: 0 0 6px;
+  padding-left: 5px;
+  text-align: justify;
+  line-height: 1.35;
+}
+
+.sop1b-section > div > ol > li:last-child,
+.sop1b-section > ol > li:last-child {
+  margin-bottom: 0;
+}
+
+.sop1b-section > div > p {
+  margin: 0 0 6px;
+  text-align: justify;
+  line-height: 1.35;
+}
+
+/* Isi editor normal; format tebal hanya muncul bila pengguna menekan Bold. */
+.sop1b-rich-grid .jodit-wysiwyg,
+.sop1b-disposition-editors .jodit-wysiwyg {
+  font-family: Arial, sans-serif !important;
+  font-weight: 400 !important;
+}
+
+/* Tailwind mereset marker list; tampilkan kembali nomor 1, 2, 3 di Jodit. */
+.sop1b-rich-grid .jodit-wysiwyg ol,
+.sop1b-disposition-editors .jodit-wysiwyg ol {
+  margin: 0 !important;
+  padding-left: 20px !important;
+  list-style: decimal outside !important;
+}
+
+.sop1b-rich-grid .jodit-wysiwyg ul,
+.sop1b-disposition-editors .jodit-wysiwyg ul {
+  margin: 0 !important;
+  padding-left: 20px !important;
+  list-style: disc outside !important;
+}
+
+.sop1b-rich-grid .jodit-wysiwyg li,
+.sop1b-disposition-editors .jodit-wysiwyg li {
+  display: list-item !important;
+  margin: 0 0 3px !important;
+  padding-left: 5px !important;
+  font-weight: 400 !important;
+}
+
+/* Margin halaman SOP Form-1B sama persis dengan P-17. */
+.p17-paper.sop1b-paper {
+  width: 8.5in;
+  min-width: 8.5in;
+  max-width: 8.5in;
+  height: 13in;
+  min-height: 13in;
+  max-height: 13in;
+  padding: 1cm 2.09cm 2cm 2cm;
+  font-family: Arial, sans-serif;
+  font-size: 9pt;
+  line-height: 1.15;
+}
+
+@media print {
+  .p17-paper.sop1b-paper {
+    width: 8.5in !important;
+    min-width: 8.5in !important;
+    max-width: 8.5in !important;
+    height: 13in !important;
+    min-height: 13in !important;
+    max-height: 13in !important;
+    padding: 1cm 2.09cm 2cm 2cm !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 9pt !important;
+    line-height: 1.15 !important;
+  }
+}
+
+/* Semua isi laporan memakai spasi baku 1,15. */
+.sop1b-paper .sop1b-meta,
+.sop1b-paper .sop1b-section,
+.sop1b-paper .sop1b-section p,
+.sop1b-paper .sop1b-section li,
+.sop1b-paper .sop1b-flow-block,
+.sop1b-paper .sop1b-closing {
+  line-height: 1.15;
+}
+
+/* Pratinjau memakai basis yang sama dengan Jodit: Arial 9pt, spasi 1,15. */
+.sop1b-paper .sop1b-section,
+.sop1b-paper .sop1b-section p,
+.sop1b-paper .sop1b-section li,
+.sop1b-paper .sop1b-flow-block,
+.sop1b-paper .sop1b-closing {
+  font-family: Arial, sans-serif;
+  font-size: 9pt;
+  line-height: 1.15;
+}
+
+.sop1b-paper .sop1b-section h3 {
+  font-family: Arial, sans-serif;
+  font-size: 9pt;
+  line-height: 1.15;
+}
+
+.sop1b-paper .sop1b-report-title,
+.sop1b-paper .sop1b-meta,
+.sop1b-paper .sop1b-signature,
+.sop1b-paper .sop1b-signature strong,
+.sop1b-paper .sop1b-signature b,
+.sop1b-paper .sop1b-disposition th,
+.sop1b-paper .sop1b-disposition td {
+  font-size: 9pt !important;
+}
+
+/* Nomor daftar harus selalu tampak pada pratinjau dan cetak. */
+.sop1b-paper .sop1b-section > div > ol,
+.sop1b-paper .sop1b-section > ol {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: decimal !important;
+  list-style-position: outside !important;
+}
+
+.sop1b-paper .sop1b-section > div > ol > li,
+.sop1b-paper .sop1b-section > ol > li {
+  display: list-item !important;
+  margin: 0 !important;
+  padding-left: 5px;
+  line-height: 1.15;
+}
+
+/* Pagination membuat setiap butir sebagai blok sendiri; jangan beri jarak antarbutil. */
+.sop1b-paper .sop1b-list-item-block {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.sop1b-paper .sop1b-list-item-block > ol,
+.sop1b-paper .sop1b-list-item-block > ul,
+.sop1b-paper .sop1b-list-item-block > ol > li,
+.sop1b-paper .sop1b-list-item-block > ul > li {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Paragraf pengantar langsung menyambung ke daftar setelahnya. */
+.sop1b-paper .sop1b-paragraph-block,
+.sop1b-paper .sop1b-paragraph-block > p {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Satu baris kosong di antara bagian I, II, III, dan IV. */
+.sop1b-paper .sop1b-section-gap {
+  margin-top: 1.15em !important;
+}
+
+.sop1b-meta-fields select {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 7px;
+  padding: 10px 36px 10px 11px;
+  border: 1px solid #dce3df;
+  border-radius: 9px;
+  background: #fff;
+  color: #202b26;
+  font-size: 12px;
+  font-weight: 400;
+  outline: 0;
+}
+
+.sop1b-meta-fields select:focus {
+  border-color: #b4232f;
+  box-shadow: 0 0 0 3px rgba(180, 35, 47, .09);
+}
+
+.sop1b-meta-fields label > small {
+  display: block;
+  margin-top: 5px;
+  color: #929c97;
+  font-size: 8px;
+  font-weight: 400;
+}
+
+/* Bagian 04: area input disusun vertikal agar lebih lebar dan mudah diedit. */
+.sop1b-disposition-editors {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.sop1b-rich-grid .jodit-wysiwyg ol,
+.sop1b-rich-grid .jodit-wysiwyg ul,
+.sop1b-disposition-editors .jodit-wysiwyg ol,
+.sop1b-disposition-editors .jodit-wysiwyg ul,
+.sop1b-rich-grid .jodit-wysiwyg li,
+.sop1b-disposition-editors .jodit-wysiwyg li {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Kolom Pendapat Kasipidum dan Petunjuk Kajari menggunakan rata kiri. */
+.sop1b-disposition-editors .jodit-wysiwyg,
+.sop1b-disposition-editors .jodit-wysiwyg p,
+.sop1b-paper .sop1b-disposition td,
+.sop1b-paper .sop1b-disposition td p {
+  text-align: left !important;
+  line-height: 1.15;
+}
+
+/* E-Sign berada di blok penandatangan; Barcode/QR selalu berada di footer. */
+.sop1b-signature-space{display:flex!important;align-items:center;justify-content:center;height:50px}
+.sop1b-signature-space img{display:block;width:auto;max-width:100%;height:42px;margin:0 auto;object-fit:contain}
+.sop1b-verification-mark{position:absolute;left:50%;bottom:.45cm;width:38.4pt;height:43.3pt;display:grid;place-items:center;transform:translateX(-50%);color:#777;text-align:center}
+.sop1b-verification-mark img{display:block;width:100%;height:100%;object-fit:contain}
+.sop1b-verification-mark .verification-code-placeholder{width:100%;height:100%;display:grid;place-items:center;border:1px dashed #999;font:8pt/1 Arial,sans-serif}
+.sop1b-verification-mark .verification-code-placeholder small{display:block;font-size:5.5pt}
+

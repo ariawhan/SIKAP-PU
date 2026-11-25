@@ -1,0 +1,19 @@
+<details class="action-menu workflow-row-actions">
+  <summary aria-label="Buka aksi perkara" title="Aksi"><b>⋮</b></summary>
+  <div class="action-menu-list">
+    <a href="{% url 'cases:spdp_detail' item.pk %}"><i>👁</i><span><b>Lihat Detail</b><small>Informasi lengkap SPDP</small></span></a>
+    {% if can_start_p16 %}<a href="{% url 'cases:spdp_edit' item.pk %}"><i>✎</i><span><b>Edit Data Perkara</b><small>Ubah SPDP, pelaku, korban, dan tanda terima</small></span></a>{% endif %}
+    {% if not item.p16_assignment and can_start_p16 %}
+    <button type="button" data-workflow="start" data-dialog-url="{% url 'cases:start_p16' item.pk %}" data-number="{{ item.letter_number }}" data-date="{{ item.received_date|date:'d M Y' }}"><i>⚖</i><span><b>Proses P-16</b><small>Pilih Kasi Pidum</small></span></button>
+    {% elif item.p16_assignment.status == 'menunggu_jaksa' %}
+      {% if user.is_super_admin or user.pk == item.p16_assignment.kasi_pidum_id %}
+      <button type="button" data-workflow="prosecutor" data-dialog-url="{% url 'cases:assign_prosecutors' item.pk %}" data-number="{{ item.letter_number }}" data-kasi="{{ item.p16_assignment.kasi_pidum.display_name }}"><i>♟</i><span><b>Tunjuk Jaksa</b><small>Pilih Jaksa P-16</small></span></button>
+      {% else %}
+      <div class="action-menu-info"><i>▷</i><span><b>Menunggu Kasi</b><small>{{ item.p16_assignment.kasi_pidum.display_name }}</small></span></div>
+      {% endif %}
+    {% elif item.p16_assignment.status == 'jaksa_ditunjuk' %}
+    <div class="action-menu-info success"><i>✓</i><span><b>P-16 Diproses</b><small>{{ item.p16_assignment.prosecutors.count }} Jaksa ditunjuk</small></span></div>
+    {% if item.p16_assignment.draft %}<a href="{% url 'cases:p16_draft_detail' item.p16_assignment.draft.pk %}"><i>▷</i><span><b>Lihat Draf P-16</b><small>Tinjau surat penunjukan</small></span></a>{% endif %}
+    {% endif %}
+  </div>
+</details>

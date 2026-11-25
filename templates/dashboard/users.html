@@ -1,0 +1,370 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Pengguna{% endblock %}
+{% block page_name %}Pengguna{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/users.css' %}?v=20260915-1">{% endblock %}
+{% block content %}
+<section class="users-page">
+  <div class="users-heading">
+    <div>
+      <p class="kicker text-red-700">Super Admin</p>
+      <h1>Pengaturan Pengguna</h1>
+      <p>Kelola akun, identitas pegawai, kontak notifikasi, dan multi role pengguna SIKAP-PU.</p>
+    </div>
+    <button type="button" class="primary-btn user-add-button" data-open-user-modal>Tambah Pengguna</button>
+  </div>
+
+  <div class="user-stat-grid">
+    <article class="user-stat-card">
+      <small>Total Pengguna</small>
+      <strong>{{ stats.total }}</strong>
+    </article>
+    <article class="user-stat-card">
+      <small>Jaksa</small>
+      <strong>{{ stats.jaksa }}</strong>
+    </article>
+    <article class="user-stat-card">
+      <small>Pegawai</small>
+      <strong>{{ stats.pegawai }}</strong>
+    </article>
+  </div>
+
+  <section class="panel user-table-panel">
+    <div class="panel-head user-table-head">
+      <div>
+        <h3>Daftar Pengguna</h3>
+        <p>{% if keyword %}Hasil pencarian "{{ keyword }}"{% else %}Semua akun yang terdaftar di sistem{% endif %}</p>
+      </div>
+      <form method="get" class="user-search">
+        <input type="search" name="q" value="{{ keyword }}" placeholder="Cari nama, username, NIP, NRP, role...">
+        <button type="submit">Search</button>
+      </form>
+    </div>
+    <div class="table-wrap user-table-wrap">
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>Pengguna</th>
+            <th>Identitas</th>
+            <th>Kontak</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for account in users %}
+          <tr>
+            <td>
+              <div class="user-cell">
+                <span class="table-avatar">
+                  {% if account.photo %}
+                  <img src="{{ account.photo.url }}" alt="Foto {{ account.display_name }}" style="object-position: {{ account.photo_position_x }}% {{ account.photo_position_y }}%;">
+                  {% else %}
+                  <b>{{ account.display_name|slice:':2'|upper }}</b>
+                  {% endif %}
+                </span>
+                <span><b>{{ account.display_name }}</b><small>@{{ account.username }}</small></span>
+              </div>
+            </td>
+            <td>
+              <b>{{ account.rank|default:"-" }}{% if account.grade %} / {{ account.grade }}{% endif %}</b>
+              <small>NIP: {{ account.nip|default:"-" }} · NRP: {{ account.nrp|default:"-" }}</small>
+            </td>
+            <td>
+              <b>{{ account.email }}</b>
+              <small>WA: {{ account.whatsapp_number|default:"-" }} · Telegram: {{ account.telegram_chat_id|default:"-" }}</small>
+            </td>
+            <td>
+              <div class="role-badges">
+                {% for role in account.roles.all %}<span>{{ role.name }}</span>{% empty %}<small>Belum ada role</small>{% endfor %}
+              </div>
+            </td>
+            <td><span class="badge {% if account.is_active %}green{% else %}amber{% endif %}">{% if account.is_active %}Aktif{% else %}Nonaktif{% endif %}</span></td>
+            <td>
+              <div class="user-actions">
+                <button type="button" class="table-action" data-open-user-modal="user-edit-modal-{{ account.id }}">Edit</button>
+                <button type="button" class="table-action password" data-open-user-modal="user-password-modal-{{ account.id }}">Ubah Password</button>
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="toggle_active">
+                  <input type="hidden" name="user_id" value="{{ account.id }}">
+                  <button type="submit" class="table-action {% if account.is_active %}danger{% else %}success{% endif %}" {% if account.id == request.user.id %}disabled title="Akun sendiri tidak dapat dinonaktifkan"{% endif %}>{% if account.is_active %}Nonaktifkan{% else %}Aktifkan{% endif %}</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="empty-user-row">Tidak ada pengguna yang cocok.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include 'includes/pagination.html' with page_obj=page_obj keyword=keyword %}
+  </section>
+</section>
+
+<div class="user-modal" id="user-create-modal" role="dialog" aria-modal="true" aria-labelledby="user-create-title" hidden>
+  <div class="user-modal-card">
+    <header class="user-modal-head">
+      <div>
+        <p class="kicker">Tambah Pengguna</p>
+        <h2 id="user-create-title">Akun Baru</h2>
+      </div>
+      <button type="button" class="user-modal-close" data-close-user-modal aria-label="Tutup">×</button>
+    </header>
+    <form method="post" enctype="multipart/form-data" class="user-create-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create">
+      <div class="user-modal-scroll">
+        {% if form.non_field_errors %}<div class="alert-error">{{ form.non_field_errors.0 }}</div>{% endif %}
+        <section class="avatar-upload" data-avatar-upload>
+          <div class="avatar-preview" data-avatar-preview>
+            <img data-avatar-image alt="Preview foto pengguna" hidden>
+            <span data-avatar-initial>FT</span>
+          </div>
+          <div class="avatar-upload-body">
+            <b>Foto Pengguna</b>
+            <p>Upload foto, lalu geser di area bulat untuk mengatur posisi wajah.</p>
+            {{ form.photo }}
+            {{ form.photo_position_x }}
+            {{ form.photo_position_y }}
+            {{ form.photo.errors }}
+          </div>
+        </section>
+        <div class="user-form-grid">
+          <label>Nama{{ form.first_name }}{{ form.first_name.errors }}</label>
+          <label>NIP{{ form.nip }}{{ form.nip.errors }}</label>
+          <label>NRP{{ form.nrp }}{{ form.nrp.errors }}</label>
+          <label>Pangkat{{ form.rank }}{{ form.rank.errors }}</label>
+          <label>Golongan{{ form.grade }}{{ form.grade.errors }}</label>
+          <label>Username{{ form.username }}<small>{{ form.username.help_text }}</small>{{ form.username.errors }}</label>
+          <label>Email{{ form.email }}{{ form.email.errors }}</label>
+          <label>Nomor WhatsApp{{ form.whatsapp_number }}{{ form.whatsapp_number.errors }}</label>
+          <label>ID Telegram{{ form.telegram_chat_id }}{{ form.telegram_chat_id.errors }}</label>
+          <label>Sandi{{ form.password1 }}{{ form.password1.errors }}</label>
+          <label>Konfirmasi Sandi{{ form.password2 }}{{ form.password2.errors }}</label>
+        </div>
+        <section class="role-picker">
+          <div>
+            <b>Pilih Role</b>
+            <small>Pengguna bisa memiliki lebih dari satu role.</small>
+          </div>
+          {{ form.roles }}
+          {{ form.roles.errors }}
+        </section>
+      </div>
+      <footer class="user-modal-actions">
+        <button type="button" class="secondary-btn" data-close-user-modal>Batal</button>
+        <button type="submit" class="primary-btn">Simpan Pengguna</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+{% for account in users %}
+<div class="user-modal" id="user-edit-modal-{{ account.id }}" role="dialog" aria-modal="true" aria-labelledby="user-edit-title-{{ account.id }}" hidden>
+  <div class="user-modal-card">
+    <header class="user-modal-head">
+      <div>
+        <p class="kicker">Edit Pengguna</p>
+        <h2 id="user-edit-title-{{ account.id }}">{{ account.display_name }}</h2>
+      </div>
+      <button type="button" class="user-modal-close" data-close-user-modal aria-label="Tutup">×</button>
+    </header>
+    <form method="post" enctype="multipart/form-data" class="user-create-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="edit">
+      <input type="hidden" name="user_id" value="{{ account.id }}">
+      <div class="user-modal-scroll">
+        <section class="avatar-upload" data-avatar-upload>
+          <div class="avatar-preview" data-avatar-preview>
+            {% if account.photo %}
+            <img src="{{ account.photo.url }}" data-avatar-image alt="Foto {{ account.display_name }}" style="object-position: {{ account.photo_position_x }}% {{ account.photo_position_y }}%;">
+            <span data-avatar-initial hidden>{{ account.display_name|slice:':2'|upper }}</span>
+            {% else %}
+            <img data-avatar-image alt="Preview foto pengguna" hidden>
+            <span data-avatar-initial>{{ account.display_name|slice:':2'|upper }}</span>
+            {% endif %}
+          </div>
+          <div class="avatar-upload-body">
+            <b>Foto Pengguna</b>
+            <p>Upload foto baru bila ingin mengganti. Geser foto di lingkaran untuk mengatur posisi.</p>
+            <input type="file" name="photo" accept="image/*" class="user-field">
+            <input type="hidden" name="photo_position_x" value="{{ account.photo_position_x }}" data-avatar-x>
+            <input type="hidden" name="photo_position_y" value="{{ account.photo_position_y }}" data-avatar-y>
+          </div>
+        </section>
+        <div class="user-form-grid">
+          <label>Nama<input type="text" name="first_name" value="{{ account.first_name }}" class="user-field" required></label>
+          <label>NIP<input type="text" name="nip" value="{{ account.nip }}" class="user-field"></label>
+          <label>NRP<input type="text" name="nrp" value="{{ account.nrp }}" class="user-field"></label>
+          <label>Pangkat<input type="text" name="rank" value="{{ account.rank }}" class="user-field" placeholder="cth. Jaksa Utama Pratama"></label>
+          <label>Golongan
+            <select name="grade" class="user-field">
+              <option value="">Pilih golongan</option>
+              <option value="I/a" {% if account.grade == "I/a" %}selected{% endif %}>I/a</option>
+              <option value="I/b" {% if account.grade == "I/b" %}selected{% endif %}>I/b</option>
+              <option value="I/c" {% if account.grade == "I/c" %}selected{% endif %}>I/c</option>
+              <option value="I/d" {% if account.grade == "I/d" %}selected{% endif %}>I/d</option>
+              <option value="II/a" {% if account.grade == "II/a" %}selected{% endif %}>II/a</option>
+              <option value="II/b" {% if account.grade == "II/b" %}selected{% endif %}>II/b</option>
+              <option value="II/c" {% if account.grade == "II/c" %}selected{% endif %}>II/c</option>
+              <option value="II/d" {% if account.grade == "II/d" %}selected{% endif %}>II/d</option>
+              <option value="III/a" {% if account.grade == "III/a" %}selected{% endif %}>III/a</option>
+              <option value="III/b" {% if account.grade == "III/b" %}selected{% endif %}>III/b</option>
+              <option value="III/c" {% if account.grade == "III/c" %}selected{% endif %}>III/c</option>
+              <option value="III/d" {% if account.grade == "III/d" %}selected{% endif %}>III/d</option>
+              <option value="IV/a" {% if account.grade == "IV/a" %}selected{% endif %}>IV/a</option>
+              <option value="IV/b" {% if account.grade == "IV/b" %}selected{% endif %}>IV/b</option>
+              <option value="IV/c" {% if account.grade == "IV/c" %}selected{% endif %}>IV/c</option>
+              <option value="IV/d" {% if account.grade == "IV/d" %}selected{% endif %}>IV/d</option>
+              <option value="IV/e" {% if account.grade == "IV/e" %}selected{% endif %}>IV/e</option>
+            </select>
+          </label>
+          <label>Username<input type="text" name="username" value="{{ account.username }}" class="user-field" required><small>Username dicek otomatis agar tidak double.</small></label>
+          <label>Email<input type="email" name="email" value="{{ account.email }}" class="user-field" required></label>
+          <label>Nomor WhatsApp<input type="text" name="whatsapp_number" value="{{ account.whatsapp_number }}" class="user-field" placeholder="cth. 62812xxxx"></label>
+          <label>ID Telegram<input type="text" name="telegram_chat_id" value="{{ account.telegram_chat_id }}" class="user-field" placeholder="Chat ID Telegram"></label>
+        </div>
+        <section class="role-picker">
+          <div>
+            <b>Pilih Role</b>
+            <small>Pengguna bisa memiliki lebih dari satu role.</small>
+          </div>
+          <div class="role-choice-list">
+            {% for role in roles %}
+            <div><label><input type="checkbox" name="roles" value="{{ role.id }}" {% if role in account.roles.all %}checked{% endif %}> {{ role.name }}</label></div>
+            {% endfor %}
+          </div>
+        </section>
+      </div>
+      <footer class="user-modal-actions">
+        <button type="button" class="secondary-btn" data-close-user-modal>Batal</button>
+        <button type="submit" class="primary-btn">Simpan Perubahan</button>
+      </footer>
+    </form>
+  </div>
+</div>
+{% endfor %}
+
+{% for account in users %}
+<div class="user-modal" id="user-password-modal-{{ account.id }}" role="dialog" aria-modal="true" aria-labelledby="user-password-title-{{ account.id }}" hidden>
+  <div class="user-modal-card user-password-card">
+    <header class="user-modal-head">
+      <div>
+        <p class="kicker">Ubah Password</p>
+        <h2 id="user-password-title-{{ account.id }}">{{ account.display_name }}</h2>
+      </div>
+      <button type="button" class="user-modal-close" data-close-user-modal aria-label="Tutup">&times;</button>
+    </header>
+    <form method="post" class="user-create-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="change_password">
+      <input type="hidden" name="user_id" value="{{ account.id }}">
+      <div class="user-modal-scroll">
+        {% if password_user.id == account.id and password_form.non_field_errors %}<div class="alert-error">{{ password_form.non_field_errors }}</div>{% endif %}
+        <div class="password-user-note">
+          <span class="table-avatar">
+            {% if account.photo %}
+            <img src="{{ account.photo.url }}" alt="Foto {{ account.display_name }}" style="object-position: {{ account.photo_position_x }}% {{ account.photo_position_y }}%;">
+            {% else %}
+            <b>{{ account.display_name|slice:':2'|upper }}</b>
+            {% endif %}
+          </span>
+          <div>
+            <b>{{ account.display_name }}</b>
+            <small>@{{ account.username }} · {{ account.email }}</small>
+          </div>
+        </div>
+        <div class="user-form-grid password-grid">
+          <label>Sandi Baru
+            <input type="password" name="new_password1" class="user-field" autocomplete="new-password" required>
+            {% if password_user.id == account.id %}{{ password_form.new_password1.errors }}{% endif %}
+          </label>
+          <label>Konfirmasi Sandi Baru
+            <input type="password" name="new_password2" class="user-field" autocomplete="new-password" required>
+            {% if password_user.id == account.id %}{{ password_form.new_password2.errors }}{% endif %}
+          </label>
+        </div>
+        <p class="password-help">Gunakan sandi yang kuat. Setelah disimpan, pengguna dapat login memakai password baru.</p>
+      </div>
+      <footer class="user-modal-actions">
+        <button type="button" class="secondary-btn" data-close-user-modal>Batal</button>
+        <button type="submit" class="primary-btn">Simpan Password</button>
+      </footer>
+    </form>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
+{% block extra_scripts %}
+<script>
+(function(){
+  var modals = document.querySelectorAll('.user-modal');
+  var openers = document.querySelectorAll('[data-open-user-modal]');
+  function openModal(id){
+    var modal = document.getElementById(id || 'user-create-modal');
+    if(!modal) return;
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+  }
+  function closeModal(modal){
+    if(!modal) return;
+    modal.hidden = true;
+    if(!document.querySelector('.user-modal:not([hidden])')) document.body.classList.remove('modal-open');
+  }
+  openers.forEach(function(button){ button.addEventListener('click', function(){ openModal(button.dataset.openUserModal); }); });
+  modals.forEach(function(modal){
+    modal.querySelectorAll('[data-close-user-modal]').forEach(function(button){ button.addEventListener('click', function(){ closeModal(modal); }); });
+    modal.addEventListener('click', function(event){ if(event.target === modal) closeModal(modal); });
+  });
+  document.addEventListener('keydown', function(event){
+    if(event.key !== 'Escape') return;
+    var opened = document.querySelector('.user-modal:not([hidden])');
+    if(opened) closeModal(opened);
+  });
+  document.querySelectorAll('[data-avatar-upload]').forEach(function(box){
+    var file = box.querySelector('input[type="file"]');
+    var image = box.querySelector('[data-avatar-image]');
+    var initial = box.querySelector('[data-avatar-initial]');
+    var preview = box.querySelector('[data-avatar-preview]');
+    var inputX = box.querySelector('[data-avatar-x], input[name="photo_position_x"]');
+    var inputY = box.querySelector('[data-avatar-y], input[name="photo_position_y"]');
+    var dragging = false;
+    function setPosition(x, y){
+      x = Math.max(0, Math.min(100, x));
+      y = Math.max(0, Math.min(100, y));
+      if(inputX) inputX.value = Math.round(x);
+      if(inputY) inputY.value = Math.round(y);
+      if(image) image.style.objectPosition = Math.round(x) + '% ' + Math.round(y) + '%';
+    }
+    function pointerToPosition(event){
+      var rect = preview.getBoundingClientRect();
+      setPosition(((event.clientX - rect.left) / rect.width) * 100, ((event.clientY - rect.top) / rect.height) * 100);
+    }
+    file?.addEventListener('change', function(){
+      var selected = file.files && file.files[0];
+      if(!selected || !image) return;
+      image.src = URL.createObjectURL(selected);
+      image.hidden = false;
+      if(initial) initial.hidden = true;
+      setPosition(50, 50);
+    });
+    preview?.addEventListener('pointerdown', function(event){
+      if(!image || image.hidden) return;
+      dragging = true;
+      preview.setPointerCapture(event.pointerId);
+      pointerToPosition(event);
+    });
+    preview?.addEventListener('pointermove', function(event){
+      if(dragging) pointerToPosition(event);
+    });
+    preview?.addEventListener('pointerup', function(){ dragging = false; });
+    preview?.addEventListener('pointercancel', function(){ dragging = false; });
+  });
+  if(document.querySelector('#user-create-modal .errorlist')) openModal('user-create-modal');
+  {% if password_user %}openModal('user-password-modal-{{ password_user.id }}');{% endif %}
+})();
+</script>
+{% endblock %}

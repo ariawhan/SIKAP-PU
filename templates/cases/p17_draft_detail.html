@@ -1,0 +1,235 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+
+{% block title %}Editor P-17 dan SOP Form-1B{% endblock %}
+{% block page_name %}Pra Penuntutan / P-17{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'vendor/jodit/jodit.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/p17-editor.css' %}?v=20261124-1">
+<link rel="stylesheet" href="{% static 'css/p17-document.css' %}?v=20261014-2">
+<link rel="stylesheet" href="{% static 'css/sop-form-1b.css' %}?v=20261124-2">
+<link rel="stylesheet" href="{% static 'css/standard-letterhead.css' %}?v=20261124-1">
+<link rel="stylesheet" href="{% static 'css/p16-sipede.css' %}?v=20261018-1">
+<link rel="stylesheet" href="{% static 'css/acting-signatory.css' %}?v=20261123-1">
+{% endblock %}
+
+{% block content %}
+<section class="page-heading p17-page-heading">
+  <div>
+    <p class="kicker text-red-700">Pra Penuntutan</p>
+    <h1>Editor P-17 dan SOP Form-1B</h1>
+    <p>Dua dokumen terpisah untuk SPDP {{ draft.spdp.letter_number }} dalam satu menu P-17.</p>
+  </div>
+  <a class="secondary-btn" href="{% url 'cases:p17_list' %}">← Daftar P-17</a>
+</section>
+
+{% if not institution.pk or not institution.work_unit or not institution.address or not institution.leader_name or not institution.leader_title or not institution.leader_nip %}
+<div class="p17-config-warning" role="alert">
+  <span>!</span><div><b>Identitas instansi belum lengkap</b><p>Lengkapi satuan kerja, alamat, nama, jabatan, dan NIP pimpinan sebelum mencetak dokumen.</p></div>
+  {% if request.user.is_super_admin %}<a href="{% url 'configurations:institution' %}">Buka Konfigurasi</a>{% endif %}
+</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="p17-workspace" data-p17-form data-can-edit="{% if can_edit %}true{% else %}false{% endif %}" data-p17-number-region="{{ form.number_region_code }}" data-p17-number-code="{{ form.number_letter_code }}">
+  {% csrf_token %}
+  <section class="p17-editor-column">
+    {% if not can_edit %}<div class="p17-readonly-notice"><span>i</span><p><b>Mode lihat saja</b> Anda tidak memiliki akses untuk mengubah draf ini.</p></div>{% endif %}
+
+    <nav class="p17-document-tabs" aria-label="Pilih input dokumen">
+      <button type="button" class="active" data-document-tab="p17"><span>P-17</span><small>Surat permintaan perkembangan</small></button>
+      <button type="button" data-document-tab="sop1b"><span>SOP Form-1B</span><small>Laporan Penuntut Umum</small></button>
+    </nav>
+
+    <div class="p17-editor-panel active" data-document-editor="p17">
+      <article class="p17-editor-card">
+        <header class="p17-section-title"><span>01</span><div><b>Identitas Surat P-17</b><small>Nomor, tanggal, sifat, lampiran, hal, dan tujuan surat</small></div></header>
+        <div class="p17-meta-fields">
+          <label class="p17-number-field">{{ form.letter_number.label }}{{ form.letter_number }}<small data-p17-number-help>Isi angka nomor urut saja, contoh: 11.</small>{{ form.letter_number.errors }}</label>
+          <label>{{ form.letter_date.label }}{{ form.letter_date }}{{ form.letter_date.errors }}</label>
+          <label>{{ form.letter_nature.label }}{{ form.letter_nature }}{{ form.letter_nature.errors }}</label>
+          <label>{{ form.attachment.label }}{{ form.attachment }}{{ form.attachment.errors }}</label>
+          <!-- <div class="p17-number-preview"><span>Nomor surat lengkap</span><b data-p17-number-preview>Masukkan nomor urut</b><small>B-[nomor]/{{ form.number_region_code|default:'kode wilayah' }}/{{ form.number_letter_code|default:'kode surat' }}/bulan/tahun</small></div>{{ form.manual_number }} -->
+        </div>
+        {% include 'cases/includes/acting_signatory_fields.html' %}
+        <div class="p17-field-separator"><span>HAL / PERIHAL</span></div>
+        <label class="p17-subject-field"><span>Perihal surat</span>{{ form.subject_html }}<small>Gunakan teks biasa. Perihal langsung ditampilkan pada naskah P-17.</small>{{ form.subject_html.errors }}</label>
+        <div class="p17-field-separator"><span>TUJUAN (YTH.)</span></div>
+        <div class="p17-recipient-editor" data-p17-recipient-editor>
+          {{ form.recipient_html }}{{ form.recipients_json }}
+          <div class="p17-recipient-editor-head"><div><b>Daftar Tujuan Surat</b><small>Tambahkan hanya tujuan surat. Kolom Di / Tempat berlaku untuk seluruh tujuan.</small></div><button type="button" data-p17-add-recipient>+ Tambah Tujuan</button></div>
+          <div class="p17-recipient-rows" data-p17-recipient-rows></div>
+          <label class="p17-recipient-place-field">Di / Tempat<input type="text" maxlength="150" placeholder="Contoh: Singaraja" data-p17-recipient-place></label>
+          {{ form.recipient_html.errors }}{{ form.recipients_json.errors }}
+        </div>
+        <div class="p17-field-separator"><span>BARCODE / QR FOOTER</span></div>
+        <div class="p17-barcode-field" data-p17-barcode-widget>
+          <span class="p17-field-label">{{ form.barcode_image.label }}</span>
+          <div class="p17-barcode-uploader" data-p17-barcode-dropzone role="button" tabindex="0" aria-label="Upload barcode verifikasi P-17">
+            <div class="p17-barcode-preview" data-p17-barcode-preview>{% if draft.barcode_image %}<img src="{{ draft.barcode_image.url }}" alt="Barcode P-17 saat ini">{% else %}<span>QR</span>{% endif %}</div>
+            <div class="p17-barcode-copy"><b data-p17-barcode-title>{% if draft.barcode_image %}Barcode footer sudah terpasang{% else %}Upload barcode verifikasi footer{% endif %}</b><small data-p17-barcode-status>{% if draft.barcode_image %}{{ draft.barcode_image.name }}{% else %}Barcode tampil di footer; E-Sign tetap berada pada blok tanda tangan.{% endif %}</small></div>
+          </div>
+          <div class="p17-barcode-native">{{ form.barcode_image }}</div>
+          {{ form.barcode_image.errors }}
+        </div>
+      </article>
+
+      <article class="p17-editor-card">
+        <header class="p17-section-title"><span>02</span><div><b>Isi</b><small>Uraian permintaan perkembangan penyidikan P-17</small></div></header>
+        <div class="p17-rich-field">{{ form.body_html }}{{ form.body_html.errors }}</div>
+      </article>
+
+      <article class="p17-editor-card">
+        <header class="p17-section-title"><span>03</span><div><b>Tembusan P-17</b><small>Edit melalui Jodit; gunakan daftar bernomor</small></div></header>
+        <div class="p17-rich-field p17-copies-editor">{{ form.copies_html }}{{ form.copies_html.errors }}</div>
+      </article>
+
+      {% if form.non_field_errors %}<div class="form-error-summary">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="p17-editor-actions">
+        <a class="secondary-btn" href="{% url 'cases:p17_list' %}">Batal</a>
+        <button type="button" class="secondary-btn" data-p17-pdf-download data-url="{% url 'cases:p17_sipede_upload' draft.pk %}">Download PDF</button>
+        {% if can_edit %}<button type="button" class="p16-sipede-button" data-p17-sipede data-url="{% url 'cases:p17_sipede_upload' draft.pk %}" {% if draft.sipede_status == 'sudah' %}disabled{% endif %}>{% if draft.sipede_status == 'sudah' %}Sudah di SIPede{% else %}Ambil Nomor &amp; Upload SIPede{% endif %}</button>{% endif %}
+        {% if can_edit %}<button type="submit" class="primary-btn">Simpan Kedua Draf</button>{% endif %}
+      </div>
+    </div>
+
+    <div class="p17-editor-panel" data-document-editor="sop1b" hidden>
+      <article class="p17-editor-card">
+        <header class="p17-section-title"><span>01</span><div><b>Identitas SOP Form-1B</b><small>Data laporan Penuntut Umum yang terpisah dari P-17</small></div></header>
+        <div class="sop1b-meta-fields">
+          <label>{{ sop_form.recipient.label }}{{ sop_form.recipient }}{{ sop_form.recipient.errors }}</label>
+          <label>{{ sop_form.report_date.label }}{{ sop_form.report_date }}{{ sop_form.report_date.errors }}</label>
+          <label class="wide">{{ sop_form.sender.label }}{{ sop_form.sender }}{{ sop_form.sender.errors }}</label>
+          <label>{{ sop_form.attachment.label }}{{ sop_form.attachment }}{{ sop_form.attachment.errors }}</label>
+          <label class="wide">{{ sop_form.subject.label }}{{ sop_form.subject }}{{ sop_form.subject.errors }}</label>
+        </div>
+      </article>
+
+      <article class="p17-editor-card">
+        <header class="p17-section-title"><span>02</span><div><b>Isi Laporan</b><small>Dasar, fakta, analisis, serta kesimpulan dan saran</small></div></header>
+        <div class="sop1b-rich-grid">
+          <label><span>DASAR</span><div class="p17-rich-field">{{ sop_form.legal_basis_html }}</div>{{ sop_form.legal_basis_html.errors }}</label>
+          <label><span>FAKTA DAN DATA</span><div class="p17-rich-field">{{ sop_form.facts_html }}</div>{{ sop_form.facts_html.errors }}</label>
+          <label><span>ANALISIS YURIDIS</span><div class="p17-rich-field">{{ sop_form.legal_analysis_html }}</div>{{ sop_form.legal_analysis_html.errors }}</label>
+          <label><span>KESIMPULAN DAN SARAN</span><div class="p17-rich-field">{{ sop_form.conclusion_html }}</div>{{ sop_form.conclusion_html.errors }}</label>
+          <label><span>PENUTUP</span>{{ sop_form.closing }}{{ sop_form.closing.errors }}</label>
+        </div>
+      </article>
+
+      <article class="p17-editor-card">
+        <header class="p17-section-title"><span>03</span><div><b>Penandatangan</b><small>Data Jaksa/Penuntut Umum pada SOP Form-1B</small></div></header>
+        <div class="sop1b-meta-fields">
+          <label class="wide">{{ sop_form.prosecutor_choice.label }}{{ sop_form.prosecutor_choice }}<small>Pilihan hanya menampilkan Jaksa yang ditunjuk pada P-16. Pilihan pertama digunakan sebagai default.</small>{{ sop_form.prosecutor_choice.errors }}</label>
+        </div>
+      </article>
+
+      <article class="p17-editor-card">
+        <header class="p17-section-title"><span>04</span><div><b>Pendapat dan Petunjuk</b><small>Kolom Pendapat Kasipidum dan Petunjuk Kajari</small></div></header>
+        <div class="sop1b-disposition-editors">
+          <label><span>PENDAPAT KASIPIDUM</span><div class="p17-rich-field">{{ sop_form.kasi_opinion_html }}</div>{{ sop_form.kasi_opinion_html.errors }}</label>
+          <label><span>PETUNJUK KAJARI</span><div class="p17-rich-field">{{ sop_form.leader_instruction_html }}</div>{{ sop_form.leader_instruction_html.errors }}</label>
+        </div>
+      </article>
+
+      <article class="p17-editor-card">
+        <header class="p17-section-title"><span>05</span><div><b>Barcode/QR Footer SOP Form-1B</b><small>Barcode tampil di footer; E-Sign tetap berada pada blok tanda tangan.</small></div></header>
+        <label class="sop1b-barcode-field">{{ sop_form.barcode_image.label }}{{ sop_form.barcode_image }}{{ sop_form.barcode_image.errors }}</label>
+      </article>
+
+      {% if sop_form.non_field_errors %}<div class="form-error-summary">{{ sop_form.non_field_errors }}</div>{% endif %}
+      <div class="p17-editor-actions">
+        <a class="secondary-btn" href="{% url 'cases:p17_list' %}">Batal</a>
+        <button type="button" class="secondary-btn" data-p17-print>Cetak Preview P-17</button>
+        <button type="button" class="secondary-btn" data-sop1b-print>Cetak SOP Form-1B</button>
+        {% if can_edit %}<button type="submit" class="primary-btn">Simpan Kedua Draf</button>{% endif %}
+      </div>
+    </div>
+  </section>
+
+  <aside class="p17-preview-column" aria-label="Pratinjau dokumen P-17 dan SOP Form-1B">
+    <div class="p17-preview-toolbar">
+      <span><i></i> PRATINJAU LANGSUNG</span>
+      <nav aria-label="Pilih pratinjau dokumen">
+        <button type="button" class="active" data-preview-tab="p17">P-17</button>
+        <button type="button" data-preview-tab="sop1b">SOP FORM-1B</button>
+      </nav>
+      <small>F4 · 8,5 × 13 inci</small>
+    </div>
+    <div class="p17-preview-panel active" data-document-preview="p17">
+      <div class="p17-overflow-warning" data-p17-overflow-warning hidden><b>Ada blok yang terlalu panjang</b><p>Pisahkan paragraf atau daftar yang ditandai agar dapat dibagi dengan aman.</p></div>
+      <div class="p17-preview-stage"><div class="p17-preview-pages" data-p17-pages></div></div>
+    </div>
+    <div class="p17-preview-panel" data-document-preview="sop1b" hidden>
+      <div class="p17-overflow-warning" data-sop1b-overflow-warning hidden><b>Ada blok yang terlalu panjang</b><p>Pisahkan paragraf agar naskah dapat dibagi ke halaman berikutnya.</p></div>
+      <div class="p17-preview-stage"><div class="p17-preview-pages" data-sop1b-pages></div></div>
+    </div>
+  </aside>
+
+  <template data-p17-document-source>{{ preview_content_html|safe }}</template>
+  <template data-p17-letterhead>
+    <header class="p17-letterhead p16-standard-letterhead">
+      <div class="p17-letterhead-main p16-standard-letterhead-main">
+        <span class="p16-standard-letterhead-logo"><img src="{% static 'img/logo-kejaksaan-p16-transparent.png' %}" alt="Logo Kejaksaan Republik Indonesia"></span>
+        <div class="p16-standard-letterhead-copy">
+          <b>{{ institution.institution_name|default:'KEJAKSAAN REPUBLIK INDONESIA'|upper }}</b>
+          <strong>{{ institution.work_unit|default:'SATUAN KERJA BELUM DIKONFIGURASI'|upper }}</strong>
+          <p>{{ institution.address|default:'Alamat instansi belum dikonfigurasi' }}</p>
+        </div>
+      </div>
+      <div class="p17-letterhead-rule"><b>“Demi Keadilan dan Kebenaran Berdasarkan<br>Ketuhanan Yang Maha Esa”</b><strong>P-17</strong></div>
+    </header>
+  </template>
+
+  <template data-sop1b-document-source>{{ sop_preview_content_html|safe }}</template>
+  <template data-sop1b-letterhead>
+    <header class="sop1b-letterhead p16-standard-letterhead">
+      <div class="sop1b-letterhead-main p16-standard-letterhead-main">
+        <span class="p16-standard-letterhead-logo"><img src="{% static 'img/logo-kejaksaan-p16-transparent.png' %}" alt="Logo Kejaksaan Republik Indonesia"></span>
+        <div class="p16-standard-letterhead-copy">
+          <b>{{ institution.institution_name|default:'KEJAKSAAN REPUBLIK INDONESIA'|upper }}</b>
+          <strong>{{ institution.work_unit|default:'SATUAN KERJA BELUM DIKONFIGURASI'|upper }}</strong>
+          <p>{{ institution.address|default:'Alamat instansi belum dikonfigurasi' }}</p>
+        </div>
+      </div>
+      <div class="sop1b-letterhead-rule"><b>“Demi Keadilan dan Kebenaran<br>Berdasarkan Ketuhanan Yang Maha Esa”</b><strong>SOP FORM-1B</strong></div>
+    </header>
+  </template>
+
+  <div class="p16-sipede-modal" data-p17-sipede-modal hidden>
+    <button type="button" class="p16-sipede-backdrop" data-p17-sipede-close aria-label="Tutup"></button>
+    <section class="p16-sipede-dialog" role="dialog" aria-modal="true" aria-labelledby="p17-sipede-title">
+      <button type="button" class="p16-sipede-close" data-p17-sipede-close aria-label="Tutup">&times;</button>
+      <header><img src="{% static 'img/sipede-color.png' %}" alt="SIPede"><div><small>ADMINISTRASI PERKARA</small><h2 id="p17-sipede-title">Upload P-17 ke SIPede</h2></div></header>
+      <p data-p17-sipede-message>Sistem akan mengambil nomor resmi dan hanya mengunggah dokumen P-17 sebagai PDF. SOP Form-1B tidak ikut diunggah.</p>
+      <div class="p16-sipede-fields">
+        <label>Sifat<select data-p17-sipede-field="sifat"><option value="B" selected>Biasa</option><option value="T">Terbatas</option><option value="R">Rahasia</option><option value="SR">Sangat Rahasia</option><option value="PRIN">Perintah</option></select></label>
+        <label>Kode masalah<input type="text" maxlength="50" required value="{{ form.number_letter_code }}" data-p17-sipede-field="kode_masalah"></label>
+        <label>Tujuan<textarea rows="2" maxlength="500" required data-p17-sipede-field="tujuan">{{ p17_sipede_destination }}</textarea></label>
+        <label>Perihal<textarea rows="3" maxlength="500" required data-p17-sipede-field="perihal">{{ p17_sipede_subject }}</textarea></label>
+        <label>Ditandatangani oleh<select required data-p17-sipede-field="penandatangan">{% for name in sipede_signatory_names %}<option value="{{ name }}"{% if name == default_sipede_signatory %} selected{% endif %}>{{ name }}</option>{% endfor %}</select></label>
+      </div>
+      <div class="p16-sipede-progress" data-p17-sipede-progress hidden><i></i><span>Memproses…</span></div>
+      <footer><button type="button" class="secondary-btn" data-p17-sipede-close>Batal</button><button type="button" class="primary-btn" data-p17-sipede-confirm>Ambil Nomor &amp; Upload</button></footer>
+    </section>
+  </div>
+  <div class="p16-disposition-modal" data-p17-disposition-modal hidden>
+    <button type="button" class="p16-disposition-backdrop" data-p17-disposition-close aria-label="Tutup"></button>
+    <section class="p16-disposition-dialog" role="dialog" aria-modal="true" aria-labelledby="p17-disposition-title">
+      <button type="button" class="p16-sipede-close" data-p17-disposition-close aria-label="Tutup">&times;</button>
+      <header><span>⇄</span><div><small>SIPEDE</small><h2 id="p17-disposition-title">Penerusan Surat P-17</h2></div></header>
+      <p>Nomor surat sudah diperoleh. Pilih tujuan penerusan sebelum PDF P-17 diunggah.</p>
+      <section class="p16-disposition-picker"><label class="p16-disposition-all"><input type="checkbox" data-p17-disposition-all> <span>Pilih semua tujuan</span></label><div class="p16-disposition-options" data-p17-disposition-options></div></section>
+      <footer><button type="button" class="secondary-btn" data-p17-disposition-close>Batal</button><button type="button" class="primary-btn" data-p17-disposition-confirm>Buat PDF &amp; Kirim</button></footer>
+    </section>
+  </div>
+</form>
+{% include 'configurations/includes/sipede_auth_modal.html' %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'vendor/jodit/jodit.min.js' %}"></script>
+<script src="{% static 'js/sipede-integration.js' %}?v=20261017-1"></script>
+<script src="{% static 'js/p17-editor.js' %}?v=20261018-1"></script>
+<script src="{% static 'js/p17-sipede.js' %}?v=20261018-1"></script>
+<script src="{% static 'js/sop-form-1b.js' %}?v=20261124-2"></script>
+<script src="{% static 'js/acting-signatory.js' %}?v=20261123-1"></script>
+{% endblock %}

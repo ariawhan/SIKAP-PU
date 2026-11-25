@@ -1,0 +1,28 @@
+{% load static %}
+<section class="p17-page-content" data-p17-page>
+  <div class="p17-meta">
+    <div><b>Nomor</b><span>:</span><p data-p17-output="number">{{ draft.letter_number }}</p></div>
+    <div><b>Sifat</b><span>:</span><p data-p17-output="nature">{{ draft.letter_nature }}</p></div>
+    <div><b>Lampiran</b><span>:</span><p data-p17-output="attachment">{{ draft.attachment }}</p></div>
+    <div class="p17-subject-row"><b>Hal</b><span>:</span><div data-p17-section="subject">{{ draft.subject_html|striptags }}</div></div>
+    <p class="p17-place-date">{{ institution.city|default:'Singaraja' }}, <span data-p17-output="date">{{ draft.letter_date|date:'d F Y' }}</span></p>
+  </div>
+
+  <div class="p17-recipient" data-p17-section="recipient">{{ draft.recipient_html|safe }}</div>
+
+  <div class="p17-letter-body" data-p17-section="body">{{ draft.body_html|safe }}</div>
+
+  <div class="p17-signature">
+    <p><strong><span data-acting-output="title">{% if draft.acting_type %}{{ draft.get_acting_type_display }} {% endif %}{{ institution.leader_title|default:'Kepala Kejaksaan Negeri' }}</span><br>Selaku Penuntut Umum</strong></p>
+    <div class="p17-signature-space"><img src="{% static 'img/tte.png' %}" alt="Tanda tangan elektronik"></div>
+    <p><strong><u><span data-acting-output="name">{% if draft.acting_type %}{{ draft.acting_name|default:'Nama pejabat belum diisi' }}{% else %}{{ institution.leader_name|default:'Nama pimpinan belum dikonfigurasi' }}{% endif %}</span></u></strong></p>
+    <p><strong><span data-acting-output="identity">{% if draft.acting_type %}{{ draft.acting_position|default:'Jabatan belum diisi' }} NIP.{{ draft.acting_nip|default:'belum diisi' }}{% else %}{% if institution.leader_rank %}{{ institution.leader_rank }} {% endif %}NIP.{{ institution.leader_nip|default:'belum dikonfigurasi' }}{% endif %}</span></strong></p>
+  </div>
+
+  <div class="p17-copies">
+    <p><u>Tembusan:</u></p>
+    <div data-p17-section="copies">{{ draft.copies_html|safe }}</div>
+  </div>
+
+  <div class="p17-verification-mark{% if draft.barcode_image %} has-barcode{% endif %}" data-p17-barcode-mark aria-label="Barcode verifikasi P-17">{% if draft.barcode_image %}<img src="{{ draft.barcode_image.url }}" alt="Barcode verifikasi P-17">{% else %}<span>QR</span><small>SIKAP-PU</small>{% endif %}</div>
+</section>

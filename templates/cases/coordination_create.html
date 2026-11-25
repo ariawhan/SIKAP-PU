@@ -1,0 +1,34 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+
+{% block title %}Buat {{ document_label }}{% endblock %}
+{% block page_name %}Pra Penuntutan / {{ document_label }} / Baru{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/coordination-editor.css' %}?v=20261124-1">{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="kicker text-red-700">Pra Penuntutan</p>
+    <h1>Buat {{ document_label }}</h1>
+    <p>Pilih perkara yang akan dibuatkan berita acara koordinasi.</p>
+  </div>
+  <a class="secondary-btn" href="{% url list_url_name %}">← Daftar {{ document_label }}</a>
+</section>
+
+<section class="coordination-create-shell">
+  <article class="coordination-create-card">
+    <div class="coordination-create-mark"><span>BA</span><b>{{ coordination_roman }}</b></div>
+    <div class="coordination-create-copy">
+      <span>BERITA ACARA BARU</span>
+      <h2>Koordinasi Penyidik dan Penuntut Umum</h2>
+      <p>Sistem mengisi data perkara, Penuntut Umum, Kepala Seksi Tindak Pidana Umum, serta materi awal dari P-16. Seluruh bagian tetap dapat disunting.</p>
+    </div>
+    <form method="post" class="coordination-create-form">
+      {% csrf_token %}
+      <label>{{ form.spdp.label }}{{ form.spdp }}<small>Hanya SPDP yang sudah memiliki draf P-16 dan belum mempunyai {{ document_label }} yang ditampilkan.</small>{{ form.spdp.errors }}</label>
+      {{ form.non_field_errors }}
+      <div><a class="secondary-btn" href="{% url list_url_name %}">Batal</a><button class="primary-btn" type="submit">Buat dan Buka Editor</button></div>
+    </form>
+  </article>
+</section>
+{% endblock %}

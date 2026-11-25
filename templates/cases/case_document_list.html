@@ -1,0 +1,40 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}{{ document_label }}{% endblock %}
+{% block page_name %}Pra Penuntutan / {{ document_label }}{% endblock %}
+{% block extra_head %}{% if document_type != 'p18' and document_type != 'p20' and document_type != 'sop07' %}<link rel="stylesheet" href="{% static 'css/spdp-list.css' %}?v=20261124-1">{% endif %}{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="kicker text-red-700">Pra Penuntutan</p><h1>Daftar {{ document_label }}</h1><p>{{ document_description }}</p></div>
+  {% if can_create %}<a class="primary-btn" href="{% url create_url_name %}">+ Buat {{ document_label }}</a>{% endif %}
+</section>
+{% if document_type == 'p18' or document_type == 'p20' or document_type == 'sop07' %}
+{% include 'cases/includes/stat_cards_only.html' %}
+{% elif show_overview %}
+{% include 'cases/includes/list_overview.html' %}
+{% endif %}
+<section class="panel">
+  <div class="case-toolbar"><form method="get"><span>⌕</span><input name="q" value="{{ query }}" placeholder="Cari nomor surat, SPDP, atau pelaku"><button>Cari</button></form><span>{{ page_obj.paginator.count }} draf</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nomor Surat</th><th>Perkara / SPDP</th><th>Data Pelaku</th><th>Tanggal</th>{% if document_type != 'p18' and document_type != 'p20' and document_type != 'sop07' %}<th>Sisa Hari</th>{% endif %}<th>Status</th><th>Aksi</th></tr></thead>
+      <tbody>
+        {% for draft in drafts %}
+        <tr>
+          <td><b>{{ draft.letter_number }}</b><small>{{ document_label }}</small></td>
+          <td><b>{{ draft.spdp.letter_number }}</b><small>Diterima {{ draft.spdp.received_date|date:'d M Y' }}</small></td>
+          <td>{% for suspect in draft.spdp.suspects.all %}<b>{{ suspect.name }}</b>{% empty %}Belum ada data pelaku{% endfor %}</td>
+          <td>{{ draft.letter_date|date:'d M Y' }}</td>
+          {% if document_type != 'p18' and document_type != 'p20' and document_type != 'sop07' %}<td><span class="deadline-badge {{ draft.deadline_class }}"><span class="deadline-badge-label">{{ draft.deadline_title }}</span><span class="deadline-badge-value">{{ draft.deadline_value }}</span></span>{% if draft.deadline_detail %}<small>{{ draft.deadline_detail }}</small>{% endif %}</td>{% endif %}
+          <td>{% if document_type == 'sop07' and draft.workflow_is_issued %}<span class="badge red">Diberhentikan</span>{% elif document_type == 'p20' and draft.sipede_status == 'sudah' %}<span class="badge red">Diberhentikan</span>{% elif document_type == 'p18' or document_type == 'p19' %}{% if draft.workflow_is_issued %}<span class="badge green">Terbit</span>{% else %}<span class="badge amber">Draf</span>{% endif %}{% else %}<span class="badge amber">{{ draft.get_status_display }}</span>{% endif %}</td>
+          <td>{% if document_type == 'p18' or document_type == 'p19' %}{% include 'cases/includes/workflow_action_menu.html' with item=draft detail_url_name=detail_url_name document_label=document_label %}{% else %}<a class="row-action" href="{% url detail_url_name draft.pk %}">Buka Draf →</a>{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="{% if document_type == 'p18' or document_type == 'p20' or document_type == 'sop07' %}6{% else %}7{% endif %}"><div class="empty-table"><span>▤</span><b>Belum ada {{ document_label }}</b><p>Buat draf dari perkara yang memenuhi tahapan.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'includes/pagination.html' with page_obj=page_obj query=query %}
+</section>
+{% endblock %}

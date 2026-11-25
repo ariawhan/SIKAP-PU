@@ -1,0 +1,28 @@
+{% if item.workflow_is_issued %}
+<details class="action-menu workflow-row-actions">
+  <summary aria-label="Buka aksi {{ document_label|default:'dokumen' }}" title="Aksi"><b>⋮</b></summary>
+  <div class="action-menu-list">
+    <a href="{% url detail_url_name item.workflow_detail_pk %}"><i>👁</i><span><b>Lihat</b><small>Buka dokumen yang sudah terbit</small></span></a>
+    {% for action in item.workflow_actions %}
+    <form method="post" action="{% url 'cases:workflow_generate' action.source action.target item.workflow_spdp_id %}">
+      {% csrf_token %}
+      <button type="submit"><i>＋</i><span><b>{{ action.label }}</b><small>Buat dan buka draf berikutnya</small></span></button>
+    </form>
+    {% empty %}
+      {% if item.workflow_next_locked %}<div class="action-menu-info success"><i>✓</i><span><b>Tahap lanjutan sudah dibuat</b><small>Pilihan lain dari tahap ini dikunci</small></span></div>{% endif %}
+    {% endfor %}
+    {% if mark_p21_completed and item.can_mark_p21_completed %}
+      {% if item.status == 'completed' %}
+        <div class="action-menu-info success"><i>✓</i><span><b>P-21 sudah dilaksanakan</b><small>Reminder P-21 telah dihentikan</small></span></div>
+      {% else %}
+        <form method="post" action="{% url 'cases:p21_mark_completed' item.pk %}">
+          {% csrf_token %}
+          <button type="submit"><i>✓</i><span><b>P-21 sudah dilaksanakan</b><small>Hentikan reminder P-21 untuk perkara ini</small></span></button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </div>
+</details>
+{% else %}
+<a class="row-action" href="{% url detail_url_name item.workflow_detail_pk %}">Lihat Draf →</a>
+{% endif %}

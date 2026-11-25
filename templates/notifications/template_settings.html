@@ -1,0 +1,153 @@
+{% extends 'dashboard/layout.html' %}
+{% block title %}Setting Template Notifikasi{% endblock %}
+{% block page_name %}Setting Template Notifikasi{% endblock %}
+{% block content %}
+<section class="notification-template-page">
+  <header class="notification-template-hero">
+    <div>
+      <p class="notification-template-kicker">SUPER ADMIN · PUSAT PESAN</p>
+      <h1>Setting Template Notifikasi</h1>
+      <p>Atur isi pesan serta kanal pengiriman WhatsApp dan Telegram untuk setiap tahapan tanpa mengubah kode sistem.</p>
+    </div>
+    <div class="notification-template-summary">
+      <small>Template tersedia</small>
+      <strong>{{ notification_templates|length }}</strong>
+      <span>Setiap perubahan langsung digunakan pada pengiriman berikutnya.</span>
+    </div>
+  </header>
+
+  <div class="notification-template-layout{% if selected_template %} has-editor{% endif %}">
+    <article class="notification-template-card">
+      <div class="notification-template-card-head">
+        <div>
+          <span>Daftar Template</span>
+          <h2>Pesan otomatis sistem</h2>
+        </div>
+        <p>Pilih template yang ingin diubah.</p>
+      </div>
+      <div class="notification-template-table-wrap">
+        <table class="notification-template-table">
+          <thead><tr><th>Template</th><th>Channel</th><th>Status</th><th>Diperbarui</th><th>Aksi</th></tr></thead>
+          <tbody>
+            {% for item in notification_templates %}
+            <tr{% if selected_template.pk == item.pk %} class="selected"{% endif %}>
+              <td><b>{{ item.name }}</b><small>{{ item.description }}</small></td>
+              <td><span class="notification-template-channel {{ item.channel }}">{{ item.get_channel_display }}</span></td>
+              <td>{% if item.is_default %}<span class="notification-template-state default">Bawaan</span>{% else %}<span class="notification-template-state custom">Disesuaikan</span>{% endif %}</td>
+              <td><b>{{ item.updated_at|date:"d M Y" }}</b><small>{{ item.updated_by.display_name|default:"Sistem" }}</small></td>
+              <td><a class="notification-template-edit" href="?edit={{ item.key }}#template-editor">Ubah</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    {% if selected_template and template_form %}
+    <article class="notification-template-editor" id="template-editor">
+      <header>
+        <div>
+          <span>Editor Template</span>
+          <h2>{{ selected_template.name }}</h2>
+          <p>{{ selected_template.description }}</p>
+        </div>
+        <span class="notification-template-channel {{ selected_template.channel }}">{{ selected_template.get_channel_display }}</span>
+      </header>
+
+      <form method="post" class="notification-template-form">
+        {% csrf_token %}
+        <input type="hidden" name="template_key" value="{{ selected_template.key }}">
+        <div class="notification-template-editor-grid">
+          <div class="notification-template-fields">
+            <label>
+              <span>Judul notifikasi</span>
+              {{ template_form.subject_template }}
+              {{ template_form.subject_template.errors }}
+            </label>
+            <label>
+              <span>Isi pesan</span>
+              {{ template_form.body_template }}
+              {{ template_form.body_template.errors }}
+              <small>Baris baru pada editor akan dipertahankan saat pesan dikirim.</small>
+            </label>
+          </div>
+          <aside class="notification-variable-box">
+            <div><b>Variabel yang dapat digunakan</b><small>Klik variabel untuk menyalinnya.</small></div>
+            <div class="notification-variable-list">
+              {% for variable in selected_template.allowed_variables %}
+              <button type="button" data-copy-variable="{{ variable }}">{% templatetag openvariable %}{{ variable }}{% templatetag closevariable %}</button>
+              {% endfor %}
+            </div>
+            <p id="notification-variable-feedback" aria-live="polite"></p>
+            <div class="notification-variable-note">
+              <b>Catatan</b>
+              <p>Jangan mengubah tulisan di dalam kurung kurawal. Nilainya akan diisi otomatis sesuai data perkara.</p>
+            </div>
+          </aside>
+        </div>
+
+        {% if selected_menu_setting %}
+        <section class="notification-template-channels" aria-labelledby="template-channel-title">
+          <div>
+            <span>Konfigurasi Pengiriman</span>
+            <h3 id="template-channel-title">{{ selected_menu_setting.get_menu_key_display }}</h3>
+            {% if selected_template.channel == 'web' %}
+            <p>Aktifkan atau nonaktifkan notifikasi yang muncul di dalam aplikasi web.</p>
+            {% else %}
+            <p>Pengaturan ini berlaku untuk kanal eksternal pada tahapan yang sama.</p>
+            {% endif %}
+          </div>
+          {% if selected_template.channel == 'web' %}
+          <label class="notification-channel-toggle notification-channel-toggle-single">
+            <input type="checkbox" name="menu_web_enabled"{% if selected_menu_setting.web_enabled %} checked{% endif %}>
+            <span><b>Aktif</b><small>Tampilkan notifikasi kepada pengguna di aplikasi web.</small></span>
+          </label>
+          {% else %}
+          <label class="notification-channel-toggle">
+            <input type="checkbox" name="menu_whatsapp_enabled"{% if selected_menu_setting.whatsapp_enabled %} checked{% endif %}>
+            <span><b>WhatsApp</b><small>Kirim reminder ke nomor pengguna.</small></span>
+          </label>
+          <label class="notification-channel-toggle">
+            <input type="checkbox" name="menu_telegram_enabled"{% if selected_menu_setting.telegram_enabled %} checked{% endif %}>
+            <span><b>Telegram</b><small>Kirim reminder ke akun Telegram pengguna.</small></span>
+          </label>
+          {% endif %}
+        </section>
+        {% endif %}
+
+        <div class="notification-template-actions">
+          <button type="submit" name="action" value="reset_template" class="notification-template-reset" formnovalidate onclick="return confirm('Kembalikan isi template ini ke bawaan sistem?')">Kembalikan Bawaan</button>
+          <a href="{% url 'notifications:template_settings' %}" class="secondary-btn">Tutup Editor</a>
+          <button type="submit" name="action" value="save_template" class="primary-btn">Simpan Template</button>
+        </div>
+      </form>
+    </article>
+    {% else %}
+    <aside class="notification-template-guide">
+      <span>✦</span>
+      <h2>Pilih template untuk mulai</h2>
+      <p>Klik tombol <b>Ubah</b> pada tabel. Variabel perkara tetap tersedia agar pesan dapat terisi otomatis.</p>
+    </aside>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  const feedback = document.getElementById("notification-variable-feedback");
+  document.querySelectorAll("[data-copy-variable]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const value = `{${button.dataset.copyVariable}}`;
+      try {
+        await navigator.clipboard.writeText(value);
+        if (feedback) feedback.textContent = `${value} disalin.`;
+      } catch (error) {
+        if (feedback) feedback.textContent = `Salin manual: ${value}`;
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}

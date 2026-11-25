@@ -1,0 +1,74 @@
+{% load static %}
+<section class="coordination-source-content" data-coordination-document-content>
+  <section class="coordination-main-content">
+    <header class="coordination-title-block">
+      <h1>BERITA ACARA KOORDINASI {% if draft.coordination_type == 'ba1' %}I{% elif draft.coordination_type == 'ba2' %}KE-II{% else %}KE-III{% endif %}</h1>
+      <h2>ANTARA PENYIDIK DAN PENUNTUT UMUM</h2>
+    </header>
+
+    <p class="coordination-opening">Pada hari ini <span data-coordination-output="date-long">{{ draft.meeting_date|date:'l, d F Y' }}</span>, bertempat di <span data-coordination-output="meeting-place">{{ draft.meeting_place }}</span>, kami yang bertanda tangan di bawah ini:</p>
+
+    <section class="coordination-party-card">
+      <h3>I. &nbsp;PIHAK PENUNTUT UMUM :</h3>
+      <dl>
+        <div><dt>1. &nbsp;Nama</dt><dd>: <span data-coordination-output="prosecutor-name">{{ draft.prosecutor_name|default:'---' }}</span></dd></div>
+        <div><dt>&nbsp;&nbsp;&nbsp;&nbsp;Pangkat / Nip.</dt><dd>: <span data-coordination-output="prosecutor-rank">{{ draft.prosecutor_rank|default:'---' }}</span> / <span data-coordination-output="prosecutor-nip">{{ draft.prosecutor_nip|default:'---' }}</span></dd></div>
+        <div><dt>&nbsp;&nbsp;&nbsp;&nbsp;Jabatan</dt><dd>: Jaksa Penuntut Umum.</dd></div>
+      </dl>
+    </section>
+
+    <section class="coordination-party-card">
+      <h3>II. PIHAK PENYIDIK (POLRI / PPNS / PENYIDIK TERTENTU):</h3>
+      <dl>
+        <div><dt>1. &nbsp;Nama</dt><dd>: <span data-coordination-output="investigator-name">{{ draft.investigator_name|default:'---' }}</span></dd></div>
+        <div><dt>&nbsp;&nbsp;&nbsp;&nbsp;Pangkat / Nrp</dt><dd>: <span data-coordination-output="investigator-rank">{{ draft.investigator_rank|default:'---' }}</span> / <span data-coordination-output="investigator-nrp">{{ draft.investigator_nrp|default:'---' }}</span></dd></div>
+        <div><dt>&nbsp;&nbsp;&nbsp;&nbsp;Jabatan</dt><dd>: <span data-coordination-output="investigator-position">{{ draft.investigator_position|default:'Penyidik' }}</span></dd></div>
+      </dl>
+    </section>
+
+    <div class="coordination-body" data-coordination-section="body">{{ draft.body_html|safe }}</div>
+
+    <section class="coordination-signatures">
+      <div>
+        <p>Penyidik</p>
+        <span class="coordination-sign-space"></span>
+        <strong data-coordination-output="investigator-name">{{ draft.investigator_name|default:'---' }}</strong>
+        <u><span data-coordination-output="investigator-rank">{{ draft.investigator_rank|default:'---' }}</span> / NRP <span data-coordination-output="investigator-nrp">{{ draft.investigator_nrp|default:'---' }}</span></u>
+      </div>
+      <div>
+        <p>Penuntut Umum</p>
+        <span class="coordination-sign-space coordination-esign"><img src="{% static 'img/tte.png' %}" alt="Tanda tangan elektronik"></span>
+        <strong data-coordination-output="prosecutor-name">{{ draft.prosecutor_name|default:'---' }}</strong>
+        <u><span data-coordination-output="prosecutor-rank">{{ draft.prosecutor_rank|default:'---' }}</span> / <span data-coordination-output="prosecutor-nip">{{ draft.prosecutor_nip|default:'---' }}</span></u>
+      </div>
+    </section>
+
+    <h3 class="coordination-acknowledge-title">Mengetahui;</h3>
+    <section class="coordination-signatures coordination-supervisors">
+      <div>
+        <p><b data-coordination-output="investigator-supervisor-title">{{ draft.investigator_supervisor_title|default:'ATASAN PENYIDIK' }}</b></p>
+        <span class="coordination-sign-space"></span>
+        <strong data-coordination-output="investigator-supervisor-name">{{ draft.investigator_supervisor_name|default:'---' }}</strong>
+        <u><span data-coordination-output="investigator-supervisor-rank">{{ draft.investigator_supervisor_rank|default:'---' }}</span> / <span data-coordination-output="investigator-supervisor-nrp">{{ draft.investigator_supervisor_nrp|default:'---' }}</span></u>
+      </div>
+      <div>
+        <p><b data-coordination-output="prosecutor-supervisor-title">{{ draft.prosecutor_supervisor_title|default:'KEPALA SEKSI TINDAK PIDANA UMUM' }}</b></p>
+        <span class="coordination-sign-space"></span>
+        <strong data-coordination-output="prosecutor-supervisor-name">{{ draft.prosecutor_supervisor_name|default:'---' }}</strong>
+        <u><span data-coordination-output="prosecutor-supervisor-rank">{{ draft.prosecutor_supervisor_rank|default:'---' }}</span> / <span data-coordination-output="prosecutor-supervisor-nip">{{ draft.prosecutor_supervisor_nip|default:'---' }}</span></u>
+      </div>
+    </section>
+    <div class="coordination-verification-mark{% if draft.barcode_image %} has-barcode{% endif %}" data-coordination-barcode-mark aria-label="Barcode verifikasi koordinasi">{% if draft.barcode_image %}<img src="{{ draft.barcode_image.url }}" alt="Barcode verifikasi koordinasi">{% else %}{% include 'cases/includes/verification_code_placeholder.html' %}{% endif %}</div>
+  </section>
+
+  {% for number in '123' %}
+  <section class="coordination-documentation{% if number == '1' and not draft.documentation_image_1 or number == '2' and not draft.documentation_image_2 or number == '3' and not draft.documentation_image_3 %} is-empty{% endif %}" data-coordination-documentation="{{ number }}">
+    <div class="coordination-documentation-frame">
+      {% if number == '1' and draft.documentation_image_1 %}<img src="{{ draft.documentation_image_1.url }}" alt="Dokumentasi koordinasi 1">
+      {% elif number == '2' and draft.documentation_image_2 %}<img src="{{ draft.documentation_image_2.url }}" alt="Dokumentasi koordinasi 2">
+      {% elif number == '3' and draft.documentation_image_3 %}<img src="{{ draft.documentation_image_3.url }}" alt="Dokumentasi koordinasi 3">
+      {% else %}<span>Belum ada dokumentasi</span>{% endif %}
+    </div>
+  </section>
+  {% endfor %}
+</section>

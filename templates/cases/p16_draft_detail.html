@@ -1,0 +1,286 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Editor P-16{% endblock %}
+{% block page_name %}Pra Penuntutan / P-16{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'vendor/jodit/jodit.min.css' %}"><link rel="stylesheet" href="{% static 'css/spdp-form.css' %}?v=20260915-9"><link rel="stylesheet" href="{% static 'css/p16-editor.css' %}?v=20261022-1"><link rel="stylesheet" href="{% static 'css/p16-cms-response.css' %}?v=20261018-1"><link rel="stylesheet" href="{% static 'css/p16-structured-editor.css' %}?v=20261022-1"><link rel="stylesheet" href="{% static 'css/p16-document.css' %}?v=20261018-1"><link rel="stylesheet" href="{% static 'css/p16-sipede.css' %}?v=20261018-3"><link rel="stylesheet" href="{% static 'css/sipede-integration.css' %}?v=20261017-1">{% endblock %}
+
+{% block content %}
+<section class="page-heading p16-page-heading">
+  <div><p class="kicker text-red-700">Pra Penuntutan</p><h1>Editor P-16</h1><p>Lengkapi setiap bagian surat dan periksa hasilnya melalui pratinjau langsung.</p></div>
+  <div class="p16-heading-actions"><a class="secondary-btn" href="{% url 'cases:p16_list' %}">← Daftar P-16</a></div>
+</section>
+
+{% if not institution.pk or not institution.work_unit or not institution.address or not institution.leader_name or not institution.leader_title or not institution.leader_rank or not institution.leader_nip %}
+<div class="p16-config-warning" role="alert">
+  <span>!</span>
+  <div><b>Identitas surat belum lengkap</b><p>Lengkapi satuan kerja, alamat, jabatan, nama, pangkat, dan NIP pimpinan sebelum mencetak P-16.</p></div>
+  {% if request.user.is_super_admin %}<a href="{% url 'configurations:institution' %}">Buka Konfigurasi Instansi</a>{% endif %}
+</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" id="p16-draft-form" class="p16-workspace" data-p16-form data-spdp-form data-can-edit="{% if can_edit %}true{% else %}false{% endif %}" data-p16-number-region="{{ form.number_region_code }}" data-p16-number-code="{{ form.number_letter_code }}" data-p16-sipede-number="{% if 'DRAFT/' not in draft.draft_number %}{{ draft.draft_number }}{% endif %}" style="{{ p16_layout_style }}">
+  {% csrf_token %}
+  <section class="p16-editor-column">
+    {% if not can_edit %}<div class="p16-readonly-notice"><span>i</span><p><b>Mode lihat saja</b> Hanya Kasi Pidum, Jaksa yang ditunjuk, Admin, atau Super Admin yang dapat mengubah draf.</p></div>{% endif %}
+
+    <article class="p16-editor-card">
+      <div class="p16-section-title p16-identity-title"><span>01</span><div><b>Identitas Surat</b><small>Nomor dan tanggal surat P-16</small></div></div>
+      <div class="p16-meta-fields p16-identity-fields">
+        <label class="p16-number-field">{{ form.draft_number.label }}{{ form.draft_number }}<small data-p16-number-help>Isi angka nomor urut saja, contoh: 1169. Akhiran huruf dari SIPede seperti 1600A juga didukung.</small>{{ form.draft_number.errors }}</label>
+        <label class="p16-date-field">{{ form.letter_date.label }}{{ form.letter_date }}<small>Otomatis menggunakan tanggal saat draf dibuat.</small>{{ form.letter_date.errors }}</label>
+        <div class="p16-acting-field" data-p16-acting-picker>
+          <span class="p16-field-label">Status Penandatangan</span>
+          {{ form.acting_type }}
+          <div class="p16-acting-options">
+            <label><input type="checkbox" value="plt" data-p16-acting-choice{% if draft.acting_type == 'plt' %} checked{% endif %}><span aria-hidden="true">&#10003;</span><span class="p16-acting-option-copy"><b>PLT</b><small>Pelaksana Tugas</small></span></label>
+            <label><input type="checkbox" value="plh" data-p16-acting-choice{% if draft.acting_type == 'plh' %} checked{% endif %}><span aria-hidden="true">&#10003;</span><span class="p16-acting-option-copy"><b>PLH</b><small>Pelaksana Harian</small></span></label>
+          </div>
+          <small class="p16-acting-help">Kosongkan jika ditandatangani pejabat definitif.</small>
+          {{ form.acting_type.errors }}
+          <div class="p16-acting-identity" data-p16-acting-fields{% if not draft.acting_type %} hidden{% endif %}>
+            <label>Nama{{ form.acting_name }}{{ form.acting_name.errors }}</label>
+            <label>Jabatan/Pangkat{{ form.acting_position }}{{ form.acting_position.errors }}</label>
+            <label>NIP{{ form.acting_nip }}{{ form.acting_nip.errors }}</label>
+          </div>
+        </div>
+        <!-- <div class="p16-number-preview"><span>Nomor surat lengkap</span><b data-p16-number-preview>Masukkan nomor urut</b><small>PRINT-[nomor]/{{ form.number_region_code|default:'kode wilayah' }}/{{ form.number_letter_code|default:'kode surat' }}/bulan/tahun</small></div> -->
+        <div hidden>{{ form.manual_number }}</div>
+        <div class="p16-barcode-field" data-p16-barcode-widget>
+          <span class="p16-field-label">{{ form.barcode_image.label }}</span>
+          <div class="p16-barcode-uploader" data-p16-barcode-dropzone role="button" tabindex="0" aria-label="Pilih gambar barcode atau QR P-16">
+            <div class="p16-barcode-preview" data-p16-barcode-preview>{% if draft.barcode_image %}<img src="{{ draft.barcode_image.url }}" alt="Barcode P-16 saat ini">{% else %}<span>QR</span>{% endif %}</div>
+            <div class="p16-barcode-copy">
+              <b data-p16-barcode-title>{% if draft.barcode_image %}Barcode sudah terpasang{% else %}Upload barcode verifikasi{% endif %}</b>
+              <small data-p16-barcode-status>{% if draft.barcode_image %}{{ draft.barcode_image.name }}{% else %}Klik atau tarik gambar ke sini.{% endif %}</small>
+            </div>
+          </div>
+          <div class="p16-barcode-native">{{ form.barcode_image }}</div>
+          {{ form.barcode_image.errors }}
+        </div>
+      </div>
+    </article>
+
+    <details class="p16-content-group" data-p16-content-group{% if form.prosecutors.errors or form.consideration_html.errors or form.legal_basis_html.errors or suspect_formset.non_form_errors or form.offense_summary_html.errors or form.recipient_html.errors or form.instruction_html.errors or form.copies_html.errors %} open{% endif %}>
+      <summary class="p16-content-group-summary">
+        <span class="p16-content-group-icon">⌄</span>
+        <div><b>Isi P-16</b><small>Jaksa Penuntut, Menimbang, Dasar, Kepada, Untuk, dan Tembusan</small></div>
+      </summary>
+      <div class="p16-content-group-body">
+
+    <article class="p16-editor-card">
+      <div class="p16-section-title"><span>02</span><div><b>Jaksa Penuntut</b><small>Kelola seluruh Jaksa dan lihat perubahan langsung pada lampiran</small></div></div>
+      <div class="p16-additional-prosecutors">
+        <div class="p16-additional-head"><div><b>Tambah Jaksa</b><small>Pilih Jaksa, lalu tekan Tambah untuk memasukkannya ke dalam tim</small></div><span>Bisa lebih dari satu</span></div>
+        {% if prosecutor_options %}
+        <div class="p16-prosecutor-picker" data-p16-prosecutor-picker>
+          <div class="p16-prosecutor-add-row">
+            <label class="p16-prosecutor-select-field">Jaksa
+              <select data-p16-prosecutor-select {% if not can_edit %}disabled{% endif %}>
+                <option value="">Pilih Jaksa Penuntut</option>
+                {% for option in prosecutor_options %}<option value="{{ option.user.pk }}" data-name="{{ option.user.display_name }}" data-initials="{{ option.user.display_name|slice:':2'|upper }}" data-subtitle="{{ option.user.rank|default:'Pangkat belum diisi' }}{% if option.user.nip %} · NIP {{ option.user.nip }}{% elif option.user.nrp %} · NRP {{ option.user.nrp }}{% endif %}" data-rank="{{ option.user.rank|default:'Pangkat belum diisi' }}" data-nip="{{ option.user.nip|default:'' }}" data-nrp="{{ option.user.nrp|default:'' }}" data-status="{{ option.status }}"{% if option.selected %} disabled{% endif %}>{{ option.user.display_name }}</option>{% endfor %}
+              </select>
+            </label>
+            {% if can_edit %}<button type="button" class="p16-prosecutor-add-btn" data-p16-prosecutor-add>+ Tambah</button>{% endif %}
+          </div>
+          <div class="p16-prosecutor-selected-list" data-p16-prosecutor-list data-empty="Belum ada Jaksa dalam tim P-16."></div>
+          <div class="p16-prosecutor-native" data-p16-prosecutor-inputs>{{ form.prosecutors }}</div>
+        </div>
+        {% else %}<p class="p16-empty-option">Belum ada pengguna aktif dengan role Jaksa.</p>{% endif %}
+        {{ form.prosecutors.errors }}
+      </div>
+    </article>
+
+    <article class="p16-editor-card">
+      <div class="p16-section-title"><span>03</span><div><b>Menimbang</b><small>Wajib diisi menggunakan daftar bernomor 1, 2, 3, dan seterusnya</small></div></div>
+      <div class="p16-rich-field">{{ form.consideration_html }}{{ form.consideration_html.errors }}</div>
+    </article>
+
+    <article class="p16-editor-card">
+      <div class="p16-section-title"><span>04</span><div><b>Dasar</b><small>Wajib diisi menggunakan daftar bernomor 1, 2, 3, dan seterusnya</small></div></div>
+      <div class="p16-rich-field">{{ form.legal_basis_html }}{{ form.legal_basis_html.errors }}</div>
+      <section class="p16-suspect-manager">
+        <header class="p16-suspect-manager-head">
+          <div><span>DATA PERKARA</span><b>Data Pelaku</b><small>Edit pelaku yang sudah ada atau tambahkan pelaku baru.</small></div>
+          <button type="button" class="secondary-btn" data-add-suspect{% if not can_edit %} disabled{% endif %}>+ Tambah Data Pelaku</button>
+        </header>
+        {{ suspect_formset.management_form }}
+        <div class="suspect-summary" data-suspect-summary>
+          <div class="suspect-summary-empty" data-suspect-empty>Belum ada data pelaku. Klik "Tambah Data Pelaku" untuk mengisi.</div>
+        </div>
+        {{ suspect_formset.non_form_errors }}
+      </section>
+      <section class="p16-offense-editor">
+        <header><span>SETELAH DATA PELAKU</span><b>Uraian Tindak Pidana</b><small>Isi awal dibuat otomatis dari data perkara dan tetap dapat disesuaikan.</small></header>
+        <div class="p16-rich-field">{{ form.offense_summary_html }}{{ form.offense_summary_html.errors }}</div>
+      </section>
+    </article>
+
+    <article class="p16-editor-card">
+      <div class="p16-section-title"><span>05</span><div><b>Kepada</b><small>Pihak yang menerima perintah</small></div></div>
+      <div class="p16-rich-field">{{ form.recipient_html }}{{ form.recipient_html.errors }}</div>
+    </article>
+
+    <article class="p16-editor-card">
+      <div class="p16-section-title"><span>06</span><div><b>Untuk</b><small>Wajib diisi menggunakan daftar bernomor 1, 2, 3, dan seterusnya</small></div></div>
+      <div class="p16-rich-field">{{ form.instruction_html }}{{ form.instruction_html.errors }}</div>
+    </article>
+
+    <article class="p16-editor-card">
+      <div class="p16-section-title"><span>07</span><div><b>Tembusan</b><small>Daftar pihak yang menerima tembusan</small></div></div>
+      <div class="p16-rich-field">{{ form.copies_html }}{{ form.copies_html.errors }}</div>
+    </article>
+
+      </div>
+    </details>
+
+    <details class="p16-content-group p16-administration-editor-group" data-p16-content-group{% if form.administrative_staff.errors or form.administration_legal_basis_html.errors or form.administration_consideration_html.errors or form.administration_instruction_html.errors or form.administration_copies_html.errors %} open{% endif %}>
+      <summary class="p16-content-group-summary">
+        <span class="p16-content-group-icon">⌄</span>
+        <div><b>Penunjukan Petugas Administrasi</b><small>Dasar, Pertimbangan, petugas yang ditunjuk, Untuk, dan Tembusan</small></div>
+      </summary>
+      <div class="p16-content-group-body">
+        <article class="p16-editor-card">
+          <div class="p16-section-title"><span>01</span><div><b>Dasar</b><small>Dasar hukum dan SPDP untuk penunjukan petugas administrasi</small></div></div>
+          <div class="p16-rich-field">{{ form.administration_legal_basis_html }}{{ form.administration_legal_basis_html.errors }}</div>
+        </article>
+
+        <article class="p16-editor-card">
+          <div class="p16-section-title"><span>02</span><div><b>Pertimbangan</b><small>Alasan penunjukan petugas administrasi perkara</small></div></div>
+          <div class="p16-rich-field">{{ form.administration_consideration_html }}{{ form.administration_consideration_html.errors }}</div>
+        </article>
+
+        <article class="p16-editor-card">
+          <div class="p16-section-title"><span>03</span><div><b>Petugas Administrasi</b><small>Tambahkan satu atau beberapa pegawai untuk membantu administrasi perkara</small></div></div>
+          <div class="p16-additional-prosecutors">
+            <div class="p16-additional-head"><div><b>Tambah Petugas</b><small>Pilih pegawai, lalu tekan Tambah untuk memasukkannya ke daftar</small></div><span>Bisa lebih dari satu</span></div>
+            <div class="p16-prosecutor-picker" data-p16-administrative-staff-picker>
+              <div class="p16-prosecutor-add-row">
+                <label class="p16-prosecutor-select-field">Pegawai
+                  <select data-p16-administrative-staff-select {% if not can_edit %}disabled{% endif %}>
+                    <option value="">Pilih Petugas Administrasi</option>
+                    {% for option in administrative_staff_options %}<option value="{{ option.user.pk }}" data-name="{{ option.user.display_name }}" data-initials="{{ option.user.display_name|slice:':2'|upper }}" data-rank="{{ option.user.rank|default:'Pangkat belum diisi' }}" data-nip="{{ option.user.nip|default:'' }}" data-roles="{{ option.user.role_labels|default:'Petugas Administrasi' }}"{% if option.selected %} disabled{% endif %}>{{ option.user.display_name }}</option>{% endfor %}
+                  </select>
+                </label>
+                {% if can_edit %}<button type="button" class="p16-prosecutor-add-btn" data-p16-administrative-staff-add>+ Tambah</button>{% endif %}
+              </div>
+              <div class="p16-prosecutor-selected-list" data-p16-administrative-staff-list data-empty="Belum ada petugas administrasi yang ditambahkan."></div>
+              <div class="p16-prosecutor-native" data-p16-administrative-staff-inputs>{{ form.administrative_staff }}</div>
+            </div>
+            {% if not administrative_staff_options %}<p class="p16-empty-option">Belum ada pengguna aktif dengan role Pegawai.</p>{% endif %}
+            {{ form.administrative_staff.errors }}
+          </div>
+        </article>
+
+        <article class="p16-editor-card">
+          <div class="p16-section-title"><span>04</span><div><b>Untuk</b><small>Tugas yang diperintahkan kepada petugas administrasi</small></div></div>
+          <div class="p16-rich-field">{{ form.administration_instruction_html }}{{ form.administration_instruction_html.errors }}</div>
+        </article>
+
+        <article class="p16-editor-card">
+          <div class="p16-section-title"><span>05</span><div><b>Tembusan</b><small>Daftar penerima tembusan surat perintah</small></div></div>
+          <div class="p16-rich-field">{{ form.administration_copies_html }}{{ form.administration_copies_html.errors }}</div>
+        </article>
+      </div>
+    </details>
+
+    {% if form.non_field_errors %}<div class="form-error-summary">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="p16-editor-actions">
+      <button type="button" class="secondary-btn" data-p16-pdf-download data-url="{% url 'cases:p16_sipede_upload' draft.pk %}">Downlaod PDF</button>
+      <button type="button" class="secondary-btn" data-p16-print>Cetak Semua Dokumen</button>
+      {% if can_edit %}<button type="button" class="p16-sipede-button" data-p16-sipede data-url="{% url 'cases:p16_sipede_upload' draft.pk %}" {% if draft.sipede_status == 'sudah' %}disabled{% endif %}>{% if draft.sipede_status == 'sudah' %}Sudah di SIPede{% else %}Ambil Nomor & Upload SIPede{% endif %}</button>{% endif %}
+      {% if can_edit %}<button type="submit" class="primary-btn" data-p16-save>Simpan</button>{% endif %}
+    </div>
+  </section>
+
+  <aside class="p16-preview-column" aria-label="Pratinjau P-16">
+    <div class="p16-preview-toolbar"><span><i></i> PRATINJAU LANGSUNG</span><small>F4 8,5 × 13 inci</small></div>
+    <nav class="p16-preview-tabs" aria-label="Bagian pratinjau">
+      <button type="button" class="active" data-p16-tab="naskah"><span>01</span>Naskah P-16</button>
+      <button type="button" data-p16-tab="lampiran"><span>02</span>Lampiran</button>
+      <button type="button" data-p16-tab="administrasi"><span>03</span>Petugas Administrasi</button>
+    </nav>
+    <div class="p16-overflow-warning" data-p16-overflow-warning role="alert" hidden><b>Isi melewati batas kertas</b><p>Periksa dan ringkas isi pada <span data-p16-overflow-pages></span> sebelum mencetak agar teks tidak terpotong.</p></div>
+    <div class="p16-preview-pages" data-p16-preview-pages></div>
+  </aside>
+
+  <dialog class="suspect-dialog p16-suspect-dialog" data-suspect-dialog aria-labelledby="p16-suspect-dialog-title">
+    <div class="suspect-dialog-shell">
+      <header class="suspect-dialog-head">
+        <div><span>DRAF P-16</span><h2 id="p16-suspect-dialog-title">Data Pelaku</h2><p>Lengkapi identitas pelaku yang dicantumkan pada naskah P-16.</p></div>
+        <button type="button" data-cancel-suspect-dialog aria-label="Tutup popup">&times;</button>
+      </header>
+      <div class="suspect-dialog-body"><div class="suspect-list" data-suspect-list>{% for suspect_form in suspect_formset %}{% include 'cases/suspect_form.html' with suspect_form=suspect_form number=forloop.counter %}{% endfor %}</div></div>
+      <footer class="suspect-dialog-actions"><span>Perubahan masuk ke daftar setelah tombol Selesai ditekan, lalu tersimpan bersama draf.</span><button type="button" class="primary-btn" data-finish-suspect-dialog>Selesai</button></footer>
+    </div>
+  </dialog>
+
+  <template data-p16-document-source>{{ preview_content_html|safe }}</template>
+  <template data-p16-letterhead>
+    <header class="p16-letterhead">
+      <div class="p16-letterhead-main"><span class="p16-letterhead-logo"><img src="{% static 'img/logo-kejaksaan-p16-transparent.png' %}" alt="Logo Kejaksaan Republik Indonesia"></span><div><b>{{ institution.institution_name|default:'KEJAKSAAN REPUBLIK INDONESIA'|upper }}</b><strong>{{ institution.work_unit|default:'SATUAN KERJA BELUM DIKONFIGURASI'|upper }}</strong><p>{{ institution.address|default:'Alamat instansi belum dikonfigurasi' }}</p></div></div>
+      <div class="p16-letterhead-rule p16-letterhead-motto"><b>“Demi Keadilan dan Kebenaran Berdasarkan<br>Ketuhanan Yang Maha Esa”</b><strong>P-16</strong></div>
+    </header>
+  </template>
+  <template id="empty-suspect-form">{% include 'cases/suspect_form.html' with suspect_form=suspect_formset.empty_form number='__number__' %}</template>
+
+  <div class="p16-sipede-modal" data-p16-sipede-modal hidden>
+    <button type="button" class="p16-sipede-backdrop" data-p16-sipede-close aria-label="Tutup"></button>
+    <section class="p16-sipede-dialog" role="dialog" aria-modal="true" aria-labelledby="p16-sipede-title">
+      <button type="button" class="p16-sipede-close" data-p16-sipede-close aria-label="Tutup">&times;</button>
+      <header><img src="{% static 'img/sipede-color.png' %}" alt="SIPede"><div><small>ADMINISTRASI PERKARA</small><h2 id="p16-sipede-title">Upload P-16 ke SIPede</h2></div></header>
+      <p data-p16-sipede-message>Sistem akan mengambil nomor surat resmi dan mengunggah seluruh dokumen P-16 sebagai PDF.</p>
+      <div class="p16-sipede-fields">
+        <label>Sifat<select data-p16-sipede-field="sifat"><option value="PRIN" selected>Perintah</option><option value="B">Biasa</option><option value="T">Terbatas</option><option value="R">Rahasia</option><option value="SR">Sangat Rahasia</option><option value="KEP">Keputusan</option></select></label>
+        <label>Kode masalah<input type="text" maxlength="50" required value="{{ form.number_letter_code|default:'Eoh.1' }}" data-p16-sipede-field="kode_masalah"></label>
+        <label>Tujuan<textarea rows="2" maxlength="500" required data-p16-sipede-field="tujuan">KEPALA KEJAKSAAN NEGERI BULELENG</textarea></label>
+        <label>Perihal<textarea rows="3" maxlength="500" required data-p16-sipede-field="perihal">PENUNJUKAN PENUNTUT UMUM UNTUK MENGIKUTI PERKEMBANGAN PENYIDIKAN PERKARA TINDAK PIDANA</textarea></label>
+        <label>Ditandatangani oleh<select required data-p16-sipede-field="penandatangan">{% for name in sipede_signatory_names %}<option value="{{ name }}"{% if name == default_sipede_signatory %} selected{% endif %}>{{ name }}</option>{% endfor %}</select></label>
+      </div>
+      <div class="p16-sipede-progress" data-p16-sipede-progress hidden><i></i><span>Memproses…</span></div>
+      <footer><button type="button" class="secondary-btn" data-p16-sipede-close>Batal</button><button type="button" class="primary-btn" data-p16-sipede-confirm>Ambil Nomor & Upload</button></footer>
+    </section>
+  </div>
+  <div class="p16-disposition-modal" data-p16-disposition-modal hidden>
+    <button type="button" class="p16-disposition-backdrop" data-p16-disposition-close aria-label="Tutup"></button>
+    <section class="p16-disposition-dialog" role="dialog" aria-modal="true" aria-labelledby="p16-disposition-title">
+      <button type="button" class="p16-sipede-close" data-p16-disposition-close aria-label="Tutup">&times;</button>
+      <header><span>⇄</span><div><small>SIPEDE</small><h2 id="p16-disposition-title">Penerusan Surat</h2></div></header>
+      <p>Nomor surat sudah diperoleh. Pilih tujuan penerusan sebelum PDF diunggah dan surat dikirim.</p>
+      <section class="p16-disposition-picker" data-p16-disposition-picker>
+        <label class="p16-disposition-all"><input type="checkbox" data-p16-disposition-all> <span>Pilih semua tujuan</span></label>
+        <div class="p16-disposition-options" data-p16-disposition-options></div>
+      </section>
+      <footer><button type="button" class="secondary-btn" data-p16-disposition-close>Batal</button><button type="button" class="primary-btn" data-p16-disposition-confirm>Buat PDF &amp; Kirim</button></footer>
+    </section>
+  </div>
+  <div class="p16-cms-modal" data-p16-cms-modal data-default-account="{{ cms_default_account.user_id|default:'' }}" data-sync-url="{% url 'cases:p16_cms_prepare' draft.pk %}" hidden>
+    <button type="button" class="p16-cms-backdrop" data-p16-cms-close aria-label="Tutup"></button>
+    <section class="p16-cms-dialog" role="dialog" aria-modal="true" aria-labelledby="p16-cms-title">
+      <button type="button" class="p16-cms-close" data-p16-cms-close aria-label="Tutup">&times;</button>
+      <header><span>CMS</span><div><small>SINKRONISASI DATA</small><h2 id="p16-cms-title">Sinkron CMS</h2></div></header>
+      <div class="p16-cms-warning"><span>!</span><div><b>Pastikan data yang Anda buat sudah benar</b><p>Periksa kembali identitas surat, jaksa, tersangka, isi P-16, dan dokumen sebelum melanjutkan. Data yang dipilih akan digunakan dalam proses sinkronisasi CMS.</p></div></div>
+      {% if cms_can_choose_account %}
+        <div class="p16-cms-account-section">
+          <div><b>Pilih akun CMS</b><small>Staf dan Admin dapat menggunakan akun CMS sendiri atau akun Jaksa yang sudah dikonfigurasi.</small></div>
+          <div class="p16-cms-account-list" data-p16-cms-accounts>
+            {% for account in cms_accounts %}
+              <label><input type="radio" name="cms_account_user" value="{{ account.user_id }}"{% if account.is_default %} checked{% endif %}><span><b>{{ account.name }}{% if account.is_self %} <em>Akun saya</em>{% elif account.is_assigned %} <em>Jaksa perkara</em>{% endif %}</b><small>{{ account.username }}</small></span></label>
+            {% empty %}
+              <div class="p16-cms-account-empty"><b>Belum ada akun CMS yang tersedia</b><small>Konfigurasikan akun CMS sendiri atau akun Jaksa terlebih dahulu.</small></div>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <div class="p16-cms-own-account">
+          {% if cms_own_account %}<span>✓</span><div><b>Menggunakan akun CMS Anda</b><small>{{ cms_own_account.username }}</small></div>{% else %}<span>!</span><div><b>Akun CMS belum dikonfigurasi</b><small>Lengkapi konfigurasi CMS sebelum melanjutkan.</small></div>{% endif %}
+        </div>
+      {% endif %}
+      <p class="p16-cms-form-message" data-p16-cms-message hidden></p>
+      <footer><button type="button" class="secondary-btn" data-p16-cms-close>Batal</button><button type="button" class="primary-btn" data-p16-cms-continue{% if not cms_accounts %} disabled{% endif %}>Lanjut</button></footer>
+    </section>
+  </div>
+</form>
+{% include 'configurations/includes/sipede_auth_modal.html' %}
+{% endblock %}
+
+{% block extra_scripts %}<script src="{% static 'vendor/jodit/jodit.min.js' %}"></script><script src="{% static 'js/sipede-integration.js' %}?v=20261017-1"></script><script src="{% static 'js/p16-editor.js' %}?v=20261022-1"></script><script src="{% static 'js/spdp-form.js' %}?v=20260916-1"></script>{% endblock %}

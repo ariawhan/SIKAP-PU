@@ -1,0 +1,46 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Tahap 1{% endblock %}
+{% block page_name %}Pra Penuntutan / Tahap 1{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/stage-one.css' %}?v=20261123-1"><link rel="stylesheet" href="{% static 'css/spdp-list.css' %}?v=20261124-1">{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="kicker text-red-700">Penerimaan Berkas Perkara</p><h1>Tahap 1</h1><p>Data perkara yang sudah menerima berkas Tahap 1.</p></div><a class="primary-btn" href="{% url 'cases:stage_one_select' %}">+ Tambah Tahap 1</a></section>
+<section class="case-overview-grid">
+  <article class="case-summary-card">
+    <div class="case-summary-head"><span>Data Tahap 1</span><h2>Total Tahap 1</h2></div>
+    <strong>{{ stats.total }}</strong>
+    <div class="case-summary-breakdown">
+      <div><span>Tahun {{ current_period|date:'Y' }}</span><b>{{ stats.year }}</b></div>
+      <div><span>Bulan {{ current_period|date:'F' }}</span><b>{{ stats.month }}</b></div>
+      <div><span>Hari Ini</span><b>{{ stats.day }}</b></div>
+    </div>
+  </article>
+  <article class="case-priority-card">
+    <div class="case-priority-head"><div><span>Aktivitas</span><h2>Harus Diselesaikan</h2></div><b>{{ priority_cases|length }} prioritas</b></div>
+    <div class="case-priority-list">
+      {% for item in priority_cases %}
+      <div class="case-priority-item case-priority-{{ item.activity_deadline.color_class }}">
+        <span class="deadline-badge {{ item.activity_deadline.color_class }}">{{ item.activity_deadline.remaining_title }} {{ item.activity_deadline.remaining_value }}</span>
+        <a href="{{ item.activity_url }}" class="case-priority-link"><b>{{ item.letter_number }}</b><small>{{ item.activity_deadline.stage_label }} · {{ item.activity_deadline.status_text }}</small></a>
+        <div class="case-priority-quick-actions"><form method="post" action="{% url 'dashboard:send_reminder' item.pk %}" class="case-priority-notify">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button type="submit" title="Kirim reminder ke WhatsApp dan Telegram">🔔 <span>Notif</span></button></form>{% include 'cases/includes/workflow_action_menu.html' with item=item detail_url_name=item.workflow_detail_url_name document_label='Tahap 1' %}</div>
+      </div>
+      {% empty %}<div class="case-priority-empty"><b>Tidak ada aktivitas mendesak</b><small>Tahap 1 yang masih memiliki tenggat aktif akan tampil di sini.</small></div>{% endfor %}
+    </div>
+  </article>
+</section>
+<section class="panel mt-4">
+  <div class="panel-head stage-one-list-head"><div><h3>Daftar Perkara Tahap 1</h3><p>Hanya menampilkan Tahap 1 yang sudah dibuat.</p></div><form method="get"><input type="search" name="q" value="{{ query }}" placeholder="Cari SPDP, berkas, pengantar, atau pelaku"><button type="submit">Cari</button></form></div>
+  <div class="table-wrap"><table><thead><tr><th>Perkara</th><th>Berkas Perkara</th><th>Surat Pengantar</th><th>Pelaku</th><th>Sisa Hari</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+    {% for item in cases %}<tr>
+      <td><b>{{ item.letter_number }}</b><small>Diterima {{ item.received_date|date:'d M Y' }}</small></td>
+      <td><b>{{ item.stage_one.case_file_number }}</b></td>
+      <td>{{ item.stage_one.cover_letter_number }}</td>
+      <td>{{ item.suspects.count }} orang</td>
+      <td><span class="deadline-badge {{ item.deadline_class }}"><span class="deadline-badge-label">{{ item.deadline_title }}</span><span class="deadline-badge-value">{{ item.deadline_value }}</span></span>{% if item.deadline_detail %}<small>{{ item.deadline_detail }}</small>{% endif %}</td>
+      <td><span class="badge green">Selesai</span><small>{{ item.stage_one.completed_at|date:'d M Y, H:i' }}</small></td>
+      <td>{% include 'cases/includes/workflow_action_menu.html' with item=item detail_url_name='cases:stage_one_detail' document_label='Tahap 1' %}</td>
+    </tr>{% empty %}<tr><td colspan="7"><div class="empty-table"><b>Belum ada Tahap 1</b><p>Klik Tambah Tahap 1 lalu cari SPDP yang akan diproses.</p></div></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% include 'includes/pagination.html' with page_obj=page_obj %}
+</section>
+{% endblock %}

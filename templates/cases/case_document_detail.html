@@ -1,0 +1,45 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+
+{% block title %}Editor {{ document_label }}{% endblock %}
+{% block page_name %}Pra Penuntutan / {{ document_label }}{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'vendor/jodit/jodit.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/case-document-editor.css' %}?v=20260921-1">
+<link rel="stylesheet" href="{% static 'css/case-document.css' %}?v=20261124-2">
+<link rel="stylesheet" href="{% static 'css/standard-letterhead.css' %}?v=20261124-1">
+<link rel="stylesheet" href="{% static 'css/p16-sipede.css' %}?v=20261018-3">
+<link rel="stylesheet" href="{% static 'css/letter-extras.css' %}?v=20261121-1">
+<link rel="stylesheet" href="{% static 'css/acting-signatory.css' %}?v=20261123-1">
+{% if draft.document_type == 'p18' %}<link rel="stylesheet" href="{% static 'css/p18-editor.css' %}?v=20261121-1">{% endif %}
+{% if draft.document_type == 'p19' %}<link rel="stylesheet" href="{% static 'css/p19-editor.css' %}?v=20261018-1">{% endif %}
+{% if draft.document_type == 'p20' %}<link rel="stylesheet" href="{% static 'css/p20-editor.css' %}?v=20261022-2">{% endif %}
+{% if draft.document_type == 'sop07' %}<link rel="stylesheet" href="{% static 'css/sop07-editor.css' %}?v=20261122-2">{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="page-heading case-doc-page-heading">
+  <div>
+    <p class="kicker text-red-700">Pra Penuntutan</p>
+    <h1>Editor {{ document_label }}</h1>
+    <p>Perkara {{ draft.spdp.letter_number }}.</p>
+  </div>
+  <a class="secondary-btn" href="{% url list_url_name %}">← Daftar {{ document_label }}</a>
+</section>
+{% if draft.document_type == 'p19' %}
+{% if not institution.pk or not institution.work_unit or not institution.address or not institution.leader_name or not institution.leader_title or not institution.leader_nip %}
+<div class="case-doc-p19-warning" role="alert">
+  <span>!</span>
+  <div><b>Identitas instansi belum lengkap</b><p>Lengkapi satuan kerja, alamat, nama, jabatan, dan NIP pimpinan sebelum mencetak dokumen.</p></div>
+  {% if request.user.is_super_admin %}<a href="{% url 'configurations:institution' %}">Buka Konfigurasi</a>{% endif %}
+</div>
+{% endif %}
+{% endif %}
+<form method="post" enctype="multipart/form-data" class="case-doc-workspace" data-case-document-form data-document-type="{{ draft.document_type }}" data-number-region="{{ form.number_region_code|default:'' }}" data-number-code="{{ form.number_letter_code|default:'' }}" data-can-edit="{% if can_edit %}true{% else %}false{% endif %}">{% csrf_token %}<section class="case-doc-editor-column">
+{% if draft.document_type == 'p19' and not can_edit %}<div class="case-doc-p19-readonly" role="status"><span>i</span><p><b>Mode lihat saja</b> Anda tidak memiliki akses untuk mengubah draf ini.</p></div>{% endif %}
+<article class="case-doc-editor-card"><header class="case-doc-section-title"><span>01</span><div><b>Identitas Surat</b><small>Nomor, tanggal{% if draft.document_type != 'p18' %}, sifat, lampiran, dan hal{% endif %}</small></div></header><div class="case-doc-meta-fields"><label>{{ form.letter_number.label }}{{ form.letter_number }}<small data-document-number-help>{% if draft.document_type == 'p18' or draft.document_type == 'p19' or draft.document_type == 'p20' or draft.document_type == 'sop07' %}Isi angka saja, contoh 3478. Awalan B dan kode surat dibuat otomatis.{% else %}Nomor draf dibuat otomatis.{% endif %}</small>{{ form.letter_number.errors }}</label><label>{{ form.letter_date.label }}{{ form.letter_date }}{{ form.letter_date.errors }}</label>{% if draft.document_type != 'p18' %}<label>{{ form.letter_nature.label }}{{ form.letter_nature }}{{ form.letter_nature.errors }}</label><label>{{ form.attachment.label }}{{ form.attachment }}{{ form.attachment.errors }}</label>{% else %}<div hidden>{{ form.letter_nature }}{{ form.attachment }}{{ form.subject_html }}{{ form.legal_basis_html }}{{ form.manual_number }}</div>{% endif %}{% if draft.document_type != 'p18' and draft.document_type != 'p19' and draft.document_type != 'p20' and draft.document_type != 'sop07' %}<label class="case-doc-manual">{{ form.manual_number }}<span><b>Isi nomor surat secara manual</b><small>Aktifkan untuk mengganti nomor otomatis.</small></span></label>{% elif draft.document_type == 'p19' or draft.document_type == 'p20' or draft.document_type == 'sop07' %}<div hidden>{{ form.manual_number }}</div>{% endif %}</div>{% include 'cases/includes/acting_signatory_fields.html' %}{% if draft.document_type != 'p18' %}<div class="case-doc-separator">HAL / PERIHAL</div><label class="case-doc-subject-input">{{ form.subject_html }}{{ form.subject_html.errors }}</label>{% endif %}{% include 'cases/includes/recipient_barcode_fields.html' %}</article>
+{% if draft.document_type != 'p18' and draft.document_type != 'p19' %}<article class="case-doc-editor-card"><header class="case-doc-section-title"><span>02</span><div><b>Dasar</b><small>Dasar hukum dan dokumen perkara</small></div></header><div class="case-doc-rich">{{ form.legal_basis_html }}{{ form.legal_basis_html.errors }}</div></article>{% endif %}
+<article class="case-doc-editor-card"><header class="case-doc-section-title"><span>{% if draft.document_type == 'p19' %}02{% else %}03{% endif %}</span><div><b>{% if draft.document_type == 'p18' %}Daftar Dokumen{% else %}Isi{% endif %}</b><small>{% if draft.document_type == 'p19' %}Ketik dasar, petunjuk formil, materiil, dan isi P-19 secara manual{% else %}Naskah utama {{ document_label }}{% endif %}</small></div></header><div class="case-doc-rich">{{ form.body_html }}{{ form.body_html.errors }}</div></article>
+<article class="case-doc-editor-card"><header class="case-doc-section-title"><span>{% if draft.document_type == 'p19' %}03{% else %}04{% endif %}</span><div><b>Tembusan</b><small>Gunakan daftar bernomor 1, 2, 3, dan seterusnya</small></div></header><div class="case-doc-rich case-doc-copies-editor">{{ form.copies_html }}{{ form.copies_html.errors }}</div></article><div class="case-doc-actions"><a class="secondary-btn" href="{% url list_url_name %}">Batal</a><button type="button" class="secondary-btn" data-document-print>Cetak Preview</button>{% include 'cases/includes/generic_sipede_controls.html' %}{% if can_edit %}<button class="primary-btn">Simpan Draf</button>{% endif %}</div></section>
+<aside class="case-doc-preview-column"><div class="case-doc-preview-toolbar"><span><i></i> PRATINJAU LANGSUNG</span><small>{% if draft.document_type == 'sop07' %}8,5 × 14 inci{% else %}F4 · 8,5 × 13 inci{% endif %}</small></div><div class="case-doc-overflow" data-document-overflow hidden><b>Isi membutuhkan halaman lanjutan</b><p>Sistem membagi isi ke halaman berikutnya saat dicetak.</p></div><div class="case-doc-preview-pages" data-document-pages></div></aside>
+<template data-document-source>{{ preview_content_html|safe }}</template><template data-document-letterhead><header class="case-doc-letterhead p16-standard-letterhead"><div class="case-doc-letterhead-main p16-standard-letterhead-main"><span class="p16-standard-letterhead-logo"><img src="{% static 'img/logo-kejaksaan-p16-transparent.png' %}" alt="Logo Kejaksaan"></span><div class="p16-standard-letterhead-copy"><b>{{ institution.institution_name|upper }}</b><strong>{{ institution.work_unit|upper }}</strong><p>{{ institution.address }}</p></div></div><div class="case-doc-letterhead-rule"><em>“Demi Keadilan dan Kebenaran Berdasarkan<br>Ketuhanan Yang Maha Esa”</em><strong>{{ short_code }}</strong></div></header></template></form>{% include 'configurations/includes/sipede_auth_modal.html' %}{% endblock %}{% block extra_scripts %}<script src="{% static 'vendor/jodit/jodit.min.js' %}"></script><script src="{% static 'js/sipede-integration.js' %}?v=20261017-1"></script><script src="{% static 'js/letter-recipient-editor.js' %}?v=20261121-1"></script><script src="{% static 'js/case-document-editor.js' %}?v=20261124-2"></script><script src="{% static 'js/sop-form-sipede.js' %}?v=20261121-2"></script><script src="{% static 'js/acting-signatory.js' %}?v=20261123-1"></script>{% endblock %}

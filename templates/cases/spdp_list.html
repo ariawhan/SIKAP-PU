@@ -1,0 +1,149 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Data SPDP{% endblock %}
+{% block page_name %}Penerimaan SPDP{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/spdp-list.css' %}?v=20260915-3">{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="kicker text-red-700">Pra Penuntutan</p>
+    <h1>Data Perkara / SPDP</h1>
+    <p>Daftar Surat Pemberitahuan Dimulainya Penyidikan yang telah diterima.</p>
+  </div>
+  <a class="primary-btn" href="{% url 'cases:spdp_create' %}">＋ Tambah SPDP</a>
+</section>
+
+<section class="case-overview-grid">
+  <article class="case-summary-card">
+    <div class="case-summary-head">
+      <span>Data Perkara</span>
+      <h2>Total Perkara</h2>
+    </div>
+    <strong>{{ case_stats.total }}</strong>
+    <div class="case-summary-breakdown">
+      <div><span>Tahun {{ current_period|date:'Y' }}</span><b>{{ case_stats.year }}</b></div>
+      <div><span>Bulan {{ current_period|date:'F' }}</span><b>{{ case_stats.month }}</b></div>
+      <div><span>Hari Ini</span><b>{{ case_stats.day }}</b></div>
+    </div>
+  </article>
+
+  <article class="case-priority-card">
+    <div class="case-priority-head">
+      <div>
+        <span>Aktivitas</span>
+        <h2>Harus Diselesaikan</h2>
+      </div>
+      <b>{{ priority_cases|length }} prioritas</b>
+    </div>
+    <div class="case-priority-list">
+      {% for item in priority_cases %}
+      <div class="case-priority-item case-priority-{{ item.activity_deadline.color_class }}">
+        <span class="deadline-badge {{ item.activity_deadline.color_class }}">{{ item.activity_deadline.remaining_title }} {{ item.activity_deadline.remaining_value }}</span>
+        <a href="{{ item.activity_url }}" class="case-priority-link">
+          <b>{{ item.letter_number }}</b>
+          <small>Terbitkan P-16 sebelum {{ item.activity_deadline.due_date|date:'d M Y' }} · {{ item.suspects.count }} pelaku</small>
+        </a>
+        <div class="case-priority-quick-actions">
+          <form method="post" action="{% url 'dashboard:send_reminder' item.pk %}" class="case-priority-notify">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button type="submit" title="Kirim notifikasi ke WhatsApp dan Telegram">🔔 <span>Notif</span></button></form>
+          {% include 'cases/includes/spdp_action_menu.html' with item=item %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="case-priority-empty">
+        <b>Tidak ada aktivitas mendesak</b>
+        <small>Semua perkara yang belum menerbitkan P-16 akan muncul di sini.</small>
+      </div>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<section class="panel case-list-panel">
+  <div class="case-toolbar">
+    <form method="get"><span>⌕</span><input name="q" value="{{ query }}" placeholder="Cari nomor SPDP, pelaku, atau uraian perkara"><button type="submit">Cari</button></form>
+    <span>{{ spdp_list|length }} data</span>
+  </div>
+  <div class="table-wrap">
+    <table class="case-table workflow-table">
+      <thead><tr><th>Nomor SPDP</th><th>Penyidik</th><th>Tanggal Diterima</th><th>Sisa Hari</th><th>Pelaku</th><th>Status</th><th>Aksi</th></tr></thead>
+      <tbody>
+      {% for item in spdp_list %}
+        <tr>
+          <td><b>{{ item.letter_number }}</b><small>{{ item.letter_date|date:'d M Y' }}</small></td>
+          <td>{{ item.investigator_agency }}<small>{{ item.investigating_unit }}</small></td>
+          <td>{{ item.received_date|date:'d M Y' }}</td>
+          <td>
+            <span class="deadline-badge {{ item.p16_deadline_class }}"><span class="deadline-badge-label">{{ item.p16_deadline_title }}</span><span class="deadline-badge-value">{{ item.p16_deadline_value }}</span></span>
+            <small>Batas {{ item.p16_due_date|date:'d M Y' }}</small>
+          </td>
+          <td><span class="suspect-count">{{ item.suspects.count }}</span></td>
+          <td><span class="badge {{ item.workflow_status.badge_class }}">{{ item.workflow_status.label }}</span><small>{{ item.workflow_status.detail }}</small></td>
+          <td>
+            {% include 'cases/includes/spdp_action_menu.html' with item=item %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7"><div class="empty-table"><span>▤</span><b>Belum ada data SPDP</b><p>Tambahkan SPDP pertama untuk mulai mengelola perkara.</p></div></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'includes/pagination.html' with page_obj=page_obj query=query %}
+</section>
+
+<dialog class="workflow-modal" id="start-p16-dialog" aria-labelledby="start-p16-title">
+  <form method="post" data-workflow-form>{% csrf_token %}
+    <header class="workflow-modal-head">
+      <span class="workflow-modal-icon">⚖</span>
+      <div><p>Proses P-16</p><h2 id="start-p16-title">Pilih Kasi Pidum</h2></div>
+      <button type="button" data-dialog-close aria-label="Tutup pop-up">×</button>
+    </header>
+    <div class="workflow-modal-body">
+      <section class="workflow-case-card"><span>Nomor SPDP</span><strong data-case-number>—</strong><p>Diterima <span data-case-date>—</span></p></section>
+      <p class="workflow-description">Kasi Pidum yang dipilih akan menerima perkara ini untuk melakukan penunjukan Jaksa P-16.</p>
+      <label class="workflow-field">Kasi Pidum<select name="kasi_pidum" required><option value="">Pilih Kasi Pidum</option>{% for kasi in kasi_form.kasi_pidum.field.queryset %}<option value="{{ kasi.pk }}">{{ kasi.display_name }} — {{ kasi.username }}</option>{% endfor %}</select></label>
+      {% if not kasi_form.kasi_pidum.field.queryset.exists %}<div class="workflow-warning">Belum ada pengguna aktif dengan role Kasi Pidum.</div>{% endif %}
+    </div>
+    <footer class="workflow-modal-actions"><button type="button" class="secondary-btn" data-dialog-close>Batal</button><button class="primary-btn" type="submit">Teruskan ke Kasi Pidum →</button></footer>
+  </form>
+</dialog>
+
+<dialog class="workflow-modal" id="prosecutor-dialog" aria-labelledby="prosecutor-title">
+  <form method="post" data-workflow-form>{% csrf_token %}
+    <header class="workflow-modal-head">
+      <span class="workflow-modal-icon">♙</span>
+      <div><p>Penunjukan P-16</p><h2 id="prosecutor-title">Pilih Jaksa</h2></div>
+      <button type="button" data-dialog-close aria-label="Tutup pop-up">×</button>
+    </header>
+    <div class="workflow-modal-body">
+      <section class="workflow-case-card"><span>Nomor SPDP</span><strong data-case-number>—</strong><p>Kasi Pidum: <span data-case-kasi>—</span></p></section>
+      <div class="workflow-picker" data-workflow-picker data-input-name="prosecutors" data-required="true">
+        <div class="workflow-list-head"><div><b>Jaksa Penuntut Umum</b><small>Pilih Jaksa, lalu tekan tambah</small></div><span>Minimal satu</span></div>
+        <div class="workflow-add-row">
+          <label class="workflow-field">Jaksa<select data-picker-select><option value="">Pilih Jaksa</option>{% for prosecutor in prosecutor_form.prosecutors.field.queryset %}<option value="{{ prosecutor.pk }}" data-initials="{{ prosecutor.display_name|slice:':2'|upper }}" data-subtitle="{{ prosecutor.username }}">{{ prosecutor.display_name }}</option>{% endfor %}</select></label>
+          <button type="button" class="workflow-add-btn" data-picker-add>+ Tambah</button>
+        </div>
+        <div class="workflow-selected-list" data-picker-list data-empty="Belum ada Jaksa yang ditambahkan."></div>
+        {% if not prosecutor_form.prosecutors.field.queryset.exists %}<div class="workflow-warning">Belum ada pengguna aktif dengan role Jaksa.</div>{% endif %}
+      </div>
+
+      <label class="workflow-check-card">
+        <input type="checkbox" name="administrative_staff_enabled" value="on" data-admin-toggle>
+        <span><b>Penunjukan Petugas Administrasi</b><small>Aktifkan jika perlu menunjuk pegawai untuk membantu administrasi perkara.</small></span>
+      </label>
+      <div class="workflow-picker workflow-admin-picker" data-admin-panel data-workflow-picker data-input-name="administrative_staff" data-required="true" hidden>
+        <div class="workflow-list-head"><div><b>Petugas Administrasi</b><small>Pilih pegawai, lalu tekan tambah</small></div><span>Bisa lebih dari satu</span></div>
+        <div class="workflow-add-row">
+          <label class="workflow-field">Pegawai<select data-picker-select><option value="">Pilih Pegawai</option>{% for employee in prosecutor_form.administrative_staff.field.queryset %}<option value="{{ employee.pk }}" data-initials="{{ employee.display_name|slice:':2'|upper }}" data-subtitle="{{ employee.username }}">{{ employee.display_name }}</option>{% endfor %}</select></label>
+          <button type="button" class="workflow-add-btn" data-picker-add>+ Tambah</button>
+        </div>
+        <div class="workflow-selected-list" data-picker-list data-empty="Belum ada petugas administrasi yang ditambahkan."></div>
+        {% if not prosecutor_form.administrative_staff.field.queryset.exists %}<div class="workflow-warning">Belum ada pengguna aktif dengan role Pegawai.</div>{% endif %}
+      </div>
+    </div>
+    <footer class="workflow-modal-actions"><button type="button" class="secondary-btn" data-dialog-close>Batal</button><button class="primary-btn" type="submit">✓ Simpan Penunjukan</button></footer>
+  </form>
+</dialog>
+
+<script src="{% static 'js/p16-workflow.js' %}?v=20261124-1"></script>
+{% endblock %}

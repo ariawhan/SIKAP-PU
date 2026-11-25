@@ -1,0 +1,480 @@
+.suspects-panel .case-section-head {
+  align-items: center;
+}
+
+.case-field input.locked-field,
+.case-field input[readonly],
+.case-field input:disabled,
+.case-field select:disabled {
+  border-color: #d9e0dc;
+  background: linear-gradient(135deg, #f5f7f6, #eef2f0);
+  color: #58655e;
+  cursor: not-allowed;
+}
+
+.case-field input.locked-field + small {
+  color: #9a6a25;
+}
+
+.suspect-add-button {
+  flex: none;
+  white-space: nowrap;
+}
+
+.suspect-summary {
+  display: grid;
+  gap: 9px;
+}
+
+.suspect-summary-empty {
+  padding: 22px 16px;
+  border: 1px dashed #dce3df;
+  border-radius: 11px;
+  background: #fafbfa;
+  color: #818d86;
+  font-size: 11px;
+  text-align: center;
+}
+
+.suspect-summary-empty[hidden] {
+  display: none;
+}
+
+.suspect-summary-item {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8e5;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.suspect-summary-number {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #f8e9eb;
+  color: #a5222e;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.suspect-summary-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.suspect-summary-copy b,
+.suspect-summary-copy small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suspect-summary-copy b {
+  color: #29352f;
+  font-size: 12px;
+}
+
+.suspect-summary-copy small {
+  margin-top: 3px;
+  color: #89948e;
+  font-size: 10px;
+}
+
+.suspect-summary-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.suspect-summary-actions button {
+  min-height: 33px;
+  padding: 6px 10px;
+  border: 1px solid #dfe5e2;
+  border-radius: 8px;
+  background: #fff;
+  color: #58655e;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.suspect-summary-actions button:hover {
+  border-color: #e5b8bd;
+  background: #fff5f6;
+  color: #a5222e;
+}
+
+.suspect-summary-actions button.danger {
+  color: #a3444c;
+}
+
+.suspect-dialog {
+  width: min(1000px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.7);
+  border-radius: 18px;
+  background: #fff;
+  color: #26312c;
+  box-shadow: 0 28px 90px rgba(27, 5, 8, .34);
+}
+
+.suspect-dialog[open] {
+  animation: suspect-dialog-in .18s ease-out;
+}
+
+.suspect-dialog::backdrop {
+  background: rgba(20, 12, 14, .62);
+  backdrop-filter: blur(4px);
+}
+
+.suspect-dialog-shell {
+  height: min(820px, calc(100dvh - 32px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.suspect-dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px 17px;
+  border-bottom: 1px solid #ecefed;
+  background: linear-gradient(135deg, #fff, #fdf8f8);
+}
+
+.suspect-dialog-head > div > span {
+  color: #ae2935;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+.suspect-dialog-head h2 {
+  margin-top: 3px;
+  font: 800 19px Manrope, sans-serif;
+}
+
+.suspect-dialog-head p {
+  margin-top: 4px;
+  color: #7f8a84;
+  font-size: 10px;
+}
+
+.suspect-dialog-head > button {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: #f3f5f4;
+  color: #68756e;
+  font-size: 23px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.suspect-dialog-head > button:hover {
+  background: #f9e8ea;
+  color: #a5222e;
+}
+
+.suspect-dialog-body {
+  min-height: 0;
+  padding: 17px 22px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.suspect-dialog .suspect-list {
+  display: grid;
+  gap: 13px;
+}
+
+.suspect-dialog .suspect-card {
+  padding: 17px;
+  background: #fbfcfb;
+}
+
+.suspect-dialog .dialog-card-hidden {
+  display: none !important;
+}
+
+.suspect-dialog .suspect-head {
+  margin-bottom: 14px;
+}
+
+.suspect-fieldsets {
+  display: grid;
+  gap: 13px;
+}
+
+.suspect-fieldset {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #e5eae7;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.suspect-fieldset h4 {
+  margin: 0 0 12px;
+  color: #7d242d;
+  font: 800 11px Manrope, sans-serif;
+  letter-spacing: .02em;
+}
+
+.suspect-corporation-fields[hidden],
+[data-corporate-position][hidden] {
+  display: none;
+}
+
+.case-choice-group {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid #dce3df;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.case-choice-group > b {
+  display: block;
+  margin-bottom: 8px;
+  color: #3d4943;
+  font-size: 11px;
+}
+
+.case-choice-group ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.case-choice-group li,
+.case-choice-group label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #4b5851;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.case-choice-group input {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  margin-top: 1px;
+  accent-color: #b4232f;
+}
+
+.suspect-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 22px;
+  border-top: 1px solid #ecefed;
+  background: #fafbfa;
+}
+
+.suspect-dialog-actions > span {
+  color: #89948e;
+  font-size: 9px;
+}
+
+.suspect-dialog-actions .primary-btn {
+  min-height: 40px;
+  padding: 10px 17px;
+  font-size: 11px;
+}
+
+.dark .suspect-summary-empty {
+  border-color: #393c40;
+  background: #202225;
+  color: #9a9d99;
+}
+
+.dark .case-field input.locked-field,
+.dark .case-field input[readonly],
+.dark .case-field input:disabled,
+.dark .case-field select:disabled {
+  border-color: #3a3d41;
+  background: linear-gradient(135deg, #24272a, #1f2225);
+  color: #c3c3bf;
+}
+
+.dark .case-field input.locked-field + small {
+  color: #d0a45c;
+}
+
+.dark .suspect-summary-item {
+  border-color: #393c40;
+  background: #1a1c1f;
+}
+
+.dark .suspect-summary-number {
+  background: #3a2227;
+  color: #ffabb3;
+}
+
+.dark .suspect-summary-copy b {
+  color: #eeeae5;
+}
+
+.dark .suspect-summary-copy small,
+.dark .suspect-dialog-actions > span {
+  color: #9a9d99;
+}
+
+.dark .suspect-summary-actions button {
+  border-color: #393c40;
+  background: #222428;
+  color: #d1cfcb;
+}
+
+.dark .suspect-summary-actions button:hover {
+  border-color: #704049;
+  background: #352329;
+  color: #ffabb3;
+}
+
+.dark .suspect-dialog {
+  border-color: #3a3032;
+  background: #1a1c1f;
+  color: #eeeae5;
+}
+
+.dark .suspect-dialog-head {
+  border-color: #303337;
+  background: linear-gradient(135deg, #1d1f22, #241d20);
+}
+
+.dark .suspect-dialog-head p {
+  color: #a8aaa6;
+}
+
+.dark .suspect-dialog-head > button {
+  background: #292c30;
+  color: #c3c3bf;
+}
+
+.dark .suspect-dialog-body,
+.dark .suspect-dialog .suspect-card {
+  background: #1a1c1f;
+}
+
+.dark .suspect-fieldset,
+.dark .case-choice-group {
+  border-color: #363a3e;
+  background: #202225;
+}
+
+.dark .suspect-fieldset h4 {
+  color: #ffabb3;
+}
+
+.dark .case-choice-group > b,
+.dark .case-choice-group label {
+  color: #d9d7d3;
+}
+
+.dark .suspect-dialog-actions {
+  border-color: #303337;
+  background: #1d1f22;
+}
+
+@keyframes suspect-dialog-in {
+  from { opacity: 0; transform: translateY(8px) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 650px) {
+  .suspects-panel .case-section-head {
+    align-items: flex-start;
+  }
+
+  .suspect-add-button {
+    min-height: 36px;
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+
+  .suspect-summary-item {
+    align-items: flex-start;
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .suspect-summary-number {
+    width: 30px;
+    height: 30px;
+  }
+
+  .suspect-summary-actions {
+    flex-direction: column;
+  }
+
+  .suspect-summary-actions button {
+    min-width: 54px;
+    min-height: 30px;
+    padding: 5px 7px;
+  }
+
+  .suspect-dialog {
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+    border-radius: 15px;
+  }
+
+  .suspect-dialog-shell {
+    height: calc(100dvh - 20px);
+  }
+
+  .suspect-dialog-head {
+    padding: 16px;
+  }
+
+  .suspect-dialog-body {
+    padding: 12px;
+  }
+
+  .suspect-dialog .suspect-card {
+    padding: 12px;
+  }
+
+  .suspect-fieldset {
+    padding: 12px;
+  }
+
+  .suspect-dialog-actions {
+    padding: 11px 14px;
+  }
+
+  .suspect-dialog-actions > span {
+    max-width: 55%;
+    line-height: 1.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .suspect-dialog[open] { animation: none; }
+}

@@ -1,0 +1,137 @@
+.case-doc-paper{box-sizing:border-box;aspect-ratio:8.5/13;padding:5.4% 9.26% 9.26%;font:9px/1.35 Arial,sans-serif;page:case-f4}.case-doc-paper[data-document-type="p18"]{padding:2.32% 9.26% 9.26%}.case-doc-paper[data-document-type="p19"]{padding:6.95% 9.26%}.case-doc-paper[data-document-type="p20"]{padding:4.63% 9.26% 9.26%}.case-doc-paper[data-document-type="sop07"]{aspect-ratio:8.5/14;padding:4.63% 8.82% 11.76%;page:case-legal}.case-doc-paper *{box-sizing:border-box;font-family:Arial,sans-serif}.case-doc-letterhead{margin-bottom:11px}.case-doc-letterhead-main{display:grid;grid-template-columns:17.36% 82.64%;align-items:center;min-height:67px;text-align:center}.case-doc-letterhead-main>span{width:110%;aspect-ratio:1.25/1;transform:translateX(-3%)}.case-doc-letterhead-main img{width:100%;height:100%;object-fit:contain}.case-doc-letterhead-main b,.case-doc-letterhead-main strong{display:block;font-size:10px;line-height:1.08}.case-doc-letterhead-main p{margin:4px 0 0;font-size:8px}.case-doc-letterhead-rule{display:grid;grid-template-columns:70% 30%;align-items:center;border-top:1px solid #111;border-bottom:1px solid #111}.case-doc-letterhead-rule em{padding:4px;font-size:8px;font-style:normal;font-weight:700;text-align:center}.case-doc-letterhead-rule strong{padding:4px;text-align:right;font-size:10px}.case-doc-meta{position:relative;padding-right:39%}.case-doc-meta>div{display:grid;grid-template-columns:15% 4% 1fr}.case-doc-meta b,.case-doc-meta span,.case-doc-meta p,.case-doc-subject>div{margin:0;font-size:9px;font-weight:400;line-height:1.25}.case-doc-subject p{margin:0;text-align:justify}.case-doc-date{position:absolute;top:0;right:0;width:36%;white-space:nowrap}.case-doc-recipient{margin:13px 0 16px;font-size:9px;line-height:1.4}.case-doc-recipient u{display:inline-block;margin-left:25px}.case-doc-basis{font-size:9px}.case-doc-basis>div ol{margin:4px 0 9px;padding-left:22px}.case-doc-basis li{margin-bottom:4px;text-align:justify}.case-doc-body{font-size:9px;line-height:1.45}.case-doc-body p{margin:0 0 7px;text-align:justify;text-indent:28px}.case-doc-body h4{margin:8px 0 4px;text-decoration:underline}.case-doc-body ol{margin:4px 0;padding-left:22px}.case-doc-p18-date{text-align:right}.case-doc-p18-title{text-align:center}.case-doc-p18-title h2{margin:8px 0 3px;font-size:11px;text-decoration:underline}.case-doc-p18-title p{margin:0 0 12px}.case-doc-p18-table table{width:100%;border-collapse:collapse}.case-doc-p18-table th,.case-doc-p18-table td{padding:5px;border:1px solid #111;white-space:normal;vertical-align:top;font-size:9px}.case-doc-p18-table th{text-align:center;background:#fff;color:#111}.case-doc-signature{width:51%;margin:15px 0 0 auto;text-align:center;font-size:9px}.case-doc-signature p{margin:0}.case-doc-signature>div{height:58px}.case-doc-copies{margin-top:12px;font-size:9px}.case-doc-copies>p{margin:0}.case-doc-copies ol{margin:2px 0 0;padding-left:20px}.case-doc-copies li{margin:0}
+@page{size:8.5in 13in;margin:0}@page case-f4{size:8.5in 13in;margin:0}@page case-legal{size:8.5in 14in;margin:0}@media print{.case-doc-paper{width:8.5in!important;height:13in!important;min-height:13in!important;max-height:13in!important;overflow:hidden!important;box-shadow:none!important;font:10pt/1.35 Arial,sans-serif!important}.case-doc-paper[data-document-type="p18"]{page:auto!important;padding:.5cm 2cm 2cm!important}.case-doc-paper[data-document-type="p19"]{padding:1.5cm 2cm!important}.case-doc-paper[data-document-type="p20"]{padding:1cm 2cm 2cm!important}.case-doc-paper[data-document-type="sop07"]{width:8.5in!important;height:14in!important;min-height:14in!important;max-height:14in!important;padding:1cm 1.905cm 2.54cm!important}.case-doc-letterhead-main{grid-template-columns:3.09cm 1fr!important;min-height:2.68cm!important}.case-doc-letterhead-main>span{width:3.35cm!important;height:2.68cm!important}.case-doc-letterhead-main b,.case-doc-letterhead-main strong,.case-doc-letterhead-rule strong,.case-doc-meta b,.case-doc-meta span,.case-doc-meta p,.case-doc-subject>div,.case-doc-recipient,.case-doc-basis,.case-doc-body,.case-doc-signature,.case-doc-copies{font-size:10pt!important}.case-doc-letterhead-main p,.case-doc-letterhead-rule em{font-size:8pt!important}}
+.case-doc-paper{margin-bottom:16px}.case-doc-paper::after{content:"Halaman " attr(data-page-number);position:absolute;right:12px;bottom:8px;color:#999;font:8px Arial,sans-serif}.case-doc-flow-block{margin:0}.case-doc-flow-block>p,.case-doc-flow-block>h4{margin-top:0}@media print{.case-doc-paper{margin:0!important;break-after:auto!important;page-break-after:auto!important}.case-doc-paper+.case-doc-paper{break-before:page!important;page-break-before:always!important}.case-doc-paper::after{display:none}}
+
+/* P-18 mengikuti ukuran kertas, margin, dan kop P-17. */
+.case-doc-paper[data-document-type="p18"] {
+  aspect-ratio: 8.5 / 13;
+  padding: 3.03% 9.68% 6.06% 9.26%;
+  font-family: Arial, sans-serif;
+  line-height: 1.15;
+  page: case-f4;
+}
+.case-doc-paper[data-document-type="p18"] .case-doc-letterhead { margin-bottom: 9pt; }
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-date { margin: 0; text-align: right; white-space: nowrap; }
+.case-doc-paper[data-document-type="p18"] .case-doc-recipient { margin: 13px 0 16px; line-height: 1.15; }
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-table th:first-child,
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-table td:first-child { width: 7%; text-align: center; }
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-table th:nth-child(2),
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-table td:nth-child(2) { width: 58%; }
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-table th:nth-child(3),
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-table td:nth-child(3) { width: 15%; text-align: center; }
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-table th:nth-child(4),
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-table td:nth-child(4) { width: 20%; }
+
+@media print {
+  .case-doc-paper[data-document-type="p18"] {
+    width: 8.5in !important;
+    min-width: 8.5in !important;
+    max-width: 8.5in !important;
+    height: 32.9cm !important;
+    min-height: 32.9cm !important;
+    max-height: 32.9cm !important;
+    padding: 1cm 2.09cm 2cm 2cm !important;
+    font: 10pt/1.15 Arial, sans-serif !important;
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+
+  .case-doc-paper[data-document-type="p18"]:last-child {
+    break-after: avoid-page !important;
+    page-break-after: avoid !important;
+  }
+}
+
+/* E-Sign berada di blok penandatangan; Barcode/QR selalu berada di footer. */
+.case-doc-signature-space{display:flex;align-items:center;justify-content:center}
+.case-doc-signature-space img{display:block;width:auto;max-width:100%;height:45pt;margin:0 auto;object-fit:contain}
+.case-doc-verification-mark{right:auto;left:50%;bottom:.45cm;width:38.4pt;height:43.3pt;transform:translateX(-50%)}
+.case-doc-verification-mark .verification-code-placeholder{width:100%;height:100%;display:grid;place-items:center;border:1px dashed #999;color:#777;font:8pt/1 Arial,sans-serif}
+.case-doc-verification-mark .verification-code-placeholder small{font-size:5.5pt}
+
+/* Sisakan hanya kotak kertas saat mencetak agar wrapper aplikasi tidak membuat
+   satu lembar kosong berukuran Letter setelah halaman dokumen terakhir. */
+@media print {
+  .jodit-ui-tooltip,
+  .jodit-ui-popup,
+  .jodit-ui-list {
+    display: none !important;
+  }
+
+  body > .min-h-screen,
+  body > .min-h-screen > .content-frame,
+  body > .min-h-screen > .content-frame > main,
+  .case-doc-workspace,
+  .case-doc-preview-column,
+  .case-doc-preview-pages {
+    display: contents !important;
+  }
+}
+
+/* Format naskah P-18: Arial 12 pt dengan spasi 1,5. Kop tetap memakai kop P-16. */
+.case-doc-paper[data-document-type="p18"] .case-doc-page-content {
+  font: 12pt/1.5 Arial, sans-serif;
+}
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-date,
+.case-doc-paper[data-document-type="p18"] .case-doc-recipient,
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-title,
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-table th,
+.case-doc-paper[data-document-type="p18"] .case-doc-p18-table td,
+.case-doc-paper[data-document-type="p18"] .case-doc-signature,
+.case-doc-paper[data-document-type="p18"] .case-doc-copies {
+  font-size: 12pt;
+  line-height: 1.5;
+}
+.case-doc-paper[data-document-type="p18"] .case-doc-recipient { font-weight: 400; }
+.case-doc-paper[data-document-type="p18"] .case-doc-signature-space {
+  height: 58pt;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.case-doc-paper[data-document-type="p18"] .case-doc-signature-space img {
+  display: block;
+  width: 62pt;
+  height: 45pt;
+  margin: 0 auto;
+  object-fit: contain;
+  object-position: center;
+}
+.case-doc-paper[data-document-type="p18"] .case-doc-signature{width:67%;margin-left:auto;margin-right:0}.case-doc-paper[data-document-type="p18"] .case-doc-signature>p:last-child{white-space:nowrap;text-align:center;font-size:11pt;letter-spacing:-.1pt}
+.case-doc-paper[data-document-type="p18"] .case-doc-copies ol {
+  margin: 2pt 0 0;
+  padding-left: 22pt;
+  list-style: decimal outside;
+}
+.case-doc-paper[data-document-type="p18"] .case-doc-copies li { display: list-item; }
+.case-doc-verification-mark {
+  position: absolute;
+  right: auto;
+  left: 50%;
+  bottom: .45cm;
+  width: 38.4pt;
+  height: 43.3pt;
+  display: grid;
+  place-items: center;
+  transform: translateX(-50%);
+  color: #777;
+  font: 8pt/1 Arial, sans-serif;
+  text-align: center;
+}
+.case-doc-verification-mark span,
+.case-doc-verification-mark small { display: block; }
+.case-doc-verification-mark img { width: 100%; height: 100%; object-fit: contain; }
+
+@media print {
+  .case-doc-paper[data-document-type="p18"] .case-doc-page-content,
+  .case-doc-paper[data-document-type="p18"] .case-doc-p18-date,
+  .case-doc-paper[data-document-type="p18"] .case-doc-recipient,
+  .case-doc-paper[data-document-type="p18"] .case-doc-p18-title,
+  .case-doc-paper[data-document-type="p18"] .case-doc-p18-table th,
+  .case-doc-paper[data-document-type="p18"] .case-doc-p18-table td,
+  .case-doc-paper[data-document-type="p18"] .case-doc-signature,
+  .case-doc-paper[data-document-type="p18"] .case-doc-copies {
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+  }
+}

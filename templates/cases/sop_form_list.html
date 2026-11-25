@@ -1,0 +1,43 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}SOP Form {{ form_display_number }}{% endblock %}
+{% block page_name %}Pra Penuntutan / SOP Form {{ form_display_number }}{% endblock %}
+{% block extra_head %}{% if form_number != '03' %}<link rel="stylesheet" href="{% static 'css/spdp-list.css' %}?v=20261124-1">{% endif %}{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="kicker text-red-700">Pra Penuntutan</p>
+    <h1>Daftar SOP Form {{ form_display_number }}</h1>
+    <p>{% if form_number == '02' %}Permintaan kembali perkembangan hasil penyidikan setelah P-17.{% else %}Pengembalian SPDP ketika hasil penyidikan belum diterima.{% endif %}</p>
+  </div>
+  {% if can_create %}<a class="primary-btn" href="{% url 'cases:sop_form_'|add:form_number|add:'_create' %}">+ Buat SOP Form {{ form_display_number }}</a>{% endif %}
+</section>
+{% if form_number == '03' %}{% include 'cases/includes/stat_cards_only.html' %}{% else %}{% include 'cases/includes/list_overview.html' %}{% endif %}
+<section class="panel">
+  <div class="case-toolbar">
+    <form method="get"><span>⌕</span><input name="q" value="{{ query }}" placeholder="Cari nomor surat, SPDP, atau pelaku"><button type="submit">Cari</button></form>
+    <span>{{ page_obj.paginator.count }} dokumen</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nomor Surat</th><th>Perkara / SPDP</th><th>Data Pelaku</th><th>Tanggal</th>{% if form_number != '03' %}<th>Sisa Hari</th>{% endif %}<th>Status</th><th>Aksi</th></tr></thead>
+      <tbody>
+        {% for draft in drafts %}
+        <tr>
+          <td><b>{{ draft.letter_number }}</b><small>SOP Form {{ form_display_number }}</small></td>
+          <td><b>{{ draft.spdp.letter_number }}</b><small>Diterima {{ draft.spdp.received_date|date:'d M Y' }}</small></td>
+          <td>{% for suspect in draft.spdp.suspects.all %}<b>{{ suspect.name }}</b>{% empty %}Belum ada data pelaku{% endfor %}</td>
+          <td>{{ draft.letter_date|date:'d M Y' }}</td>
+          {% if form_number != '03' %}<td><span class="deadline-badge {{ draft.deadline_class }}"><span class="deadline-badge-label">{{ draft.deadline_title }}</span><span class="deadline-badge-value">{{ draft.deadline_value }}</span></span>{% if draft.deadline_detail %}<small>{{ draft.deadline_detail }}</small>{% endif %}</td>{% endif %}
+          <td>{% if form_number == '02' and draft.workflow_is_issued or form_number == '03' and draft.sipede_status == 'sudah' %}<span class="badge green">Terbit</span>{% else %}<span class="badge amber">{{ draft.get_status_display }}</span>{% endif %}</td>
+          <td>{% if form_number == '02' %}{% include 'cases/includes/workflow_action_menu.html' with item=draft detail_url_name='cases:sop_form_02_detail' document_label='SOP Form 2' %}{% else %}<a class="row-action" href="{% url 'cases:sop_form_03_detail' draft.pk %}">{% if draft.sipede_status == 'sudah' %}Buka Surat →{% else %}Buka Draf →{% endif %}</a>{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="{% if form_number == '03' %}6{% else %}7{% endif %}"><div class="empty-table"><span>▤</span><b>Belum ada SOP Form {{ form_display_number }}</b><p>{% if form_number == '02' %}Draf dibuat setelah P-17 tersedia.{% else %}Draf dibuat setelah SOP Form 2 tersedia.{% endif %}</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'includes/pagination.html' with page_obj=page_obj query=query %}
+</section>
+{% endblock %}

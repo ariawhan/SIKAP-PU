@@ -1,0 +1,49 @@
+{% extends 'dashboard/layout.html' %}
+
+{% block title %}{{ document_label }}{% endblock %}
+{% block page_name %}Pra Penuntutan / {{ document_label }}{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="kicker text-red-700">Pra Penuntutan</p>
+    <h1>{{ document_label }}</h1>
+    <p>Kelola berita acara koordinasi antara Penyidik dan Penuntut Umum.</p>
+  </div>
+  {% if can_create %}<a class="primary-btn" href="{% url create_url_name %}">+ Buat {{ document_label }}</a>{% endif %}
+</section>
+
+<section class="panel">
+  <div class="case-toolbar">
+    <form method="get">
+      <span aria-hidden="true">⌕</span>
+      <input name="q" value="{{ query }}" placeholder="Cari nomor draf, SPDP, pelaku, atau penyidik">
+      <button type="submit">Cari</button>
+    </form>
+    <span>{{ page_obj.paginator.count }} berita acara</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Perkara / SPDP</th><th>Data Pelaku</th><th>Tanggal Koordinasi</th><th>Penuntut Umum</th><th>Penyidik</th><th>Status</th><th>Aksi</th></tr>
+      </thead>
+      <tbody>
+        {% for draft in drafts %}
+        <tr>
+          <td><b>{{ draft.spdp.letter_number }}</b><small>{{ draft.draft_number }} · diperbarui {{ draft.updated_at|date:'d M Y, H:i' }}</small></td>
+          <td>{% for suspect in draft.spdp.suspects.all %}<b>{{ suspect.name }}</b>{% if not forloop.last %}<small>dan pelaku lainnya</small>{% endif %}{% empty %}<span>Belum ada data pelaku</span>{% endfor %}</td>
+          <td><b>{{ draft.meeting_date|date:'d M Y' }}</b><small>{{ draft.meeting_place|default:'Tempat belum diisi' }}</small></td>
+          <td><b>{{ draft.prosecutor_name|default:'Belum diisi' }}</b><small>{{ draft.prosecutor_nip|default:'NIP belum diisi' }}</small></td>
+          <td><b>{{ draft.investigator_name|default:'Belum diisi' }}</b><small>{{ draft.investigator_position|default:'Penyidik' }}</small></td>
+          <td><span class="badge amber">{{ draft.get_status_display }}</span></td>
+          <td><a class="row-action" href="{% url detail_url_name draft.pk %}">Buka Draf →</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7"><div class="empty-table"><span>▤</span><b>Belum ada {{ document_label }}</b><p>Buat berita acara dari perkara yang sudah memiliki P-16.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'includes/pagination.html' with page_obj=page_obj query=query %}
+</section>
+{% endblock %}

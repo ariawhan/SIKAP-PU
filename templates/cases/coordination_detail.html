@@ -1,0 +1,145 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+
+{% block title %}Editor {{ document_label }}{% endblock %}
+{% block page_name %}Pra Penuntutan / {{ document_label }} / Editor{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'vendor/jodit/jodit.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/coordination-editor.css' %}?v=20261124-1">
+<link rel="stylesheet" href="{% static 'css/coordination-document.css' %}?v=20261124-2">
+<link rel="stylesheet" href="{% static 'css/standard-letterhead.css' %}?v=20261124-1">
+{% if coordination_type == 'ba3' %}<style>@page{size:8.5in 13in;margin:0}</style>{% else %}<style>@page{size:8.5in 14in;margin:0}</style>{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="page-heading coordination-page-heading">
+  <div>
+    <p class="kicker text-red-700">Pra Penuntutan · SOP FORM-6</p>
+    <h1>Editor {{ document_label }}</h1>
+    <p>{{ draft.spdp.letter_number }} · {{ draft.draft_number }}</p>
+  </div>
+  <a class="secondary-btn" href="{% url list_url_name %}">← Daftar {{ document_label }}</a>
+</section>
+
+{% if form.non_field_errors %}<div class="coordination-form-alert">{{ form.non_field_errors }}</div>{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="coordination-workspace" data-coordination-form data-coordination-type="{{ coordination_type }}" data-can-edit="{% if can_edit %}true{% else %}false{% endif %}">
+  {% csrf_token %}
+  <section class="coordination-editor-column">
+    {% if not can_edit %}<div class="coordination-readonly-notice"><span>i</span><p><b>Mode lihat saja</b> Anda tidak memiliki akses untuk mengubah draf ini.</p></div>{% endif %}
+
+    <article class="coordination-editor-card">
+      <header class="coordination-section-title"><span>01</span><div><b>Identitas Koordinasi</b><small>Tanggal, tempat, dan referensi perkara</small></div></header>
+      <div class="coordination-fixed-reference">
+        <div><span>SPDP</span><b>{{ draft.spdp.letter_number }}</b><small>{{ draft.spdp.letter_date|date:'d F Y' }}</small></div>
+        <div><span>P-16</span><b>{% if draft.spdp.p16_assignment.draft %}{{ draft.spdp.p16_assignment.draft.draft_number }}{% else %}Belum tersedia{% endif %}</b><small>Dasar pelaksanaan koordinasi</small></div>
+      </div>
+      <div class="coordination-field-grid two">
+        <label>{{ form.meeting_date.label }}{{ form.meeting_date }}{{ form.meeting_date.errors }}</label>
+        <label>{{ form.meeting_place.label }}{{ form.meeting_place }}{{ form.meeting_place.errors }}</label>
+      </div>
+    </article>
+
+    <article class="coordination-editor-card">
+      <header class="coordination-section-title"><span>02</span><div><b>Penuntut Umum</b><small>Otomatis diambil dari penunjukan P-16 dan tetap dapat disesuaikan</small></div></header>
+      <div class="coordination-field-grid three">
+        <label class="wide">{{ form.prosecutor_name.label }}{{ form.prosecutor_name }}{{ form.prosecutor_name.errors }}</label>
+        <label>{{ form.prosecutor_rank.label }}{{ form.prosecutor_rank }}{{ form.prosecutor_rank.errors }}</label>
+        <label>{{ form.prosecutor_nip.label }}{{ form.prosecutor_nip }}{{ form.prosecutor_nip.errors }}</label>
+      </div>
+    </article>
+
+    <article class="coordination-editor-card">
+      <header class="coordination-section-title"><span>03</span><div><b>Penyidik</b><small>Identitas petugas penyidik yang mengikuti koordinasi</small></div></header>
+      <div class="coordination-field-grid two">
+        <label>{{ form.investigator_name.label }}{{ form.investigator_name }}{{ form.investigator_name.errors }}</label>
+        <label>{{ form.investigator_position.label }}{{ form.investigator_position }}{{ form.investigator_position.errors }}</label>
+        <label>{{ form.investigator_rank.label }}{{ form.investigator_rank }}{{ form.investigator_rank.errors }}</label>
+        <label>{{ form.investigator_nrp.label }}{{ form.investigator_nrp }}{{ form.investigator_nrp.errors }}</label>
+      </div>
+    </article>
+
+    <article class="coordination-editor-card">
+      <header class="coordination-section-title"><span>04</span><div><b>Materi Koordinasi</b><small>Susun pokok pembahasan melalui editor; halaman akan terbagi otomatis</small></div></header>
+      <div class="coordination-rich-field">{{ form.body_html }}{{ form.body_html.errors }}</div>
+    </article>
+
+    <article class="coordination-editor-card">
+      <header class="coordination-section-title"><span>05</span><div><b>Pejabat yang Mengetahui</b><small>Atasan Penyidik dan Kepala Seksi Tindak Pidana Umum</small></div></header>
+      <div class="coordination-supervisor-grid">
+        <section>
+          <h3>Atasan Penyidik</h3>
+          <label>{{ form.investigator_supervisor_title.label }}{{ form.investigator_supervisor_title }}</label>
+          <label>{{ form.investigator_supervisor_name.label }}{{ form.investigator_supervisor_name }}</label>
+          <div><label>{{ form.investigator_supervisor_rank.label }}{{ form.investigator_supervisor_rank }}</label><label>{{ form.investigator_supervisor_nrp.label }}{{ form.investigator_supervisor_nrp }}</label></div>
+        </section>
+        <section>
+          <h3>Atasan Penuntut Umum</h3>
+          <label>{{ form.prosecutor_supervisor_title.label }}{{ form.prosecutor_supervisor_title }}</label>
+          <label>{{ form.prosecutor_supervisor_name.label }}{{ form.prosecutor_supervisor_name }}</label>
+          <div><label>{{ form.prosecutor_supervisor_rank.label }}{{ form.prosecutor_supervisor_rank }}</label><label>{{ form.prosecutor_supervisor_nip.label }}{{ form.prosecutor_supervisor_nip }}</label></div>
+        </section>
+      </div>
+      {% if form.investigator_supervisor_title.errors or form.investigator_supervisor_name.errors or form.investigator_supervisor_rank.errors or form.investigator_supervisor_nrp.errors or form.prosecutor_supervisor_title.errors or form.prosecutor_supervisor_name.errors or form.prosecutor_supervisor_rank.errors or form.prosecutor_supervisor_nip.errors %}<div class="coordination-field-errors">Periksa kembali data pejabat yang mengetahui.</div>{% endif %}
+    </article>
+
+    <article class="coordination-editor-card">
+      <header class="coordination-section-title"><span>06</span><div><b>Dokumentasi</b><small>Maksimal tiga foto; setiap foto dibuat sebagai satu halaman dokumentasi</small></div></header>
+      <div class="coordination-upload-grid">
+        <label class="coordination-upload-card" data-coordination-upload-card="1">
+          <span class="coordination-upload-preview">{% if draft.documentation_image_1 %}<img src="{{ draft.documentation_image_1.url }}" alt="Dokumentasi 1">{% else %}<b>01</b>{% endif %}</span>
+          <span><b>{% if draft.documentation_image_1 %}Ganti dokumentasi 1{% else %}Tambah dokumentasi 1{% endif %}</b><small>Klik untuk memilih foto</small></span>{{ form.documentation_image_1 }}
+        </label>
+        <label class="coordination-upload-card" data-coordination-upload-card="2">
+          <span class="coordination-upload-preview">{% if draft.documentation_image_2 %}<img src="{{ draft.documentation_image_2.url }}" alt="Dokumentasi 2">{% else %}<b>02</b>{% endif %}</span>
+          <span><b>{% if draft.documentation_image_2 %}Ganti dokumentasi 2{% else %}Tambah dokumentasi 2{% endif %}</b><small>Klik untuk memilih foto</small></span>{{ form.documentation_image_2 }}
+        </label>
+        <label class="coordination-upload-card" data-coordination-upload-card="3">
+          <span class="coordination-upload-preview">{% if draft.documentation_image_3 %}<img src="{{ draft.documentation_image_3.url }}" alt="Dokumentasi 3">{% else %}<b>03</b>{% endif %}</span>
+          <span><b>{% if draft.documentation_image_3 %}Ganti dokumentasi 3{% else %}Tambah dokumentasi 3{% endif %}</b><small>Klik untuk memilih foto</small></span>{{ form.documentation_image_3 }}
+        </label>
+      </div>
+      <div class="coordination-upload-grid coordination-barcode-grid">
+        <label class="coordination-upload-card coordination-barcode-card">
+          <span class="coordination-upload-preview">{% if draft.barcode_image %}<img src="{{ draft.barcode_image.url }}" alt="Barcode/QR koordinasi">{% else %}<b>QR</b>{% endif %}</span>
+          <span><b>{% if draft.barcode_image %}Ganti barcode/QR footer{% else %}Tambah barcode/QR footer{% endif %}</b><small>Barcode tampil di footer; E-Sign tetap di blok Penuntut Umum.</small></span>{{ form.barcode_image }}
+        </label>
+      </div>
+      {% if form.documentation_image_1.errors or form.documentation_image_2.errors or form.documentation_image_3.errors %}<div class="coordination-field-errors">Periksa jenis dan ukuran foto dokumentasi.</div>{% endif %}
+      {% if form.barcode_image.errors %}<div class="coordination-field-errors">{{ form.barcode_image.errors }}</div>{% endif %}
+    </article>
+
+    <div class="coordination-editor-actions">
+      <a class="secondary-btn" href="{% url list_url_name %}">Batal</a>
+      <button type="button" class="secondary-btn" data-coordination-print>Cetak Pratinjau</button>
+      {% if can_edit %}<button type="submit" class="primary-btn">Simpan {{ document_label }}</button>{% endif %}
+    </div>
+  </section>
+
+  <aside class="coordination-preview-column" aria-label="Pratinjau {{ document_label }}">
+    <div class="coordination-preview-toolbar"><span><i></i> PRATINJAU LANGSUNG</span><small>{% if coordination_type == 'ba3' %}F4 · 8,5 × 13 inci{% else %}Legal · 8,5 × 14 inci{% endif %}</small></div>
+    <div class="coordination-overflow-warning" data-coordination-overflow-warning hidden><b>Ada bagian yang terlalu panjang</b><p>Pecah paragraf panjang pada editor agar dapat dibagi ke halaman berikutnya.</p></div>
+    <div class="coordination-preview-stage"><div class="coordination-preview-pages" data-coordination-pages></div></div>
+  </aside>
+
+  <template data-coordination-document-source>{{ preview_content_html|safe }}</template>
+  <template data-coordination-letterhead>
+    <header class="coordination-letterhead p16-standard-letterhead">
+      <div class="coordination-letterhead-main p16-standard-letterhead-main">
+        <span class="p16-standard-letterhead-logo"><img src="{% static 'img/logo-kejaksaan-p16-transparent.png' %}" alt="Logo Kejaksaan Republik Indonesia"></span>
+        <div class="p16-standard-letterhead-copy">
+          <b>{{ institution.institution_name|default:'KEJAKSAAN REPUBLIK INDONESIA'|upper }}</b>
+          <strong>{{ institution.work_unit|default:'KEJAKSAAN NEGERI BULELENG'|upper }}</strong>
+          <p>{{ institution.address|default:'Jalan Dewi Sartika Nomor 1, Singaraja' }}</p>
+        </div>
+      </div>
+      <div class="coordination-letterhead-rule"><b>“Demi Keadilan dan Kebenaran Berdasarkan<br>Ketuhanan Yang Maha Esa”</b><strong>SOP FORM-6</strong></div>
+    </header>
+  </template>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'vendor/jodit/jodit.min.js' %}"></script>
+<script src="{% static 'js/coordination-editor.js' %}?v=20261124-2"></script>
+{% endblock %}

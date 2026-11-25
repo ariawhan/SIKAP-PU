@@ -1,0 +1,42 @@
+.case-doc-paper[data-document-type="sop07"]{page:auto;font-size:9px;line-height:1.15}
+.case-doc-paper[data-document-type="sop07"] .case-doc-page-content,
+.case-doc-paper[data-document-type="sop07"] .case-doc-meta b,
+.case-doc-paper[data-document-type="sop07"] .case-doc-meta span,
+.case-doc-paper[data-document-type="sop07"] .case-doc-meta p,
+.case-doc-paper[data-document-type="sop07"] .case-doc-subject>div,
+.case-doc-paper[data-document-type="sop07"] .case-doc-signature,
+.case-doc-paper[data-document-type="sop07"] .case-doc-copies{font:9px/1.15 Arial,sans-serif}
+.case-doc-paper[data-document-type="sop07"] .case-doc-date{right:0;width:auto;text-align:right}
+.case-doc-paper[data-document-type="sop07"] [data-sop07-recipient]{margin:13px 0 16px;font-size:9px;font-weight:400;line-height:1.15}
+.case-doc-paper[data-document-type="sop07"] [data-sop07-recipient] u{margin-left:0;text-decoration:none}
+.case-doc-sop07-basis{display:grid;grid-template-columns:16px minmax(0,1fr);font-size:9px;line-height:1.15}
+.case-doc-sop07-basis>div>b{display:block;margin:0 0 3pt;font-weight:400}
+.case-doc-sop07-basis ol{margin:0!important;padding-left:21pt!important;list-style:lower-alpha outside!important}
+.case-doc-sop07-basis ul{margin:2pt 0 4pt!important;padding-left:21pt!important;list-style:"-  " outside!important}
+.case-doc-sop07-basis li{margin:0 0 3pt!important;padding-left:3pt;text-align:justify}
+.case-doc-paper[data-document-type="sop07"] .case-doc-body{font-size:9px;line-height:1.15}
+.case-doc-paper[data-document-type="sop07"] .case-doc-body>ol{margin:0;padding-left:0;list-style:none}
+.case-doc-paper[data-document-type="sop07"] .case-doc-body>ol>li{display:grid;grid-template-columns:20pt minmax(0,1fr);margin:0 0 4pt;padding-left:0;text-align:justify}
+.case-doc-paper[data-document-type="sop07"] .case-doc-body>ol>li::before{content:attr(data-document-list-number) ".";grid-column:1;text-align:left}
+.case-doc-paper[data-document-type="sop07"] .case-doc-body ol ol{grid-column:2;margin:3pt 0 0;padding-left:21pt;list-style:lower-alpha outside}
+.case-doc-paper[data-document-type="sop07"] .case-doc-body ol ol li{margin:0 0 2pt;padding-left:3pt;text-align:justify}
+.case-doc-paper[data-document-type="sop07"] .case-doc-body>p{margin:3pt 0 0;text-align:left;text-indent:0}
+.case-doc-paper[data-document-type="sop07"] .case-doc-signature{width:58%;margin:22pt 21pt 0 auto;text-align:center}
+.case-doc-paper[data-document-type="sop07"] .case-doc-signature p{margin:0;line-height:1.15}
+.case-doc-paper[data-document-type="sop07"] .case-doc-signature-space{height:45pt;display:flex;align-items:center;justify-content:center}
+.case-doc-paper[data-document-type="sop07"] .case-doc-signature-space img{display:block;width:auto;max-width:100%;height:38pt;margin:0 auto;object-fit:contain}
+.case-doc-paper[data-document-type="sop07"] .case-doc-copies{margin-top:18pt}
+.case-doc-paper[data-document-type="sop07"] .case-doc-copies>p{margin:0 0 3pt}
+.case-doc-paper[data-document-type="sop07"] .case-doc-copies ol{display:block!important;margin:0!important;padding-left:22pt!important;list-style:decimal outside!important}
+.case-doc-paper[data-document-type="sop07"] .case-doc-copies li{display:list-item!important;margin:0 0 3pt!important;padding-left:3pt!important;list-style:decimal outside!important}
+.case-doc-workspace[data-document-type="sop07"] .case-doc-rich .jodit-wysiwyg{font:10pt/1.15 Arial,sans-serif!important}
+.case-doc-workspace[data-document-type="sop07"] .case-doc-rich .jodit-wysiwyg ol{padding-left:28px!important}
+.case-doc-workspace[data-document-type="sop07"] .case-doc-rich .jodit-wysiwyg li{display:list-item!important;margin:0 0 4pt!important;padding-left:3px!important;text-align:justify}
+
+@page{size:8.5in 14in;margin:0}
+@media print{
+  .case-doc-paper[data-document-type="sop07"]{page:auto!important;width:8.5in!important;height:35.45cm!important;min-height:35.45cm!important;max-height:35.45cm!important;padding:1cm 1.905cm 2.54cm!important;font:10pt/1.15 Arial,sans-serif!important;break-inside:avoid-page!important;page-break-inside:avoid!important}
+  .case-doc-paper[data-document-type="sop07"] .case-doc-signature{width:58%!important;margin:22pt 21pt 0 auto!important}
+  .case-doc-paper[data-document-type="sop07"] .case-doc-signature-space{height:45pt!important}
+  .case-doc-paper[data-document-type="sop07"] .case-doc-signature-space img{height:38pt!important}
+}

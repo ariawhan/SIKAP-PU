@@ -1,0 +1,204 @@
+{% extends 'dashboard/layout.html' %}
+{% block title %}Konfigurasi Penyidik{% endblock %}
+{% block page_name %}Konfigurasi Penyidik{% endblock %}
+
+{% block content %}
+<section class="page-heading investigator-heading">
+  <div>
+    <p class="kicker text-red-700">Settings</p>
+    <h1>Konfigurasi Instansi Penyidik</h1>
+    <p>Kelola instansi penyidik dan instansi pelaksana penyidik yang akan dipakai dalam administrasi SPDP.</p>
+  </div>
+  <button type="button" class="primary-btn" data-open-investigator-institution>Tambah Instansi Penyidik</button>
+</section>
+
+<section class="investigator-grid">
+  {% for institution in institutions %}
+  <article class="panel investigator-card">
+    <header class="investigator-card-head">
+      <div>
+        <span class="investigator-status {% if institution.is_active %}active{% else %}inactive{% endif %}">{% if institution.is_active %}Aktif{% else %}Nonaktif{% endif %}</span>
+        <h3>{{ institution.name }}</h3>
+        <p>{{ institution.units.count }} instansi pelaksana penyidik</p>
+      </div>
+      <div class="investigator-actions">
+        <button type="button" class="letter-number-action edit" data-edit-investigator-institution data-id="{{ institution.pk }}" data-name="{{ institution.name }}" data-active="{{ institution.is_active|yesno:'true,false' }}">Edit</button>
+        <form method="post" onsubmit="return confirm('Hapus instansi penyidik ini beserta semua pelaksananya?');">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete_institution">
+          <input type="hidden" name="institution_id" value="{{ institution.pk }}">
+          <button type="submit" class="letter-number-action delete">Hapus</button>
+        </form>
+      </div>
+    </header>
+
+    <div class="investigator-unit-head">
+      <b>Instansi Pelaksana Penyidik</b>
+      <button type="button" class="secondary-btn" data-open-investigator-unit data-institution-id="{{ institution.pk }}" data-institution-name="{{ institution.name }}">+ Tambah Pelaksana</button>
+    </div>
+
+    <div class="investigator-unit-list">
+      {% for unit in institution.units.all %}
+      <div class="investigator-unit-item">
+        <div>
+          <b>{{ unit.name }}</b>
+          <small>{% if unit.is_active %}Aktif{% else %}Nonaktif{% endif %}</small>
+        </div>
+        <div class="investigator-actions">
+          <button type="button" class="letter-number-action edit" data-edit-investigator-unit data-id="{{ unit.pk }}" data-institution-id="{{ institution.pk }}" data-institution-name="{{ institution.name }}" data-name="{{ unit.name }}" data-active="{{ unit.is_active|yesno:'true,false' }}">Edit</button>
+          <form method="post" onsubmit="return confirm('Hapus instansi pelaksana penyidik ini?');">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete_unit">
+            <input type="hidden" name="unit_id" value="{{ unit.pk }}">
+            <button type="submit" class="letter-number-action delete">Hapus</button>
+          </form>
+        </div>
+      </div>
+      {% empty %}
+      <div class="investigator-empty-unit">Belum ada instansi pelaksana penyidik untuk instansi ini.</div>
+      {% endfor %}
+    </div>
+  </article>
+  {% empty %}
+  <article class="panel">
+    <div class="empty-table">
+      <span>▤</span>
+      <b>Belum ada instansi penyidik.</b>
+      <p>Gunakan tombol Tambah Instansi Penyidik untuk menambahkan data pertama.</p>
+    </div>
+  </article>
+  {% endfor %}
+</section>
+
+{% include 'includes/pagination.html' with page_obj=page_obj %}
+
+<dialog class="letter-number-modal investigator-modal" id="investigator-institution-modal" aria-modal="true" aria-labelledby="investigator-institution-title">
+  <form method="post" id="investigator-institution-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add_institution" data-investigator-institution-action>
+    <input type="hidden" name="institution_id" value="" data-investigator-institution-id>
+    <header class="letter-number-modal-head">
+      <div>
+        <p>Konfigurasi</p>
+        <h2 id="investigator-institution-title">Tambah Instansi Penyidik</h2>
+      </div>
+      <button type="button" data-close-investigator-modal aria-label="Tutup popup">&times;</button>
+    </header>
+    <div class="letter-number-modal-body">
+      <label>
+        <span>{{ institution_form.name.label }}</span>
+        {{ institution_form.name }}
+        {{ institution_form.name.errors }}
+      </label>
+      <label class="investigator-toggle">
+        {{ institution_form.is_active }}
+        <span>Aktif</span>
+      </label>
+      {{ institution_form.non_field_errors }}
+    </div>
+    <footer class="letter-number-modal-actions">
+      <button type="button" class="secondary-btn" data-close-investigator-modal>Batal</button>
+      <button type="submit" class="primary-btn" data-investigator-institution-submit>Simpan Instansi</button>
+    </footer>
+  </form>
+</dialog>
+
+<dialog class="letter-number-modal investigator-modal" id="investigator-unit-modal" aria-modal="true" aria-labelledby="investigator-unit-title">
+  <form method="post" id="investigator-unit-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add_unit" data-investigator-unit-action>
+    <input type="hidden" name="unit_id" value="" data-investigator-unit-id>
+    {{ unit_form.institution }}
+    <header class="letter-number-modal-head">
+      <div>
+        <p>Konfigurasi</p>
+        <h2 id="investigator-unit-title">Tambah Instansi Pelaksana Penyidik</h2>
+      </div>
+      <button type="button" data-close-investigator-unit-modal aria-label="Tutup popup">&times;</button>
+    </header>
+    <div class="letter-number-modal-body">
+      <div class="investigator-parent-note">Instansi penyidik: <b data-investigator-unit-parent>—</b></div>
+      <label>
+        <span>{{ unit_form.name.label }}</span>
+        {{ unit_form.name }}
+        {{ unit_form.name.errors }}
+      </label>
+      <label class="investigator-toggle">
+        {{ unit_form.is_active }}
+        <span>Aktif</span>
+      </label>
+      {{ unit_form.non_field_errors }}
+    </div>
+    <footer class="letter-number-modal-actions">
+      <button type="button" class="secondary-btn" data-close-investigator-unit-modal>Batal</button>
+      <button type="submit" class="primary-btn" data-investigator-unit-submit>Simpan Pelaksana</button>
+    </footer>
+  </form>
+</dialog>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+  function setChecked(form, name, value) {
+    const input = form.querySelector(`[name="${name}"]`);
+    if (input) input.checked = value !== 'false';
+  }
+
+  const institutionModal = document.getElementById('investigator-institution-modal');
+  const institutionForm = document.getElementById('investigator-institution-form');
+  const unitModal = document.getElementById('investigator-unit-modal');
+  const unitForm = document.getElementById('investigator-unit-form');
+
+  function openInstitutionModal(mode, data = {}) {
+    institutionForm.reset();
+    const editing = mode === 'edit';
+    institutionForm.querySelector('[data-investigator-institution-action]').value = editing ? 'edit_institution' : 'add_institution';
+    institutionForm.querySelector('[data-investigator-institution-id]').value = editing ? data.id : '';
+    institutionForm.querySelector('[name="name"]').value = editing ? data.name : '';
+    setChecked(institutionForm, 'is_active', editing ? data.active : 'true');
+    institutionModal.querySelector('#investigator-institution-title').textContent = editing ? 'Edit Instansi Penyidik' : 'Tambah Instansi Penyidik';
+    institutionModal.querySelector('[data-investigator-institution-submit]').textContent = editing ? 'Simpan Perubahan' : 'Simpan Instansi';
+    institutionModal.showModal();
+    requestAnimationFrame(() => institutionForm.querySelector('[name="name"]')?.focus());
+  }
+
+  function openUnitModal(mode, data = {}) {
+    unitForm.reset();
+    const editing = mode === 'edit';
+    unitForm.querySelector('[data-investigator-unit-action]').value = editing ? 'edit_unit' : 'add_unit';
+    unitForm.querySelector('[data-investigator-unit-id]').value = editing ? data.id : '';
+    unitForm.querySelector('[name="institution"]').value = data.institutionId || '';
+    unitForm.querySelector('[name="name"]').value = editing ? data.name : '';
+    setChecked(unitForm, 'is_active', editing ? data.active : 'true');
+    unitModal.querySelector('[data-investigator-unit-parent]').textContent = data.institutionName || '—';
+    unitModal.querySelector('#investigator-unit-title').textContent = editing ? 'Edit Instansi Pelaksana Penyidik' : 'Tambah Instansi Pelaksana Penyidik';
+    unitModal.querySelector('[data-investigator-unit-submit]').textContent = editing ? 'Simpan Perubahan' : 'Simpan Pelaksana';
+    unitModal.showModal();
+    requestAnimationFrame(() => unitForm.querySelector('[name="name"]')?.focus());
+  }
+
+  document.querySelector('[data-open-investigator-institution]')?.addEventListener('click', () => openInstitutionModal('add'));
+  document.querySelectorAll('[data-edit-investigator-institution]').forEach(button => {
+    button.addEventListener('click', () => openInstitutionModal('edit', button.dataset));
+  });
+  document.querySelectorAll('[data-open-investigator-unit]').forEach(button => {
+    button.addEventListener('click', () => openUnitModal('add', button.dataset));
+  });
+  document.querySelectorAll('[data-edit-investigator-unit]').forEach(button => {
+    button.addEventListener('click', () => openUnitModal('edit', button.dataset));
+  });
+  institutionModal.querySelectorAll('[data-close-investigator-modal]').forEach(button => {
+    button.addEventListener('click', () => institutionModal.close());
+  });
+  unitModal.querySelectorAll('[data-close-investigator-unit-modal]').forEach(button => {
+    button.addEventListener('click', () => unitModal.close());
+  });
+  institutionModal.addEventListener('click', event => { if (event.target === institutionModal) institutionModal.close(); });
+  unitModal.addEventListener('click', event => { if (event.target === unitModal) unitModal.close(); });
+
+  {% if active_modal == 'institution' %}institutionModal.showModal();{% endif %}
+  {% if active_modal == 'unit' %}unitModal.showModal();{% endif %}
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,69 @@
+﻿{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/spdp-list.css' %}?v=20260915-3"><link rel="stylesheet" href="{% static 'css/dashboard-chart.css' %}?v=20261124-4">{% endblock %}
+{% block content %}
+<section class="flex items-end justify-between gap-4 mb-7"><div><p class="kicker text-red-700">Ringkasan hari ini</p><h1 class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight mt-2">Selamat datang, {{ user.first_name|default:user.username }}!</h1><p class="text-slate-500 text-sm mt-2">Pantau administrasi perkara pidana umum secara menyeluruh.</p></div><a class="primary-btn shrink-0" href="{% url 'cases:spdp_create' %}"><span>+</span><span class="hidden sm:inline">Tambah Perkara</span></a></section>
+<section class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">{% include 'dashboard/stat.html' with icon='▤' value=stats.cases.total title='Total Perkara' info='Seluruh perkara yang terdaftar' tone='green' periods=stats.cases show_day=True %}{% include 'dashboard/stat.html' with icon='⌁' value=stats.unresolved.total title='Harus Diselesaikan' info='Perkara yang belum mencapai P-21' tone='blue' periods=stats.unresolved %}{% include 'dashboard/stat.html' with icon='↩' value=stats.returned.total title='Perkara Dikembalikan' info='SOP Form 3, P-20, dan SOP Form 7' tone='amber' periods=stats.returned %}{% include 'dashboard/stat.html' with icon='✓' value=stats.p21.total title='Total P-21' info='P-21 selesai dilaksanakan; perkara belum diberhentikan' tone='purple' periods=stats.p21 %}</section>
+
+<section class="grid xl:grid-cols-[1.7fr_.8fr] gap-4 mt-4">
+  <article class="panel">
+    <div class="panel-head">
+      <div><h3>Perkembangan Perkara</h3><p>Total perkara dan tahapan P-16 sampai SOP Form 7 per bulan</p></div>
+      <span class="dev-chart-year">Tahun {{ chart.year }}</span>
+    </div>
+
+    <div class="dev-chart-block">
+      <div class="dev-chart-subhead"><b>Total Perkara</b><span>SPDP diterima per bulan</span></div>
+      <div class="dev-chart-scroll">
+        <svg class="dev-chart-svg" width="{{ chart.chart_width }}" height="{{ chart.chart_height }}" role="img" aria-label="Grafik garis total perkara Januari sampai Desember {{ chart.year }}">
+          {% for tick in chart.axis_ticks %}<line class="dev-chart-grid-line" x1="{{ chart.axis_gutter }}" y1="{{ tick.y }}" x2="{{ chart.plot_right }}" y2="{{ tick.y }}"></line><text class="dev-chart-axis-label" x="{{ chart.axis_gutter }}" y="{{ tick.y }}" dx="-6" dy="3" text-anchor="end">{{ tick.value }}</text>{% endfor %}
+          {% if chart.has_total_values %}<polyline class="dev-line-total" points="{{ chart.total_line_points }}"><title>Total perkara per bulan</title></polyline>{% endif %}
+          {% for month in chart.months %}{% if month.total %}<circle class="dev-point-total" cx="{{ month.total_point.x }}" cy="{{ month.total_point.y }}" r="3"><title>{{ month.label }} — Total Perkara: {{ month.total_point.value }}</title></circle>{% endif %}<text class="dev-chart-month-label" x="{{ month.month_label_x }}" y="{{ chart.baseline_y }}" dy="10">{{ month.label }}</text>{% endfor %}
+        </svg>
+      </div>
+      <details class="dev-chart-table">
+        <summary>Lihat sebagai tabel</summary>
+        <table><thead><tr><th>Bulan</th><th>Total Perkara</th></tr></thead><tbody>{% for month in chart.months %}<tr><td>{{ month.label }}</td><td>{{ month.total }}</td></tr>{% endfor %}</tbody></table>
+      </details>
+    </div>
+
+    <div class="dev-chart-block">
+      <div class="dev-chart-subhead"><b>Tahapan P-16 sampai SOP Form 7</b><span>Tanggal surat/tahap per bulan</span></div>
+      <div class="dev-chart-legend">{% for item in chart.stage_legend %}<span class="dev-chart-legend-item" data-stage="{{ item.index }}"><i></i>{{ item.label }}</span>{% endfor %}</div>
+      <div class="dev-chart-scroll">
+        <svg class="dev-chart-svg" width="{{ chart.chart_width }}" height="{{ chart.chart_height }}" role="img" aria-label="Grafik garis setiap tahapan Januari sampai Desember {{ chart.year }}">
+          {% for tick in chart.stage_axis_ticks %}<line class="dev-chart-grid-line" x1="{{ chart.axis_gutter }}" y1="{{ tick.y }}" x2="{{ chart.plot_right }}" y2="{{ tick.y }}"></line><text class="dev-chart-axis-label" x="{{ chart.axis_gutter }}" y="{{ tick.y }}" dx="-6" dy="3" text-anchor="end">{{ tick.value }}</text>{% endfor %}
+          {% for series in chart.stage_series %}<polyline class="dev-line-stage" data-stage="{{ series.index }}" points="{{ series.points }}"><title>{{ series.label }} per bulan</title></polyline>{% endfor %}
+          {% for month in chart.months %}{% for point in month.stage_points %}{% if point.value %}<circle class="dev-point-stage" data-stage="{{ point.index }}" cx="{{ point.x }}" cy="{{ point.y }}" r="2.5"><title>{{ month.label }} — {{ point.label }}: {{ point.value }}</title></circle>{% endif %}{% endfor %}<text class="dev-chart-month-label" x="{{ month.month_label_x }}" y="{{ chart.baseline_y }}" dy="10">{{ month.label }}</text>{% endfor %}
+        </svg>
+      </div>
+      <details class="dev-chart-table">
+        <summary>Lihat sebagai tabel</summary>
+        <table><thead><tr><th>Bulan</th>{% for stage in chart.stage_legend %}<th>{{ stage.label }}</th>{% endfor %}</tr></thead><tbody>{% for month in chart.months %}<tr><td>{{ month.label }}</td>{% for point in month.stage_points %}<td>{{ point.value }}</td>{% endfor %}</tr>{% endfor %}</tbody></table>
+      </details>
+    </div>
+  </article>
+
+  <article class="panel">
+    <div class="panel-head"><div><h3>Reminder Tenggat Perkara</h3><p>P-16 sampai SOP Form 2, Tahap 1, P-19, dan P-21</p></div><a href="{% url 'cases:stage_one_list' %}">Tahap 1</a></div>
+    {% for item in reminders|slice:":8" %}
+    <div class="dev-reminder-item">
+      <a class="dev-reminder-link" href="{{ item.target_url }}">
+        <span class="deadline-badge {{ item.color_class }}"><span class="deadline-badge-value">{{ item.remaining_display }}</span></span>
+        <div>
+        <b>{{ item.stage_label }} · {{ item.spdp.letter_number }}</b>
+        <p>Masa {{ item.period_days }} hari · batas {{ item.due_date|date:'d M Y' }} · {{ item.status_text }}</p>
+        </div>
+      </a>
+      <form method="post" action="{% url 'dashboard:send_reminder' item.spdp.pk %}" class="dev-reminder-action">{% csrf_token %}<button type="submit" title="Kirim notifikasi reminder" aria-label="Kirim notifikasi reminder untuk {{ item.spdp.letter_number }}">🔔 Notif</button></form>
+    </div>
+    {% empty %}
+    <div class="case-priority-empty"><b>Tidak ada reminder aktif</b><small>Belum ada tahapan perkara yang memiliki tenggat aktif.</small></div>
+    {% endfor %}
+  </article>
+</section>
+
+<section class="panel mt-4"><div class="panel-head"><div><h3>Perkara Terbaru</h3><p>Data terbaru langsung dari perkara yang tersimpan</p></div><a href="{% url 'cases:spdp_list' %}">Lihat Semua →</a></div><div class="table-wrap"><table><thead><tr><th>No. Perkara</th><th>Pelaku</th><th>Tahap</th><th>Jaksa</th><th>Status</th><th>Aksi</th></tr></thead><tbody>{% for case in recent_cases %}<tr><td><b>{{ case.spdp.letter_number }}</b><small>Diterima {{ case.spdp.received_date|date:'d M Y' }}</small></td><td>{{ case.suspects }}</td><td>{{ case.stage }}</td><td>{{ case.prosecutors }}</td><td><span class="badge {{ case.color }}">{{ case.status }}</span></td><td><a class="row-action" href="{% url 'cases:spdp_detail' case.spdp.pk %}">Lihat →</a></td></tr>{% empty %}<tr><td colspan="6"><div class="empty-table"><b>Belum ada perkara</b><p>Perkara yang ditambahkan akan tampil otomatis di sini.</p></div></td></tr>{% endfor %}</tbody></table></div>{% include 'includes/pagination.html' with page_obj=recent_page_obj page_param='recent_page' %}</section>{% endblock %}
+
+

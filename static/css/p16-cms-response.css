@@ -1,0 +1,16 @@
+.p16-cms-form-message {
+  border: 1px solid #f0c9cd;
+  line-height: 1.55;
+}
+
+.p16-cms-form-message.success {
+  border-color: #b9dfc7;
+  background: #edf9f1;
+  color: #256a42;
+}
+
+.dark .p16-cms-form-message.success {
+  border-color: #356849;
+  background: #1d3426;
+  color: #9ed8b3;
+}

@@ -1,0 +1,90 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Edit Profil{% endblock %}
+{% block page_name %}Edit Profil{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/profile.css' %}?v=20260915-1">{% endblock %}
+{% block content %}
+<section class="profile-page">
+  <header class="profile-heading">
+    <div>
+      <p class="kicker text-red-700">Akun Saya</p>
+      <h1>Edit Profil</h1>
+      <p>Perbarui identitas, kontak, serta posisi foto yang tampil pada akun Anda.</p>
+    </div>
+    <a href="{% url 'dashboard:index' %}" class="profile-back">Kembali ke Dashboard</a>
+  </header>
+
+  <form method="post" enctype="multipart/form-data" class="profile-card">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <section class="profile-photo-section" data-profile-photo>
+      <div class="profile-photo-preview" data-profile-photo-preview>
+        {% if user.photo %}
+        <img src="{{ user.photo.url }}" data-profile-photo-image alt="Foto {{ user.display_name }}" style="object-position: {{ user.photo_position_x }}% {{ user.photo_position_y }}%;">
+        <span data-profile-photo-initial hidden>{{ user.display_name|slice:':2'|upper }}</span>
+        {% else %}
+        <img data-profile-photo-image alt="Preview foto profil" hidden>
+        <span data-profile-photo-initial>{{ user.display_name|slice:':2'|upper }}</span>
+        {% endif %}
+      </div>
+      <div class="profile-photo-copy">
+        <span>Foto Profil</span>
+        <h2>{{ user.display_name }}</h2>
+        <p>Pilih foto baru bila diperlukan. Setelah itu, geser foto di dalam lingkaran agar wajah berada di posisi yang tepat.</p>
+        <input type="file" name="photo" accept="image/*" class="profile-field">
+        {{ form.photo.errors }}
+        {{ form.photo_position_x }}
+        {{ form.photo_position_y }}
+      </div>
+    </section>
+
+    <section class="profile-identity-bar">
+      <div><small>Username</small><b>@{{ user.username }}</b></div>
+      <div><small>Role</small><b>{{ user.role_labels }}</b></div>
+      <span>Username dan role hanya dapat diubah oleh Super Admin.</span>
+    </section>
+
+    <div class="profile-form-grid">
+      <label>Nama Lengkap{{ form.first_name }}{{ form.first_name.errors }}</label>
+      <label>Email{{ form.email }}{{ form.email.errors }}</label>
+      <label>NIP{{ form.nip }}{{ form.nip.errors }}</label>
+      <label>NRP{{ form.nrp }}{{ form.nrp.errors }}</label>
+      <label>Pangkat{{ form.rank }}{{ form.rank.errors }}</label>
+      <label>Golongan{{ form.grade }}{{ form.grade.errors }}</label>
+      <label>Nomor WhatsApp{{ form.whatsapp_number }}{{ form.whatsapp_number.errors }}</label>
+      <label>ID Telegram{{ form.telegram_chat_id }}{{ form.telegram_chat_id.errors }}</label>
+    </div>
+
+    <footer class="profile-actions">
+      <a href="{% url 'dashboard:index' %}" class="profile-cancel">Batal</a>
+      <button type="submit" class="primary-btn">Simpan Perubahan</button>
+    </footer>
+  </form>
+</section>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+(function(){
+  var box=document.querySelector('[data-profile-photo]');
+  if(!box)return;
+  var file=box.querySelector('input[type="file"]');
+  var image=box.querySelector('[data-profile-photo-image]');
+  var initial=box.querySelector('[data-profile-photo-initial]');
+  var preview=box.querySelector('[data-profile-photo-preview]');
+  var inputX=box.querySelector('input[name="photo_position_x"]');
+  var inputY=box.querySelector('input[name="photo_position_y"]');
+  var dragging=false;
+  function setPosition(x,y){
+    x=Math.max(0,Math.min(100,x));y=Math.max(0,Math.min(100,y));
+    if(inputX)inputX.value=Math.round(x);if(inputY)inputY.value=Math.round(y);
+    if(image)image.style.objectPosition=Math.round(x)+'% '+Math.round(y)+'%';
+  }
+  function move(event){var rect=preview.getBoundingClientRect();setPosition(((event.clientX-rect.left)/rect.width)*100,((event.clientY-rect.top)/rect.height)*100)}
+  file?.addEventListener('change',function(){var selected=file.files&&file.files[0];if(!selected||!image)return;image.src=URL.createObjectURL(selected);image.hidden=false;if(initial)initial.hidden=true;setPosition(50,50)});
+  preview?.addEventListener('pointerdown',function(event){if(!image||image.hidden)return;dragging=true;preview.setPointerCapture(event.pointerId);move(event)});
+  preview?.addEventListener('pointermove',function(event){if(dragging)move(event)});
+  preview?.addEventListener('pointerup',function(){dragging=false});
+  preview?.addEventListener('pointercancel',function(){dragging=false});
+})();
+</script>
+{% endblock %}

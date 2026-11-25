@@ -1,0 +1,31 @@
+<section class="suspect-card" data-receipt-form>
+  <div class="suspect-head"><div><span data-receipt-number>{{ number }}</span><b>Tanda Terima</b></div></div>
+  {{ receipt_form.id }}
+  <div class="suspect-fieldsets">
+    <div class="suspect-fieldset">
+      <h4>Penerima</h4>
+      <div class="case-form-grid three">
+        {% include 'cases/field.html' with field=receipt_form.receipt_type %}
+        {% include 'cases/field.html' with field=receipt_form.cover_letter_number %}
+        {% include 'cases/field.html' with field=receipt_form.cover_letter_date %}
+        {% include 'cases/field.html' with field=receipt_form.received_at %}
+        {% include 'cases/field.html' with field=receipt_form.issued_date %}
+        {% include 'cases/field.html' with field=receipt_form.recipient_user %}
+        {{ receipt_form.recipient_name }}
+        {% include 'cases/field.html' with field=receipt_form.recipient_rank %}
+        {% include 'cases/field.html' with field=receipt_form.recipient_position %}
+        {% include 'cases/field.html' with field=receipt_form.recipient_nip %}
+      </div>
+    </div>
+    <div class="suspect-fieldset">
+      <h4>Penyidik</h4>
+      <div class="case-form-grid two">
+        {% include 'cases/field.html' with field=receipt_form.investigator_name %}
+        {% include 'cases/field.html' with field=receipt_form.investigator_nrp %}
+        {% include 'cases/field.html' with field=receipt_form.investigator_rank %}
+        {% include 'cases/field.html' with field=receipt_form.investigator_position %}
+      </div>
+    </div>
+  </div>
+  <span class="delete-field">{{ receipt_form.DELETE }}</span>
+</section>

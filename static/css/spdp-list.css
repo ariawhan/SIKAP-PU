@@ -1,0 +1,546 @@
+/* Tampilan khusus halaman daftar perkara / SPDP. */
+.case-overview-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, .88fr) minmax(480px, 1.42fr);
+  align-items: stretch;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.case-summary-card,
+.case-priority-card {
+  position: relative;
+  min-width: 0;
+  min-height: 258px;
+  padding: 22px;
+  overflow: hidden;
+  border: 1px solid #e1e7e4;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(35, 48, 42, .055);
+}
+
+.case-summary-card::before,
+.case-priority-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, #8f1824, #c73b48 58%, rgba(199, 59, 72, 0));
+}
+
+.case-summary-card {
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 100% 0, rgba(180, 35, 47, .075), transparent 42%),
+    #fff;
+}
+
+.case-summary-head span,
+.case-priority-head span {
+  color: #b4232f;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.case-summary-head h2,
+.case-priority-head h2 {
+  margin-top: 5px;
+  color: #25312b;
+  font: 800 17px/1.3 Manrope, sans-serif;
+  letter-spacing: -.015em;
+}
+
+.case-summary-card > strong {
+  display: block;
+  margin-top: 18px;
+  color: #17231d;
+  font: 800 44px/1 Manrope, sans-serif;
+  letter-spacing: -.045em;
+}
+
+.case-summary-breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 22px;
+}
+
+.case-summary-breakdown > div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #e9eeeb;
+  border-radius: 12px;
+  background: rgba(249, 251, 250, .92);
+}
+
+.case-summary-breakdown span,
+.case-summary-breakdown b {
+  display: block;
+}
+
+.case-summary-breakdown span {
+  min-height: 28px;
+  color: #77827c;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.case-summary-breakdown b {
+  margin-top: 5px;
+  color: #26322c;
+  font: 800 19px/1.2 Manrope, sans-serif;
+}
+
+.case-priority-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.case-priority-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.case-priority-head > b {
+  flex: none;
+  min-width: 72px;
+  padding: 6px 10px;
+  border: 1px solid #f0cbd0;
+  border-radius: 999px;
+  background: #fff2f4;
+  color: #a52330;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.case-priority-list {
+  display: grid;
+  gap: 8px;
+  max-height: 194px;
+  margin-top: 16px;
+  padding-right: 3px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d9c2c5 transparent;
+}
+
+.case-priority-item {
+  display: grid;
+  grid-template-columns: minmax(76px, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 10px 12px;
+  border: 1px solid #e8edea;
+  border-radius: 12px;
+  background: #fafcfa;
+  color: #2f3b35;
+  transition: border-color .18s ease, background-color .18s ease, transform .18s ease;
+}
+
+.case-priority-item:hover {
+  border-color: #dfb3b8;
+  background: #fff7f8;
+  transform: none;
+}
+
+.case-priority-item:focus-visible {
+  outline: 3px solid rgba(180, 35, 47, .16);
+  outline-offset: 2px;
+}
+
+.case-priority-item > div {
+  min-width: 0;
+}
+
+.case-priority-item b,
+.case-priority-item small {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.case-priority-item b {
+  color: #2d3933;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.case-priority-item small,
+.case-priority-empty small {
+  margin-top: 4px;
+  color: #7e8983;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.case-priority-empty {
+  display: grid;
+  place-content: center;
+  min-height: 132px;
+  padding: 22px;
+  border: 1px dashed #d9e1dd;
+  border-radius: 13px;
+  background: #fafcfa;
+  color: #4c5852;
+  text-align: center;
+}
+
+.case-priority-empty b {
+  display: block;
+  font-size: 13px;
+}
+
+.case-list-panel {
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(35, 48, 42, .045);
+}
+
+.case-list-panel .case-toolbar {
+  margin-bottom: 18px;
+}
+
+.case-list-panel .case-toolbar form {
+  min-height: 44px;
+  border-radius: 11px;
+  background: #f8faf9;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.case-list-panel .case-toolbar form:focus-within {
+  border-color: #c75a65;
+  box-shadow: 0 0 0 3px rgba(180, 35, 47, .09);
+}
+
+.case-list-panel .case-toolbar input {
+  font-size: 12px;
+}
+
+.case-list-panel .case-toolbar button {
+  min-width: 68px;
+  font-size: 11px;
+  transition: background-color .18s ease, color .18s ease;
+}
+
+.case-list-panel .case-toolbar button:hover {
+  background: #b4232f;
+  color: #fff;
+}
+
+.case-list-panel .table-wrap {
+  border-top: 1px solid #e6ebe8;
+}
+
+.case-list-panel .workflow-table th {
+  height: 44px;
+  background: #f8faf9;
+  color: #748079;
+  font-size: 9px;
+}
+
+.case-list-panel .workflow-table td {
+  height: 66px;
+  vertical-align: middle;
+}
+
+.case-list-panel .workflow-table tbody tr {
+  transition: background-color .16s ease;
+}
+
+.case-list-panel .workflow-table tbody tr:hover {
+  background: #fffafb;
+}
+
+.badge.red {
+  border: 1px solid #efbdc2;
+  background: #fff0f2;
+  color: #aa2935;
+}
+
+.case-list-panel .workflow-table td:first-child b {
+  max-width: 230px;
+  overflow: hidden;
+  color: #2d3933;
+  text-overflow: ellipsis;
+}
+
+.case-list-panel .deadline-badge {
+  min-width: 0;
+}
+
+.case-overview-grid .deadline-badge,
+.case-list-panel .deadline-badge {
+  gap: 0;
+  min-height: 29px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.deadline-badge-label,
+.deadline-badge-value {
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.deadline-badge-label {
+  min-width: 48px;
+  padding: 6px 7px;
+  border-right: 1px solid currentColor;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.deadline-badge-value {
+  min-width: 48px;
+  padding: 6px 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.case-overview-grid .deadline-badge.overdue,
+.case-list-panel .deadline-badge.overdue {
+  border-color: #e5aeb4;
+  background: #fff7f8;
+  color: #a51f2c;
+}
+
+.deadline-badge.overdue .deadline-badge-label {
+  border-right-color: #b4232f;
+  background: #b4232f;
+  color: #fff;
+}
+
+.case-priority-item.case-priority-overdue {
+  border-color: #ead6d8;
+  border-left: 3px solid #b4232f;
+  background: #fff;
+}
+
+.case-priority-item.case-priority-overdue:hover {
+  border-color: #d7a0a6;
+  background: #fff8f9;
+}
+
+.dark .case-summary-card,
+.dark .case-priority-card,
+.dark .case-list-panel {
+  border-color: #303438;
+  background-color: #202225;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .18);
+}
+
+.dark .case-summary-card {
+  background:
+    radial-gradient(circle at 100% 0, rgba(180, 35, 47, .12), transparent 42%),
+    #202225;
+}
+
+.dark .case-summary-head h2,
+.dark .case-priority-head h2,
+.dark .case-summary-card > strong,
+.dark .case-summary-breakdown b,
+.dark .case-priority-item b {
+  color: #eeeae5;
+}
+
+.dark .case-summary-breakdown > div,
+.dark .case-priority-item,
+.dark .case-priority-empty {
+  border-color: #373b3f;
+  background: #25282b;
+}
+
+.dark .case-summary-breakdown span,
+.dark .case-priority-item small,
+.dark .case-priority-empty small {
+  color: #a0a5a1;
+}
+
+.dark .case-priority-item {
+  color: #e5e1dc;
+}
+
+.dark .case-priority-item:hover {
+  border-color: #704049;
+  background: #302328;
+}
+
+.dark .case-priority-head > b {
+  border-color: #633640;
+  background: #3a2227;
+  color: #ffabb3;
+}
+
+.dark .case-list-panel .case-toolbar form,
+.dark .case-list-panel .workflow-table th {
+  border-color: #393d41;
+  background: #25282b;
+}
+
+.dark .case-list-panel .table-wrap {
+  border-color: #32363a;
+}
+
+.dark .case-list-panel .workflow-table tbody tr:hover {
+  background: #292326;
+}
+
+.dark .badge.red {
+  border-color: #75414a;
+  background: #3a2026;
+  color: #ffadb5;
+}
+
+.dark .case-list-panel .workflow-table td:first-child b {
+  color: #ece8e3;
+}
+
+.dark .case-overview-grid .deadline-badge.overdue,
+.dark .case-list-panel .deadline-badge.overdue {
+  border-color: #75414a;
+  background: #2c2427;
+  color: #ffb0b8;
+}
+
+.dark .deadline-badge.overdue .deadline-badge-label {
+  border-right-color: #a93440;
+  background: #a93440;
+  color: #fff;
+}
+
+.dark .case-priority-item.case-priority-overdue {
+  border-color: #603a42;
+  border-left-color: #d8515e;
+  background: #25282b;
+}
+
+.dark .case-priority-item.case-priority-overdue:hover {
+  border-color: #7b4650;
+  background: #30282b;
+}
+
+@media (max-width: 1100px) {
+  .case-overview-grid {
+    grid-template-columns: minmax(290px, .8fr) minmax(420px, 1.2fr);
+  }
+}
+
+@media (max-width: 920px) {
+  .case-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .case-summary-card,
+  .case-priority-card {
+    min-height: 0;
+  }
+
+  .case-priority-list {
+    max-height: 286px;
+  }
+}
+
+@media (max-width: 639px) {
+  .case-overview-grid {
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .case-summary-card,
+  .case-priority-card {
+    padding: 17px;
+    border-radius: 15px;
+  }
+
+  .case-summary-card > strong {
+    margin-top: 14px;
+    font-size: 38px;
+  }
+
+  .case-summary-breakdown {
+    gap: 7px;
+    padding-top: 18px;
+  }
+
+  .case-summary-breakdown > div {
+    padding: 10px 9px;
+  }
+
+  .case-summary-breakdown span {
+    min-height: 27px;
+    font-size: 9px;
+  }
+
+  .case-summary-breakdown b {
+    font-size: 17px;
+  }
+
+  .case-priority-list {
+    max-height: 250px;
+  }
+
+  .case-list-panel {
+    border-radius: 15px;
+  }
+
+  .case-list-panel .case-toolbar > span {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 430px) {
+  .case-summary-breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .case-summary-breakdown span {
+    min-height: 0;
+  }
+
+  .case-summary-breakdown > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .case-summary-breakdown b {
+    margin-top: 0;
+  }
+
+  .case-priority-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .case-priority-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .case-priority-item .deadline-badge {
+    min-width: 0;
+  }
+}
+
+.case-priority-item{grid-template-columns:minmax(76px,auto) minmax(0,1fr) auto}.case-priority-link{min-width:0;color:inherit;text-decoration:none}.case-priority-link b,.case-priority-link small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.case-priority-notify{justify-self:end}.case-priority-notify button{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:31px;padding:6px 9px;border:1px solid #ecc8cc;border-radius:8px;background:#fff0f2;color:#a52330;font-size:9px;font-weight:850;cursor:pointer}.case-priority-notify button:hover{border-color:#d99ba2;background:#f9dfe2}.dark .case-priority-notify button{border-color:#664047;background:#3a2227;color:#ffadb5}@media(max-width:650px){.case-priority-item{grid-template-columns:auto minmax(0,1fr) auto}.case-priority-notify button span{display:none}}

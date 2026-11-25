@@ -1,0 +1,29 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Input Tahap 1{% endblock %}
+{% block page_name %}Pra Penuntutan / Tahap 1{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/spdp-form.css' %}?v=20260915-9"><link rel="stylesheet" href="{% static 'css/stage-one.css' %}?v=20261123-1">{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="kicker text-red-700">Tahap 1</p><h1>{% if stage_one %}Perbarui{% else %}Input{% endif %} Berkas Perkara</h1><p>SPDP {{ spdp.letter_number }} · {{ spdp.investigating_unit }}</p></div><a class="secondary-btn" href="{% url 'cases:stage_one_list' %}">← Daftar Tahap 1</a></section>
+{% if stage_one %}<section class="stage-one-complete"><span>✓</span><div><b>Tahap 1 sudah tersimpan</b><p>Diselesaikan {{ stage_one.completed_at|date:'d F Y, H:i' }}. Reminder perkara ini sudah dihentikan.</p></div></section>{% endif %}
+{% if form.non_field_errors or suspect_formset.non_form_errors %}<div class="form-error-summary">{{ form.non_field_errors }}{{ suspect_formset.non_form_errors }}</div>{% endif %}
+<form method="post" enctype="multipart/form-data" class="spdp-form stage-one-form" data-spdp-form>
+  {% csrf_token %}
+  <article class="panel"><div class="panel-head case-section-head"><div><span>01</span><h3>Data Berkas Perkara</h3><p>Nomor berkas, nomor pengantar, dan pasal sesuai berkas Tahap I.</p></div></div><div class="case-form-grid two">
+    {% include 'cases/field.html' with field=form.case_file_number %}
+    {% include 'cases/field.html' with field=form.cover_letter_number %}
+    <div class="span-all">{% include 'cases/field.html' with field=form.laws_and_articles %}</div>
+  </div></article>
+  <article class="panel"><div class="panel-head case-section-head"><div><span>02</span><h3>Surat Pengantar</h3><p>Upload surat pengantar berkas perkara dalam format PDF maksimal 10 MB.</p></div></div>
+    {% if stage_one.cover_letter_document %}<div class="stage-one-current-file"><span>PDF</span><div><b>Surat pengantar tersimpan</b><small>{{ stage_one.cover_letter_document.name }}</small></div><a href="{{ stage_one.cover_letter_document.url }}" target="_blank" rel="noopener">Lihat PDF</a></div>{% endif %}
+    <div class="upload-field">{{ form.cover_letter_document }}<span>{% if stage_one %}Kosongkan jika dokumen tidak diganti.{% else %}PDF wajib diunggah.{% endif %}</span>{{ form.cover_letter_document.errors }}</div>
+  </article>
+  <article class="panel suspects-panel"><div class="panel-head case-section-head"><div><span>03</span><h3>Identitas Tersangka / Terlapor</h3><p>Perbarui identitas sesuai data yang tercantum di dalam berkas perkara.</p></div><button type="button" class="secondary-btn suspect-add-button" data-add-suspect>+ Tambah Pelaku</button></div>
+    {{ suspect_formset.management_form }}<div class="suspect-summary" data-suspect-summary><div class="suspect-summary-empty" data-suspect-empty>Belum ada data tersangka atau terlapor.</div></div>
+  </article>
+  <div class="form-actions"><p>Pastikan nomor, pasal, surat pengantar, dan identitas sudah sesuai berkas perkara.</p><div><a class="secondary-btn" href="{% url 'cases:stage_one_list' %}">Batal</a><button class="primary-btn" type="submit">{% if stage_one %}Simpan Perubahan{% else %}Selesaikan Tahap 1{% endif %}</button></div></div>
+  <dialog class="suspect-dialog" data-suspect-dialog aria-labelledby="stage-one-suspect-title"><div class="suspect-dialog-shell"><header class="suspect-dialog-head"><div><span>TAHAP 1</span><h2 id="stage-one-suspect-title">Identitas Tersangka / Terlapor</h2><p>Sesuaikan identitas dengan berkas perkara yang diterima.</p></div><button type="button" data-cancel-suspect-dialog aria-label="Tutup popup">&times;</button></header><div class="suspect-dialog-body"><div class="suspect-list" data-suspect-list>{% for suspect_form in suspect_formset %}{% include 'cases/suspect_form.html' with suspect_form=suspect_form number=forloop.counter %}{% endfor %}</div></div><footer class="suspect-dialog-actions"><span>Perubahan disimpan setelah formulir Tahap 1 dikirim.</span><button type="button" class="primary-btn" data-finish-suspect-dialog>Selesai</button></footer></div></dialog>
+</form>
+<template id="empty-suspect-form">{% include 'cases/suspect_form.html' with suspect_form=suspect_formset.empty_form number='__number__' %}</template>
+<script src="{% static 'js/spdp-form.js' %}?v=20261018-1"></script>
+{% endblock %}

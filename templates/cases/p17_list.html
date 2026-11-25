@@ -1,0 +1,92 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+
+{% block title %}P-17{% endblock %}
+{% block page_name %}Pra Penuntutan / P-17{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/spdp-list.css' %}?v=20261124-1">{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="kicker text-red-700">Pra Penuntutan</p>
+    <h1>Daftar P-17</h1>
+    <p>Kelola surat permintaan perkembangan hasil penyidikan perkara.</p>
+  </div>
+  {% if can_create %}<a class="primary-btn" href="{% url 'cases:p17_create' %}">+ Buat P-17</a>{% endif %}
+</section>
+
+<section class="case-overview-grid">
+  <article class="case-summary-card">
+    <div class="case-summary-head">
+      <span>Data P-17</span>
+      <h2>Total P-17</h2>
+    </div>
+    <strong>{{ case_stats.total }}</strong>
+    <div class="case-summary-breakdown">
+      <div><span>Tahun {{ current_period|date:'Y' }}</span><b>{{ case_stats.year }}</b></div>
+      <div><span>Bulan {{ current_period|date:'F' }}</span><b>{{ case_stats.month }}</b></div>
+      <div><span>Hari Ini</span><b>{{ case_stats.day }}</b></div>
+    </div>
+  </article>
+
+  <article class="case-priority-card">
+    <div class="case-priority-head">
+      <div>
+        <span>Aktivitas</span>
+        <h2>Harus Diselesaikan</h2>
+      </div>
+      <b>{{ priority_cases|length }} prioritas</b>
+    </div>
+    <div class="case-priority-list">
+      {% for item in priority_cases %}
+      <div class="case-priority-item case-priority-{{ item.activity_deadline.color_class }}">
+        <span class="deadline-badge {{ item.activity_deadline.color_class }}">{{ item.activity_deadline.remaining_title }} {{ item.activity_deadline.remaining_value }}</span>
+        <a href="{{ item.activity_url }}" class="case-priority-link">
+          <b>{{ item.letter_number }}</b>
+          <small>P-17 · batas {{ item.activity_deadline.due_date|date:'d M Y' }} · {{ item.activity_deadline.status_text }}</small>
+        </a>
+        <div class="case-priority-quick-actions"><form method="post" action="{% url 'dashboard:send_reminder' item.pk %}" class="case-priority-notify">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button type="submit" title="Kirim reminder ke WhatsApp dan Telegram">🔔 <span>Notif</span></button></form>{% include 'cases/includes/workflow_action_menu.html' with item=item detail_url_name=item.workflow_detail_url_name document_label='P-17' %}</div>
+      </div>
+      {% empty %}
+      <div class="case-priority-empty">
+        <b>Tidak ada aktivitas mendesak</b>
+        <small>Perkara dengan sisa hari P-17 aktif akan muncul di sini.</small>
+      </div>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<section class="panel">
+  <div class="case-toolbar">
+    <form method="get">
+      <span aria-hidden="true">⌕</span>
+      <input name="q" value="{{ query }}" placeholder="Cari nomor P-17, SPDP, atau pelaku">
+      <button type="submit">Cari</button>
+    </form>
+    <span>{{ page_obj.paginator.count }} draf</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nomor P-17</th><th>Perkara / SPDP</th><th>Data Pelaku</th><th>Permintaan</th><th>Tanggal Surat</th><th>Sisa Hari</th><th>Status</th><th>Aksi</th></tr></thead>
+      <tbody>
+        {% for draft in drafts %}
+        <tr>
+          <td><b>{{ draft.letter_number }}</b><small>Diperbarui {{ draft.updated_at|date:'d M Y, H:i' }}</small></td>
+          <td><b>{{ draft.spdp.letter_number }}</b><small>Diterima {{ draft.spdp.received_date|date:'d M Y' }}</small></td>
+          <td>{% for suspect in draft.spdp.suspects.all %}<b>{{ suspect.name }}</b>{% empty %}<span>Belum ada data pelaku</span>{% endfor %}</td>
+          <td><span class="badge blue">Ke-{{ draft.sequence }}</span></td>
+          <td>{{ draft.letter_date|date:'d M Y' }}</td>
+          <td><span class="deadline-badge {{ draft.deadline_class }}"><span class="deadline-badge-label">{{ draft.deadline_title }}</span><span class="deadline-badge-value">{{ draft.deadline_value }}</span></span>{% if draft.deadline_detail %}<small>{{ draft.deadline_detail }}</small>{% endif %}</td>
+          <td>{% if draft.workflow_is_issued %}<span class="badge green">Terbit</span>{% else %}<span class="badge amber">Draf</span>{% endif %}</td>
+          <td>{% include 'cases/includes/workflow_action_menu.html' with item=draft detail_url_name='cases:p17_draft_detail' document_label='P-17' %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8"><div class="empty-table"><span>▤</span><b>Belum ada draf P-17</b><p>Buat P-17 setelah perkara memiliki draf P-16.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'includes/pagination.html' with page_obj=page_obj query=query %}
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Template Generate Dokumen{% endblock %}
+{% block page_name %}Konfigurasi / Template Dokumen{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/document-template-settings.css' %}?v=20261122-1">{% endblock %}
+{% block content %}
+<section class="page-heading template-page-heading">
+  <div><p class="kicker text-red-700">Pengaturan sistem</p><h1>Template Generate Dokumen</h1><p>Atur kata dan susunan awal yang digunakan saat aplikasi membuat draf baru pada setiap menu.</p></div>
+  <div class="template-revision"><span>REVISI AKTIF</span><b>{% if configuration %}{{ configuration.revision }}{% else %}Bawaan{% endif %}</b><small>{% if configuration.updated_at %}{{ configuration.updated_at|date:'d M Y, H:i' }}{% else %}Belum pernah diubah{% endif %}</small></div>
+</section>
+
+<nav class="template-menu-tabs" aria-label="Pilih menu dokumen">
+  {% for item in template_menus %}<a class="{% if item.active %}active{% endif %}" href="{% url 'configurations:document_template_settings' %}?template={{ item.key }}">{{ item.label }}</a>{% endfor %}
+</nav>
+
+<section class="template-guide">
+  <span>i</span>
+  <div><b>Ubah kalimatnya, pertahankan data dinamisnya</b><p>Teks di antara <code>&#123;&#123;</code> dan <code>&#125;&#125;</code>, serta blok <code>&#123;%</code> dan <code>%&#125;</code>, mengambil data perkara secara otomatis. Jangan menghapusnya jika data tersebut masih diperlukan.</p></div>
+</section>
+
+<form method="post" class="template-settings-form">
+  {% csrf_token %}<input type="hidden" name="template_key" value="{{ template_key }}">
+  <header class="template-settings-header"><div><small>MENU TERPILIH</small><h2>{{ definition.label }}</h2><p>{{ definition.description }}</p></div><span>{{ section_rows|length }} bagian</span></header>
+  <div class="template-section-list">
+    {% for row in section_rows %}
+    <article class="template-section-card{% if row.error %} has-error{% endif %}">
+      <header><div><span>{{ forloop.counter|stringformat:'02d' }}</span><b>{{ row.label }}</b></div><small>{% if row.customized %}Disesuaikan{% else %}Bawaan aplikasi{% endif %}</small></header>
+      <textarea name="section__{{ row.field_name }}" rows="{% if row.value|length > 900 %}16{% else %}9{% endif %}" spellcheck="false" aria-label="Template {{ row.label }}">{{ row.value }}</textarea>
+      {% if row.error %}<p class="template-field-error">{{ row.error }}</p>{% endif %}
+    </article>
+    {% endfor %}
+  </div>
+  <footer class="template-form-actions">
+    <div><b>Berlaku saat generate</b><small>Draf yang sudah diedit manual tidak ditimpa oleh pengaturan ini.</small></div>
+    <button class="secondary-btn danger" type="submit" name="action" value="reset" formnovalidate onclick="return confirm('Kembalikan seluruh bagian {{ definition.label|escapejs }} ke template bawaan aplikasi?')">Kembalikan Bawaan</button>
+    <button class="primary-btn" type="submit" name="action" value="save">Simpan Template {{ definition.label }}</button>
+  </footer>
+</form>
+{% endblock %}

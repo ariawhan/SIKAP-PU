@@ -1,0 +1,6 @@
+<ol>
+  <li>Undang-Undang Nomor 20 Tahun 2025 tentang Kitab Undang-Undang Hukum Acara Pidana;</li>
+  <li>Pedoman Jaksa Agung Republik Indonesia Nomor 1 Tahun 2026 tentang Pola Koordinasi Antara Penyidik dan Penuntut Umum;</li>
+  <li>Surat Pemberitahuan Dimulainya Penyidikan (SPDP) Nomor: {{ spdp.letter_number }} tanggal {{ spdp.letter_date|date:'d F Y' }} atas nama Tersangka {{ suspect_label }} yang diterima di {{ institution.work_unit|default:'Kejaksaan Negeri' }} pada tanggal {{ spdp.received_date|date:'d F Y' }};</li>
+  <li>Surat Perintah Untuk Mengikuti Perkembangan Penyidikan Perkara Tindak Pidana (P-16) Nomor: {% if p16_draft %}{{ p16_draft.draft_number }} tanggal {{ p16_draft.letter_date|date:'d F Y' }}{% else %}---{% endif %}.</li>
+</ol>

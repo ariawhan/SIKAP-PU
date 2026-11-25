@@ -1,0 +1,13 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Buat P-21{% endblock %}
+{% block page_name %}Pra Penuntutan / P-21 / Baru{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/p21-editor.css' %}?v=20260921-1">{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="kicker text-red-700">Pra Penuntutan</p><h1>Buat Draf P-21</h1><p>Pilih perkara yang hasil penyidikannya telah dinyatakan lengkap.</p></div><a class="secondary-btn" href="{% url 'cases:p21_list' %}">← Daftar P-21</a></section>
+<section class="p21-create-shell"><article class="p21-create-card">
+  <div class="p21-create-mark"><span>P-21</span></div>
+  <div class="p21-create-copy"><span>PEMBERITAHUAN HASIL PENYIDIKAN</span><h2>Buat Surat P-21</h2><p>Identitas perkara dan naskah awal akan dibuat otomatis, lalu dapat disesuaikan melalui editor.</p></div>
+  <form method="post" class="p21-create-form">{% csrf_token %}<label>{{ form.spdp.label }}{{ form.spdp }}<small>Hanya perkara yang sudah memiliki P-16 dan belum memiliki P-21.</small>{{ form.spdp.errors }}</label>{{ form.non_field_errors }}<div><a class="secondary-btn" href="{% url 'cases:p21_list' %}">Batal</a><button class="primary-btn" type="submit">Buat dan Buka Editor</button></div></form>
+</article></section>
+{% endblock %}

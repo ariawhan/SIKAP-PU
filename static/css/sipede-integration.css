@@ -1,0 +1,414 @@
+.integration-service-card,
+.integration-session-card {
+  border: 1px solid #e1e6e3;
+  box-shadow: 0 14px 38px rgba(30, 51, 41, .055);
+}
+
+.integration-session-card {
+  overflow: hidden;
+}
+
+.integration-connect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 43px;
+  padding-inline: 16px;
+  box-shadow: 0 9px 20px rgba(159, 31, 44, .18);
+}
+
+.integration-connect-icon {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .16);
+  font-size: 12px;
+}
+
+.integration-connect-help {
+  display: block;
+  margin-top: 12px;
+  color: #8a9690;
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.sipede-auth-modal {
+  position: fixed;
+  z-index: 10050;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  isolation: isolate;
+}
+
+.sipede-auth-modal[hidden] {
+  display: none;
+}
+
+.sipede-auth-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(24, 8, 11, .72);
+  backdrop-filter: blur(5px);
+  cursor: default;
+  animation: sipede-fade-in .18s ease-out;
+}
+
+.sipede-auth-dialog {
+  position: relative;
+  width: min(470px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, .72);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 30px 90px rgba(24, 8, 11, .38);
+  animation: sipede-dialog-in .22s ease-out;
+}
+
+/* Dipakai juga dari editor P-16: selalu berada di atas popup nomor/upload. */
+.p16-sipede-open .sipede-auth-dialog {
+  border-color: rgba(255, 255, 255, .9);
+  box-shadow: 0 32px 100px rgba(3, 15, 33, .52);
+}
+
+.sipede-auth-close {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e7ebe9;
+  border-radius: 10px;
+  background: #f8faf9;
+  color: #68756e;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.sipede-auth-close:hover {
+  border-color: #d8b9bd;
+  background: #fff2f3;
+  color: #a2202d;
+}
+
+.sipede-auth-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 25px 60px 19px 24px;
+  border-bottom: 1px solid #edf0ee;
+  background: linear-gradient(135deg, #fff 58%, #fff5f6);
+}
+
+.sipede-auth-head > span {
+  width: 54px;
+  height: 54px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #e0e6e3;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 7px 18px rgba(33, 56, 45, .07);
+}
+
+.sipede-auth-head img {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+}
+
+.sipede-auth-head .kicker {
+  margin: 0 0 4px;
+  font-size: 8px;
+}
+
+.sipede-auth-head h2 {
+  margin: 0;
+  color: #17251e;
+  font: 800 20px Manrope, sans-serif;
+}
+
+.sipede-auth-body {
+  padding: 22px 24px 24px;
+}
+
+.sipede-auth-message {
+  min-height: 36px;
+  margin: 0 0 15px;
+  color: #66756d;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.sipede-auth-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid #dce6e1;
+  border-radius: 11px;
+  background: #f5f9f7;
+}
+
+.sipede-auth-loading[hidden],
+.sipede-auth-captcha[hidden],
+.sipede-auth-success[hidden],
+.sipede-auth-error[hidden] {
+  display: none;
+}
+
+.sipede-auth-loading i {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border: 3px solid #d5e0da;
+  border-top-color: #b4232f;
+  border-radius: 50%;
+  animation: sipede-spin .75s linear infinite;
+}
+
+.sipede-auth-loading b,
+.sipede-auth-loading small {
+  display: block;
+}
+
+.sipede-auth-loading b {
+  color: #304038;
+  font-size: 11px;
+}
+
+.sipede-auth-loading small {
+  margin-top: 3px;
+  color: #89958f;
+  font-size: 9px;
+}
+
+.sipede-auth-captcha {
+  display: grid;
+  gap: 14px;
+}
+
+.sipede-captcha-frame {
+  overflow: hidden;
+  border: 1px solid #dfe6e2;
+  border-radius: 12px;
+  background: #fafcfb;
+}
+
+.sipede-captcha-frame > span {
+  display: block;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e7ece9;
+  color: #88958e;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.sipede-captcha-frame img {
+  width: 100%;
+  min-height: 76px;
+  display: block;
+  object-fit: contain;
+  padding: 12px;
+  background: #fff;
+}
+
+.sipede-auth-captcha label {
+  color: #3d4b44;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.sipede-auth-captcha input {
+  width: 100%;
+  height: 45px;
+  display: block;
+  margin-top: 7px;
+  padding: 0 12px;
+  border: 1px solid #d8e0dc;
+  border-radius: 9px;
+  background: #fff;
+  color: #26342d;
+  outline: none;
+  font-size: 14px;
+  letter-spacing: .04em;
+}
+
+.sipede-auth-captcha input:focus {
+  border-color: #b4232f;
+  box-shadow: 0 0 0 3px rgba(180, 35, 47, .09);
+}
+
+.sipede-auth-captcha .primary-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.sipede-auth-success,
+.sipede-auth-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.sipede-auth-success {
+  border: 1px solid #cce9d9;
+  background: #edf9f2;
+  color: #1f7047;
+}
+
+.sipede-auth-success > span,
+.sipede-auth-error > span {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 900;
+}
+
+.sipede-auth-success > span {
+  background: #36a369;
+}
+
+.sipede-auth-error {
+  border: 1px solid #f0cdd1;
+  background: #fff4f5;
+  color: #8e2430;
+}
+
+.sipede-auth-error > span {
+  background: #bd3643;
+}
+
+.sipede-auth-success b,
+.sipede-auth-error b {
+  display: block;
+  font-size: 12px;
+}
+
+.sipede-auth-success p,
+.sipede-auth-error p {
+  margin: 4px 0 0;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.sipede-auth-error button {
+  margin-top: 11px;
+  padding: 7px 11px;
+  border: 1px solid #d9a8ad;
+  border-radius: 8px;
+  background: #fff;
+  color: #9e2632;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sipede-auth-footer {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 24px;
+  border-top: 1px solid #edf0ee;
+  background: #fafbfa;
+  color: #87928c;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.modal-open {
+  overflow: hidden;
+}
+
+.dark .integration-service-card,
+.dark .integration-session-card {
+  border-color: #303438;
+}
+
+.dark .sipede-auth-dialog {
+  border-color: #3a3d41;
+  background: #1c1f22;
+}
+
+.dark .sipede-auth-head {
+  border-color: #303438;
+  background: linear-gradient(135deg, #1c1f22 58%, #2b2024);
+}
+
+.dark .sipede-auth-head > span,
+.dark .sipede-captcha-frame img {
+  background: #fff;
+}
+
+.dark .sipede-auth-head h2,
+.dark .sipede-auth-loading b,
+.dark .sipede-auth-captcha label {
+  color: #eeeae6;
+}
+
+.dark .sipede-auth-message {
+  color: #a5ada8;
+}
+
+.dark .sipede-auth-loading,
+.dark .sipede-captcha-frame {
+  border-color: #383d40;
+  background: #24282b;
+}
+
+.dark .sipede-auth-captcha input {
+  border-color: #414549;
+  background: #22262a;
+  color: #eee;
+}
+
+.dark .sipede-auth-footer {
+  border-color: #303438;
+  background: #181b1e;
+}
+
+@keyframes sipede-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sipede-fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes sipede-dialog-in {
+  from { opacity: 0; transform: translateY(12px) scale(.98); }
+}
+
+@media (max-width: 560px) {
+  .sipede-auth-modal { padding: 10px; }
+  .sipede-auth-dialog { max-height: calc(100dvh - 20px); border-radius: 16px; }
+  .sipede-auth-head { padding: 20px 52px 16px 18px; }
+  .sipede-auth-body { padding: 18px; }
+  .sipede-auth-footer { padding-inline: 18px; }
+  .integration-connect-btn { width: 100%; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sipede-auth-backdrop,
+  .sipede-auth-dialog,
+  .sipede-auth-loading i { animation: none; }
+}

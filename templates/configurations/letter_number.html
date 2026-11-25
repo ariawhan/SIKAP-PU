@@ -1,0 +1,120 @@
+{% extends 'dashboard/layout.html' %}
+{% block title %}Konfigurasi Nomor Surat{% endblock %}
+{% block page_name %}Konfigurasi Nomor Surat{% endblock %}
+
+{% block content %}
+<section class="page-heading letter-number-heading">
+  <div>
+    <p class="kicker text-red-700">Settings</p>
+    <h1>Konfigurasi Nomor Surat</h1>
+    <p>Kelola kode nomor surat berdasarkan direktorat.</p>
+  </div>
+</section>
+
+<section class="panel letter-number-panel">
+  <div class="letter-number-toolbar">
+    <div>
+      <h3>Daftar Nomor Surat</h3>
+      <p>{{ page_obj.paginator.count }} nomor surat tersimpan</p>
+    </div>
+    <a class="primary-btn" href="{% url 'configurations:letter_number_create' %}">Tambah Nomor Surat</a>
+  </div>
+
+  <div class="table-wrap letter-number-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Direktorat</th>
+          <th>Kode Surat</th>
+          <th>Jenis Perkara</th>
+          <th class="letter-number-action-heading">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in letter_numbers %}
+        <tr>
+          <td><b>{{ item.directorate }}</b></td>
+          <td><span class="letter-number-code">{{ item.code }}</span></td>
+          <td>
+            <div class="letter-number-case-type-tags">
+              {% for name in item.case_type_visible %}
+              <span class="letter-number-case-type-tag">{{ name }}</span>
+              {% empty %}
+              <span class="letter-number-case-type-empty">&mdash;</span>
+              {% endfor %}
+              {% if item.case_type_extra %}
+              <span class="letter-number-case-type-tag more" title="{{ item.case_type_extra|join:', ' }}">+{{ item.case_type_extra|length }} lainnya</span>
+              {% endif %}
+            </div>
+          </td>
+          <td>
+            <div class="letter-number-actions">
+              <a class="letter-number-action edit" href="{% url 'configurations:letter_number_detail' pk=item.pk %}">Edit</a>
+              <button type="button" class="letter-number-action delete" data-delete-letter-number data-id="{{ item.pk }}" data-label="{{ item.directorate }}: {{ item.code }}">Hapus</button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4">
+            <div class="empty-table">
+              <b>Belum ada nomor surat.</b>
+              <p>Gunakan tombol Tambah Nomor Surat untuk menambahkan data pertama.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'includes/pagination.html' with page_obj=page_obj %}
+</section>
+
+<dialog class="letter-number-modal letter-number-delete-modal" id="letter-number-delete-modal" aria-modal="true" aria-labelledby="letter-number-delete-title">
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="delete_letter_number">
+    <input type="hidden" name="letter_number_id" value="" data-delete-letter-number-id>
+    <header class="letter-number-modal-head danger">
+      <div>
+        <p>Konfirmasi</p>
+        <h2 id="letter-number-delete-title">Hapus Nomor Surat?</h2>
+      </div>
+      <button type="button" data-close-delete-modal aria-label="Tutup popup">&times;</button>
+    </header>
+    <div class="letter-number-modal-body">
+      <div class="letter-number-delete-warning">
+        <b data-delete-letter-number-label></b>
+        <p>Seluruh jenis perkara di dalamnya ikut terhapus. Data yang sudah dihapus tidak dapat dikembalikan.</p>
+      </div>
+    </div>
+    <footer class="letter-number-modal-actions">
+      <button type="button" class="secondary-btn" data-close-delete-modal>Batal</button>
+      <button type="submit" class="primary-btn danger-btn">Ya, Hapus</button>
+    </footer>
+  </form>
+</dialog>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+  const deleteModal = document.getElementById('letter-number-delete-modal');
+  if (!deleteModal) return;
+
+  document.querySelectorAll('[data-delete-letter-number]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      deleteModal.querySelector('[data-delete-letter-number-id]').value = button.dataset.id;
+      deleteModal.querySelector('[data-delete-letter-number-label]').textContent = button.dataset.label;
+      deleteModal.showModal();
+    });
+  });
+  deleteModal.querySelectorAll('[data-close-delete-modal]').forEach(function (button) {
+    button.addEventListener('click', function () { deleteModal.close(); });
+  });
+  deleteModal.addEventListener('click', function (event) {
+    if (event.target === deleteModal) deleteModal.close();
+  });
+})();
+</script>
+{% endblock %}

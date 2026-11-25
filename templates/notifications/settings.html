@@ -1,0 +1,545 @@
+{% extends 'dashboard/layout.html' %}
+{% block title %}Notifikasi{% endblock %}
+{% block page_name %}Notifikasi{% endblock %}
+{% block content %}
+<section class="notification-page">
+  <div class="notification-hero">
+    <div>
+      <span class="notification-kicker">SUPER ADMIN</span>
+      <h1>Notifikasi</h1>
+      <p>Pantau log pengiriman pesan Telegram dan WhatsApp Gateway untuk pengingat internal SIKAP-PU.</p>
+    </div>
+    <div class="notification-hero-status">
+      <span>Status WhatsApp</span>
+      <b data-wa-status-text>{{ setting.get_whatsapp_connection_status_display }}</b>
+      <small>Channel: {% if setting.whatsapp_enabled %}Aktif{% else %}Nonaktif{% endif %} · Terakhir scan: {{ setting.whatsapp_last_login_at|date:"d M Y H:i"|default:"Belum pernah" }}</small>
+    </div>
+  </div>
+
+  <div class="notification-stat-grid">
+    <article class="notification-stat-card whatsapp-stat">
+      <span class="notification-stat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false"><path d="M12 2.4a9.4 9.4 0 0 0-8 14.3L2.8 21l4.5-1.2A9.4 9.4 0 1 0 12 2.4Zm0 1.7a7.7 7.7 0 0 1 6.5 11.8 7.7 7.7 0 0 1-10.9 2.3l-.3-.2-2.3.6.6-2.2-.2-.4A7.7 7.7 0 0 1 12 4.1Zm-3.3 4.1c-.2 0-.5.1-.7.4-.2.3-.9.9-.9 2.1s.9 2.4 1.1 2.5c.1.2 1.8 2.9 4.5 3.9 2.2.9 2.7.7 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.4l-1.7-.8c-.2-.1-.4-.1-.6.1-.2.3-.7.8-.9 1-.2.2-.3.2-.6.1-.3-.2-1.1-.4-2-1.2-.8-.7-1.3-1.5-1.4-1.8-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.3-.5.1-.2.1-.3 0-.5l-.8-1.9c-.2-.4-.4-.4-.6-.4h-.5Z"/></svg>
+      </span>
+      <div>
+        <small>Total Pesan WhatsApp</small>
+        <strong>{{ stats.whatsapp_total }}</strong>
+        <p>{{ stats.whatsapp_failed }} gagal tercatat</p>
+      </div>
+    </article>
+    <article class="notification-stat-card telegram-stat">
+      <span class="notification-stat-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false"><path d="M21.7 3.3c.3-.9-.5-1.6-1.3-1.3L2.8 8.8c-1 .4-1 1.8.1 2.1l4.4 1.4 1.7 5.4c.3.9 1.4 1.1 2 .4l2.5-2.7 4.6 3.4c.8.6 1.9.1 2.1-.9L21.7 3.3ZM8.3 11.3l8.8-5.4-6.7 7.2-.3 3.1-1.1-3.5-.7-1.4Z"/></svg>
+      </span>
+      <div>
+        <small>Total Pesan Telegram</small>
+        <strong>{{ stats.telegram_total }}</strong>
+        <p>{{ stats.telegram_failed }} gagal tercatat</p>
+      </div>
+    </article>
+  </div>
+
+  <article class="notification-log-card">
+    <div class="notification-log-head">
+      <div>
+        <span>Log Pengiriman</span>
+        <h2>Riwayat notifikasi</h2>
+        <p>Semua pengiriman pesan yang dilakukan sistem akan tercatat di tabel ini.</p>
+      </div>
+      <div class="notification-setting-actions">
+        <form method="post" class="notification-cancel-queue-form" onsubmit="return confirm('Batalkan semua pesan yang masih menunggu dalam antrean?')">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="cancel_queue">
+          <button type="submit" class="secondary-btn queue-stop-action"{% if not stats.queued_total %} disabled{% endif %}>Hentikan Antrean{% if stats.queued_total %} ({{ stats.queued_total }}){% endif %}</button>
+        </form>
+        <button type="button" class="secondary-btn automatic-action" data-open-notification-modal="automatic-settings-modal">Setting Notifikasi</button>
+        <button type="button" class="secondary-btn success" data-open-notification-modal="whatsapp-settings-modal">Setting WhatsApp</button>
+        <button type="button" class="secondary-btn telegram-action" data-open-notification-modal="telegram-settings-modal">Setting Telegram</button>
+      </div>
+    </div>
+    <div class="notification-table-wrap">
+      <table class="notification-log-table">
+        <thead>
+          <tr>
+            <th>Waktu</th>
+            <th>Channel</th>
+            <th>Tujuan</th>
+            <th>Pesan</th>
+            <th>Status</th>
+            <th>Dikirim oleh</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td>{% if log.status == 'queued' and log.scheduled_at %}<b>{{ log.scheduled_at|date:"d M Y" }}</b><small>Jadwal {{ log.scheduled_at|date:"H:i" }} WITA</small>{% else %}<b>{{ log.created_at|date:"d M Y" }}</b><small>{{ log.created_at|date:"H:i" }} WITA</small>{% endif %}</td>
+            <td><span class="channel-pill {{ log.channel }}">{{ log.get_channel_display }}</span></td>
+            <td><b>{{ log.recipient_name|default:"-" }}</b><small>{{ log.recipient|default:"-" }}</small></td>
+            <td class="log-message"><b>{{ log.subject|default:"Pesan notifikasi" }}</b><small>{{ log.preview_message }}</small></td>
+            <td>
+              {% if log.status == 'failed' %}
+              <button type="button" class="log-status failed log-status-detail" data-notification-failure data-failure-subject="{{ log.subject|default:'Pesan notifikasi' }}" data-failure-channel="{{ log.get_channel_display }}" data-failure-recipient="{{ log.recipient_name|default:log.recipient|default:'-' }}" data-failure-context="{{ log.context_label|default:'-' }}" data-failure-time="{{ log.attempted_at|default:log.created_at|date:'d M Y H:i' }} WITA" data-failure-error="{{ log.error_message|default:'Penyebab kegagalan tidak tercatat oleh sistem.' }}">{{ log.get_status_display }}</button>
+              {% else %}
+              <span class="log-status {{ log.status }}">{{ log.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td><b>{{ log.triggered_by.display_name|default:"Sistem" }}</b><small>{{ log.context_label|default:"-" }}</small></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="notification-empty-state">
+                <span>✉</span>
+                <b>Belum ada log pengiriman</b>
+                <p>Log akan muncul otomatis ketika sistem mulai mengirim notifikasi WhatsApp atau Telegram.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include 'includes/pagination.html' with page_obj=page_obj %}
+  </article>
+</section>
+
+<div class="notification-modal" id="notification-failure-modal" role="dialog" aria-modal="true" aria-labelledby="notification-failure-title" hidden>
+  <section class="notification-modal-shell notification-failure-shell">
+    <header class="notification-modal-head failure">
+      <span class="notification-modal-icon notification-failure-icon" aria-hidden="true">!</span>
+      <div>
+        <p>Pengiriman Gagal</p>
+        <h2 id="notification-failure-title" data-failure-modal-subject>Detail kegagalan notifikasi</h2>
+      </div>
+      <button type="button" data-close-notification-modal aria-label="Tutup popup">&times;</button>
+    </header>
+    <div class="notification-modal-body">
+      <div class="notification-failure-meta">
+        <div><small>Channel</small><b data-failure-modal-channel>-</b></div>
+        <div><small>Tujuan</small><b data-failure-modal-recipient>-</b></div>
+        <div><small>Konteks</small><b data-failure-modal-context>-</b></div>
+        <div><small>Waktu Percobaan</small><b data-failure-modal-time>-</b></div>
+      </div>
+      <div class="notification-failure-reason">
+        <span>Penyebab kegagalan</span>
+        <p data-failure-modal-error>Penyebab kegagalan tidak tercatat oleh sistem.</p>
+      </div>
+    </div>
+    <footer class="notification-modal-actions">
+      <button type="button" class="primary-btn" data-close-notification-modal>Tutup</button>
+    </footer>
+  </section>
+</div>
+
+<div class="notification-modal" id="automatic-settings-modal" role="dialog" aria-modal="true" aria-labelledby="automatic-settings-title" hidden>
+  <form method="post" class="notification-modal-shell notification-schedule-shell">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="save_automatic">
+    <header class="notification-modal-head automatic">
+      <span class="notification-modal-icon notification-clock-icon" aria-hidden="true">&#128339;</span>
+      <div>
+        <p>Setting Notifikasi</p>
+        <h2 id="automatic-settings-title">Jam Notifikasi Otomatis</h2>
+      </div>
+      <button type="button" data-close-notification-modal aria-label="Tutup popup">&times;</button>
+    </header>
+    <div class="notification-modal-body">
+      <div class="notification-schedule-intro">
+        <span>WITA</span>
+        <div><b>Jadwal pengiriman harian</b><p>Atur waktu sistem memproses notifikasi otomatis setiap hari.</p></div>
+      </div>
+      <label class="toggle-field notification-toggle notification-schedule-toggle">
+        {{ automatic_form.automatic_notification_enabled }}
+        <span><b>{{ automatic_form.automatic_notification_enabled.label }}</b><small>Nonaktifkan jika notifikasi hanya akan dikirim secara manual.</small></span>
+      </label>
+      <div class="notification-time-field">
+        <label for="{{ automatic_form.automatic_notification_time.id_for_label }}">{{ automatic_form.automatic_notification_time.label }}</label>
+        {{ automatic_form.automatic_notification_time }}
+        <small>Zona waktu Asia/Makassar (WITA). Contoh: 08:00.</small>
+        {{ automatic_form.automatic_notification_time.errors }}
+      </div>
+      <div class="notification-time-field notification-delay-field">
+        <label for="{{ automatic_form.outbound_message_delay_minutes.id_for_label }}">{{ automatic_form.outbound_message_delay_minutes.label }}</label>
+        <div class="notification-delay-control">
+          {{ automatic_form.outbound_message_delay_minutes }}
+          <span>menit</span>
+        </div>
+        <small>Jeda minimum antar pesan dihitung terpisah untuk WhatsApp dan Telegram. Nilai yang diizinkan 1–60 menit.</small>
+        {{ automatic_form.outbound_message_delay_minutes.errors }}
+      </div>
+      <div class="notification-next-schedule">
+        <span>&#9432;</span><p>Perubahan jam dan jeda berlaku untuk antrean notifikasi berikutnya.</p>
+      </div>
+    </div>
+    <footer class="notification-modal-actions">
+      <button type="button" class="secondary-btn" data-close-notification-modal>Batal</button>
+      <button type="submit" class="primary-btn">Simpan Jadwal</button>
+    </footer>
+  </form>
+</div>
+
+<div class="notification-modal" id="whatsapp-settings-modal" role="dialog" aria-modal="true" aria-labelledby="whatsapp-settings-title" hidden>
+  <form method="post" class="notification-modal-shell">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="save_whatsapp">
+    <input type="hidden" id="wa-status-url" value="{% url 'notifications:whatsapp_status' %}">
+    <input type="hidden" id="wa-start-url" value="{% url 'notifications:whatsapp_start' %}">
+    <input type="hidden" id="wa-logout-url" value="{% url 'notifications:whatsapp_logout' %}">
+    <input type="hidden" id="wa-test-url" value="{% url 'notifications:whatsapp_test_message' %}">
+    <header class="notification-modal-head whatsapp">
+      <span class="notification-modal-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false"><path d="M12 2.4a9.4 9.4 0 0 0-8 14.3L2.8 21l4.5-1.2A9.4 9.4 0 1 0 12 2.4Zm0 1.7a7.7 7.7 0 0 1 6.5 11.8 7.7 7.7 0 0 1-10.9 2.3l-.3-.2-2.3.6.6-2.2-.2-.4A7.7 7.7 0 0 1 12 4.1Zm-3.3 4.1c-.2 0-.5.1-.7.4-.2.3-.9.9-.9 2.1s.9 2.4 1.1 2.5c.1.2 1.8 2.9 4.5 3.9 2.2.9 2.7.7 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.4l-1.7-.8c-.2-.1-.4-.1-.6.1-.2.3-.7.8-.9 1-.2.2-.3.2-.6.1-.3-.2-1.1-.4-2-1.2-.8-.7-1.3-1.5-1.4-1.8-.2-.3 0-.4.1-.6l.4-.4c.1-.2.2-.3.3-.5.1-.2.1-.3 0-.5l-.8-1.9c-.2-.4-.4-.4-.6-.4h-.5Z"/></svg>
+      </span>
+      <div>
+        <p>Setting WhatsApp</p>
+        <h2 id="whatsapp-settings-title">WhatsApp Gateway</h2>
+      </div>
+      <button type="button" data-close-notification-modal aria-label="Tutup popup">×</button>
+    </header>
+    <div class="notification-modal-body">
+      <label class="toggle-field notification-toggle">
+        {{ whatsapp_form.whatsapp_enabled }}
+        <span><b>{{ whatsapp_form.whatsapp_enabled.label }}</b><small>Aktifkan channel WhatsApp untuk pengiriman notifikasi internal.</small></span>
+      </label>
+      {{ whatsapp_form.whatsapp_enabled.errors }}
+
+      <div class="channel-status modal-status">
+        <span data-wa-status-text id="wa-live-status">{{ setting.get_whatsapp_connection_status_display }}</span>
+        <small>Channel: {% if setting.whatsapp_enabled %}Aktif{% else %}Nonaktif{% endif %} · Session: {{ wa_session }}</small>
+      </div>
+
+      <div class="qr-placeholder wa-qr-panel" id="wa-qr-panel">
+        <span id="wa-qr-initial">{% if setting.whatsapp_connection_status == 'active' %}OK{% else %}QR{% endif %}</span>
+        <img id="wa-qr-image" alt="Barcode WhatsApp" hidden>
+        <div>
+          <b id="wa-qr-title">{% if setting.whatsapp_connection_status == 'active' %}Masih aktif{% else %}Scan barcode WhatsApp{% endif %}</b>
+          <p id="wa-qr-message">Klik tombol tampilkan barcode jika session WhatsApp perlu login ulang.</p>
+        </div>
+      </div>
+
+      <div class="wa-actions">
+        <button type="button" class="secondary-btn" id="wa-start-button"{% if setting.whatsapp_connection_status == 'active' %} disabled{% endif %}>{% if setting.whatsapp_connection_status == 'active' %}Session Aktif{% else %}Tampilkan Barcode{% endif %}</button>
+        <button type="button" class="secondary-btn danger" id="wa-logout-button">Login Ulang</button>
+        <button type="button" class="secondary-btn success" id="wa-test-button">Tes Pesan</button>
+      </div>
+    </div>
+    <footer class="notification-modal-actions">
+      <button type="button" class="secondary-btn" data-close-notification-modal>Batal</button>
+      <button type="submit" class="primary-btn">Simpan Setting WhatsApp</button>
+    </footer>
+  </form>
+</div>
+
+<div class="notification-modal" id="telegram-settings-modal" role="dialog" aria-modal="true" aria-labelledby="telegram-settings-title" hidden>
+  <form method="post" class="notification-modal-shell">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="save_telegram">
+    <input type="hidden" id="telegram-test-url" value="{% url 'notifications:telegram_test_message' %}">
+    <input type="hidden" id="telegram-fetch-chat-url" value="{% url 'notifications:telegram_fetch_chat_id' %}">
+    <header class="notification-modal-head telegram">
+      <span class="notification-modal-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false"><path d="M21.7 3.3c.3-.9-.5-1.6-1.3-1.3L2.8 8.8c-1 .4-1 1.8.1 2.1l4.4 1.4 1.7 5.4c.3.9 1.4 1.1 2 .4l2.5-2.7 4.6 3.4c.8.6 1.9.1 2.1-.9L21.7 3.3ZM8.3 11.3l8.8-5.4-6.7 7.2-.3 3.1-1.1-3.5-.7-1.4Z"/></svg>
+      </span>
+      <div>
+        <p>Setting Telegram</p>
+        <h2 id="telegram-settings-title">Bot Telegram</h2>
+      </div>
+      <button type="button" data-close-notification-modal aria-label="Tutup popup">×</button>
+    </header>
+    <div class="notification-modal-body">
+      <label class="toggle-field notification-toggle">
+        {{ telegram_form.telegram_enabled }}
+        <span><b>{{ telegram_form.telegram_enabled.label }}</b><small>Aktifkan channel Telegram untuk pengiriman notifikasi internal.</small></span>
+      </label>
+      <div class="channel-status modal-status">
+        <span>{{ setting.telegram_status }}</span>
+        <small>Token: {{ setting.masked_telegram_token }}</small>
+      </div>
+      <div class="admin-form channel-fields">
+        <label>{{ telegram_form.telegram_bot_token.label }}{{ telegram_form.telegram_bot_token }}{{ telegram_form.telegram_bot_token.errors }}</label>
+        <label>{{ telegram_form.telegram_default_chat_id.label }}{{ telegram_form.telegram_default_chat_id }}{{ telegram_form.telegram_default_chat_id.errors }}</label>
+      </div>
+
+      <div class="telegram-link-card">
+        <div>
+          <b>Hubungkan akun Telegram pengguna</b>
+          <p>Minta pengguna mengirim <code>/start</code> ke bot, pilih akunnya, lalu ambil Chat ID.</p>
+        </div>
+        <div class="telegram-link-controls">
+          <select id="telegram-user-select" aria-label="Pilih pengguna untuk Chat ID Telegram">
+            <option value="">Pilih pengguna</option>
+            {% for account in telegram_users %}
+            <option value="{{ account.id }}" data-chat-id="{{ account.telegram_chat_id }}">
+              {{ account.display_name }}{% if account.telegram_chat_id %} - sudah terhubung{% endif %}
+            </option>
+            {% endfor %}
+          </select>
+          <button type="button" class="secondary-btn telegram-action" id="telegram-fetch-chat-button">Ambil Chat ID</button>
+        </div>
+      </div>
+
+      <div class="telegram-test-feedback" id="telegram-test-message">
+        Simpan setting atau isi token dan Chat ID, lalu klik Tes Pesan untuk mencoba pengiriman Telegram.
+      </div>
+    </div>
+    <footer class="notification-modal-actions">
+      <button type="button" class="secondary-btn" data-close-notification-modal>Batal</button>
+      <button type="button" class="secondary-btn telegram-action" id="telegram-test-button">Tes Pesan</button>
+      <button type="submit" class="primary-btn">Simpan Setting Telegram</button>
+    </footer>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  const modalButtons = document.querySelectorAll("[data-open-notification-modal]");
+  const closeButtons = document.querySelectorAll("[data-close-notification-modal]");
+  const modals = document.querySelectorAll(".notification-modal");
+  let lastFocusedElement = null;
+
+  function syncBodyScroll() {
+    document.body.classList.toggle(
+      "notification-modal-open",
+      Boolean(document.querySelector(".notification-modal:not([hidden])"))
+    );
+  }
+
+  function openModal(id) {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    lastFocusedElement = document.activeElement;
+    modal.hidden = false;
+    syncBodyScroll();
+    window.requestAnimationFrame(() => {
+      modal.querySelector("[data-close-notification-modal]")?.focus();
+    });
+  }
+
+  function closeModal(target) {
+    const modal = target?.classList?.contains("notification-modal")
+      ? target
+      : target?.closest(".notification-modal");
+    if (!modal) return;
+    modal.hidden = true;
+    syncBodyScroll();
+    lastFocusedElement?.focus?.();
+  }
+
+  modalButtons.forEach((button) => {
+    button.addEventListener("click", () => openModal(button.dataset.openNotificationModal));
+  });
+
+  document.querySelectorAll("[data-notification-failure]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const values = {
+        subject: button.dataset.failureSubject,
+        channel: button.dataset.failureChannel,
+        recipient: button.dataset.failureRecipient,
+        context: button.dataset.failureContext,
+        time: button.dataset.failureTime,
+        error: button.dataset.failureError
+      };
+      Object.entries(values).forEach(([key, value]) => {
+        const target = document.querySelector(`[data-failure-modal-${key}]`);
+        if (target) target.textContent = value || "-";
+      });
+      openModal("notification-failure-modal");
+    });
+  });
+
+  closeButtons.forEach((button) => {
+    button.addEventListener("click", () => closeModal(button));
+  });
+
+  modals.forEach((modal) => {
+    document.body.appendChild(modal);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeModal(modal);
+    });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const openedModal = document.querySelector(".notification-modal:not([hidden])");
+    if (openedModal) closeModal(openedModal);
+  });
+
+  const statusUrl = document.getElementById("wa-status-url")?.value;
+  const startUrl = document.getElementById("wa-start-url")?.value;
+  const logoutUrl = document.getElementById("wa-logout-url")?.value;
+  const testUrl = document.getElementById("wa-test-url")?.value;
+  const telegramTestUrl = document.getElementById("telegram-test-url")?.value;
+  const telegramFetchChatUrl = document.getElementById("telegram-fetch-chat-url")?.value;
+  const statusLabels = document.querySelectorAll("[data-wa-status-text]");
+  const message = document.getElementById("wa-qr-message");
+  const title = document.getElementById("wa-qr-title");
+  const image = document.getElementById("wa-qr-image");
+  const initial = document.getElementById("wa-qr-initial");
+  const startButton = document.getElementById("wa-start-button");
+  const logoutButton = document.getElementById("wa-logout-button");
+  const testButton = document.getElementById("wa-test-button");
+  const telegramTestButton = document.getElementById("telegram-test-button");
+  const telegramFetchChatButton = document.getElementById("telegram-fetch-chat-button");
+  const telegramTestMessage = document.getElementById("telegram-test-message");
+  const telegramTokenInput = document.querySelector("[name='telegram-telegram_bot_token']");
+  const telegramChatInput = document.querySelector("[name='telegram-telegram_default_chat_id']");
+  const telegramUserSelect = document.getElementById("telegram-user-select");
+  const csrf = document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
+  let poller = null;
+
+  function setLoading(text) {
+    if (message) message.textContent = text;
+  }
+
+  function updateStartButton(status) {
+    if (!startButton) return;
+    const active = status === "active";
+    startButton.disabled = active;
+    startButton.textContent = active ? "Session Aktif" : "Tampilkan Barcode";
+  }
+
+  function render(data) {
+    if (!data) return;
+    const status = data.status || "offline";
+    const label = status === "active" ? "Masih aktif" : status === "connecting" ? "Menyiapkan barcode" : "Perlu login ulang";
+    statusLabels.forEach((item) => { item.textContent = label; });
+    if (title) title.textContent = label;
+    if (message) message.textContent = data.error || data.message || "Menunggu status Wa-Gateway.";
+    updateStartButton(status);
+    if (data.qrDataUrl && image && initial) {
+      image.src = data.qrDataUrl;
+      image.hidden = false;
+      initial.hidden = true;
+    } else if (status === "active" && image && initial) {
+      image.hidden = true;
+      initial.hidden = false;
+      initial.textContent = "OK";
+    } else if (image && initial) {
+      image.hidden = true;
+      initial.hidden = false;
+      initial.textContent = "QR";
+    }
+  }
+
+  async function requestJson(url, method, body) {
+    const headers = {"X-CSRFToken": csrf, "Accept": "application/json"};
+    const options = {
+      method,
+      headers,
+      credentials: "same-origin"
+    };
+    if (body) {
+      headers["Content-Type"] = "application/json";
+      options.body = JSON.stringify(body);
+    }
+    const response = await fetch(url, options);
+    return response.json();
+  }
+
+  async function refresh() {
+    if (!statusUrl) return;
+    try { render(await requestJson(statusUrl, "GET")); }
+    catch (error) { render({status: "offline", error: "Wa-Gateway belum berjalan."}); }
+  }
+
+  function startPolling() {
+    if (poller) return;
+    poller = setInterval(refresh, 4000);
+  }
+
+  startButton?.addEventListener("click", async function(){
+    if (startButton.disabled) return;
+    setLoading("Meminta barcode dari Wa-Gateway...");
+    try {
+      render(await requestJson(startUrl, "POST"));
+      startPolling();
+    } catch (error) {
+      render({status: "offline", error: "Wa-Gateway belum berjalan."});
+    }
+  });
+
+  logoutButton?.addEventListener("click", async function(){
+    setLoading("Menghapus session WhatsApp...");
+    try {
+      render(await requestJson(logoutUrl, "POST"));
+      startPolling();
+    } catch (error) {
+      render({status: "offline", error: "Wa-Gateway belum berjalan."});
+    }
+  });
+
+  testButton?.addEventListener("click", async function(){
+    setLoading("Mengirim pesan tes ke nomor akun session...");
+    try {
+      render(await requestJson(testUrl, "POST"));
+      startPolling();
+    } catch (error) {
+      render({status: "offline", error: "Wa-Gateway belum berjalan."});
+    }
+  });
+
+  telegramTestButton?.addEventListener("click", async function(){
+    if (!telegramTestUrl || !telegramTestMessage) return;
+    telegramTestButton.disabled = true;
+    telegramTestMessage.className = "telegram-test-feedback";
+    telegramTestMessage.textContent = "Mengirim tes pesan Telegram...";
+    try {
+      const data = await requestJson(telegramTestUrl, "POST", {
+        bot_token: telegramTokenInput?.value || "",
+        chat_id: telegramChatInput?.value || ""
+      });
+      telegramTestMessage.textContent = data.message || data.error || "Respons Telegram diterima.";
+      telegramTestMessage.classList.add(data.ok ? "success" : "failed");
+    } catch (error) {
+      telegramTestMessage.textContent = "Gagal menghubungi endpoint tes Telegram.";
+      telegramTestMessage.classList.add("failed");
+    } finally {
+      telegramTestButton.disabled = false;
+    }
+  });
+
+  telegramUserSelect?.addEventListener("change", function(){
+    const selected = telegramUserSelect.selectedOptions[0];
+    const chatId = selected?.dataset?.chatId || "";
+    if (chatId && telegramChatInput) {
+      telegramChatInput.value = chatId;
+      telegramTestMessage.className = "telegram-test-feedback success";
+      telegramTestMessage.textContent = `Chat ID tersimpan untuk ${selected.textContent.trim()}.`;
+    }
+  });
+
+  telegramFetchChatButton?.addEventListener("click", async function(){
+    if (!telegramFetchChatUrl || !telegramTestMessage) return;
+    telegramFetchChatButton.disabled = true;
+    telegramTestMessage.className = "telegram-test-feedback";
+    telegramTestMessage.textContent = "Membaca chat terbaru dari bot Telegram...";
+    try {
+      const data = await requestJson(telegramFetchChatUrl, "POST", {
+        bot_token: telegramTokenInput?.value || "",
+        user_id: telegramUserSelect?.value || ""
+      });
+      telegramTestMessage.textContent = data.message || data.error || "Respons Telegram diterima.";
+      telegramTestMessage.classList.add(data.ok ? "success" : "failed");
+      if (data.ok && telegramChatInput) {
+        telegramChatInput.value = data.chat_id || "";
+        const selected = telegramUserSelect?.selectedOptions[0];
+        if (selected) {
+          selected.dataset.chatId = data.chat_id || "";
+          selected.textContent = `${data.display_name || data.username} - sudah terhubung`;
+        }
+      }
+    } catch (error) {
+      telegramTestMessage.textContent = "Gagal membaca update Telegram.";
+      telegramTestMessage.classList.add("failed");
+    } finally {
+      telegramFetchChatButton.disabled = false;
+    }
+  });
+
+  refresh();
+  startPolling();
+})();
+</script>
+{% endblock %}

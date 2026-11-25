@@ -1,0 +1,115 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Tata Letak Dokumen{% endblock %}
+{% block page_name %}Settings / Tata Letak Dokumen{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/document-layout-designer.css' %}?v=20261005-1">{% endblock %}
+
+{% block content %}
+<section class="page-heading layout-page-heading">
+  <div><p class="kicker text-red-700">Settings</p><h1>Tata Letak Dokumen</h1><p>Atur format surat secara visual tanpa mengubah CSS. Pengaturan berlaku untuk seluruh draf P-16.</p></div>
+  <a class="secondary-btn" href="{% url 'cases:p16_list' %}">Lihat Daftar P-16</a>
+</section>
+
+<section class="layout-summary" aria-label="Ringkasan konfigurasi">
+  <div><span>Template aktif</span><b>P-16</b><small>Surat Perintah Penunjukan Penuntut Umum</small></div>
+  <div><span>Ukuran kertas</span><b>F4 · 8,5 × 13 inci</b><small>Orientasi potret</small></div>
+  <div><span>Revisi</span><b>Versi {{ configuration.revision }}</b><small>{% if configuration.updated_at %}Diperbarui {{ configuration.updated_at|date:'d M Y, H:i' }}{% else %}Belum pernah diperbarui{% endif %}</small></div>
+  <div class="layout-summary-safe"><span>Status</span><b>Area cetak aman</b><small>Isi tetap mengalir otomatis antarhalaman</small></div>
+</section>
+
+<form method="post" class="layout-designer" data-layout-designer style="{{ layout_style }}">
+  {% csrf_token %}<input type="hidden" name="template_key" value="{{ template_key }}">
+  {{ layout|json_script:"layout-initial-data" }}
+  {{ layout_defaults|json_script:"layout-default-data" }}
+
+  <aside class="layout-control-panel">
+    <header class="layout-panel-head"><div><span>FORMAT P-16</span><h2>Panel Pengaturan</h2><p>Klik elemen pada kertas atau ubah angka dengan slider.</p></div><span class="layout-unsaved-badge" data-layout-dirty hidden>Belum disimpan</span></header>
+
+    <div class="layout-font-field">
+      <label for="layout-font-family">Jenis huruf dokumen</label>
+      <select id="layout-font-family" name="font_family" data-layout-control="font_family">
+        {% for choice in font_choices %}<option value="{{ choice.value }}"{% if choice.selected %} selected{% endif %}>{{ choice.label }}</option>{% endfor %}
+      </select>
+      {% if font_error %}<small class="layout-field-error">{{ font_error }}</small>{% endif %}
+    </div>
+
+    <div class="layout-control-groups">
+      {% for group in layout_groups %}
+      <details class="layout-control-group" data-layout-group="{{ group.key }}"{% if forloop.first %} open{% endif %}>
+        <summary><span>{{ forloop.counter|stringformat:'02d' }}</span><div><b>{{ group.label }}</b><small>{{ group.description }}</small></div><i>⌄</i></summary>
+        <div class="layout-control-group-body">
+          {% for field in group.fields %}
+          <div class="layout-control-field{% if field.error %} has-error{% endif %}" data-layout-field="{{ field.key }}">
+            <div><label for="layout-{{ field.key }}">{{ field.label }}</label><output data-layout-output="{{ field.key }}">{{ field.value }} {{ field.unit }}</output></div>
+            <div class="layout-control-inputs">
+              <input type="range" min="{{ field.min }}" max="{{ field.max }}" step="{{ field.step }}" value="{{ field.value }}" data-layout-control="{{ field.key }}" aria-label="{{ field.label }}">
+              <label><input id="layout-{{ field.key }}" type="number" name="{{ field.key }}" min="{{ field.min }}" max="{{ field.max }}" step="{{ field.step }}" value="{{ field.value }}" data-layout-control="{{ field.key }}"><span>{{ field.unit }}</span></label>
+            </div>
+            {% if field.error %}<small class="layout-field-error">{{ field.error }}</small>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+
+    <footer class="layout-panel-actions">
+      <button type="button" class="secondary-btn" data-layout-reset>Reset Default</button>
+      <button type="submit" class="primary-btn" data-layout-save>Simpan Tata Letak</button>
+    </footer>
+  </aside>
+
+  <section class="layout-preview-panel">
+    <header class="layout-preview-toolbar">
+      <div><span class="layout-live-dot"></span><b>PRATINJAU VISUAL</b><small data-layout-status>Semua perubahan tersimpan</small></div>
+      <div class="layout-toolbar-actions">
+        <button type="button" data-layout-undo title="Batalkan perubahan" aria-label="Undo" disabled>↶</button>
+        <button type="button" data-layout-redo title="Ulangi perubahan" aria-label="Redo" disabled>↷</button>
+        <button type="button" class="active" data-layout-grid aria-pressed="true">Grid</button>
+        <button type="button" data-layout-zoom-out aria-label="Perkecil">−</button><output data-layout-zoom>100%</output><button type="button" data-layout-zoom-in aria-label="Perbesar">+</button>
+      </div>
+    </header>
+    <div class="layout-help-strip"><b>Petunjuk:</b> tarik garis margin atau elemen berbingkai merah. Tarik sudut logo, TTE, atau barcode untuk mengubah ukurannya.</div>
+    <div class="layout-canvas" data-layout-canvas>
+      <div class="layout-paper-frame" data-layout-paper-frame>
+        <article class="layout-paper show-grid" data-layout-paper>
+          <div class="layout-ruler layout-ruler-x" aria-hidden="true"></div><div class="layout-ruler layout-ruler-y" aria-hidden="true"></div>
+          <button type="button" class="layout-margin-line top" data-margin-handle="top"><span>Atas</span></button>
+          <button type="button" class="layout-margin-line right" data-margin-handle="right"><span>Kanan</span></button>
+          <button type="button" class="layout-margin-line bottom" data-margin-handle="bottom"><span>Bawah</span></button>
+          <button type="button" class="layout-margin-line left" data-margin-handle="left"><span>Kiri</span></button>
+
+          <div class="layout-paper-content">
+            <header class="layout-document-letterhead">
+              <div class="layout-letterhead-main">
+                <button type="button" class="layout-selectable layout-logo" data-layout-target="logo" data-layout-resizable="logo" aria-label="Atur posisi dan ukuran logo"><img src="{% static 'img/logo-kejaksaan-p16-clean.png' %}" alt="Logo Kejaksaan"><span>Logo</span></button>
+                <button type="button" class="layout-selectable layout-header-copy" data-layout-target="header" aria-label="Atur posisi teks kop"><b>{{ institution.institution_name|default:'KEJAKSAAN REPUBLIK INDONESIA'|upper }}</b><b>KEJAKSAAN TINGGI {{ institution.province|default:'BALI'|upper }}</b><strong>{{ institution.work_unit|default:'KEJAKSAAN NEGERI BULELENG'|upper }}</strong><small>{{ institution.address|default:'Jl. Dewi Sartika No. 23, Singaraja' }}</small><span>Teks Kop</span></button>
+              </div>
+              <div class="layout-letterhead-rule"><b>“Demi Keadilan dan Kebenaran Berdasarkan<br>Ketuhanan Yang Maha Esa”</b><strong>P-16</strong></div>
+            </header>
+
+            <section class="layout-document-body">
+              <div class="layout-title"><b>SURAT PERINTAH</b><b>PENUNJUKAN PENUNTUT UMUM</b><b>UNTUK MENGIKUTI PERKEMBANGAN PENYIDIKAN</b><p>Nomor: B-123/N.1.11/Enz.1/10/2026</p><strong>KEPALA KEJAKSAAN NEGERI BULELENG</strong></div>
+              <div class="layout-clause"><b>Menimbang</b><span>:</span><ol><li>bahwa untuk mengikuti perkembangan penyidikan perkara tindak pidana perlu diterbitkan Surat Perintah.</li><li>bahwa pejabat yang namanya tercantum dipandang mampu melaksanakan tugas.</li></ol></div>
+              <div class="layout-clause"><b>Dasar</b><span>:</span><ol><li>Undang-Undang Republik Indonesia tentang Kejaksaan.</li><li>Surat Pemberitahuan Dimulainya Penyidikan.</li></ol></div>
+              <div class="layout-suspect-sample"><b>Data Pelaku</b><p><span>Nama Lengkap</span><i>:</i><span>CONTOH NAMA PELAKU</span></p><p><span>Nomor Identitas</span><i>:</i><span>5108xxxxxxxxxxxx</span></p></div>
+              <p class="layout-body-indented">diduga melakukan tindak pidana sebagaimana diatur dalam ketentuan peraturan perundang-undangan berdasarkan SPDP yang diterima.</p>
+              <h3>MEMERINTAHKAN:</h3>
+              <div class="layout-clause"><b>Kepada</b><span>:</span><p>Pejabat/Pegawai yang namanya tercantum dalam lampiran Surat Perintah ini.</p></div>
+              <div class="layout-clause"><b>Untuk</b><span>:</span><ol><li>Mengikuti perkembangan penyidikan perkara tindak pidana.</li><li>Melaporkan pelaksanaan tugas secara berjenjang.</li></ol></div>
+              <p class="layout-continuation-sample">Lanjutan isi surat mengikuti indentasi aman dan tetap turun otomatis ke halaman berikutnya.</p>
+
+              <button type="button" class="layout-selectable layout-signature" data-layout-target="signature" data-layout-resizable="signature" aria-label="Atur posisi tanda tangan"><p>Dikeluarkan di <span>:</span> Singaraja<br>Pada tanggal <span>:</span> 05 Oktober 2026</p><b>KEPALA KEJAKSAAN NEGERI BULELENG</b><div><img src="{% static 'img/tte.png' %}" alt="Tanda tangan elektronik"></div><strong>{{ institution.leader_name|default:'NAMA PIMPINAN'|upper }}</strong><small>{{ institution.leader_rank|default:'Jaksa Utama Pratama' }} NIP.{{ institution.leader_nip|default:'197112011999031009' }}</small><span>TTE & Tanda Tangan</span></button>
+              <div class="layout-copies"><u>Tembusan:</u><ol><li>Yth. Kepala Kejaksaan Tinggi Bali.</li><li>Arsip.</li></ol></div>
+            </section>
+          </div>
+          <button type="button" class="layout-selectable layout-barcode" data-layout-target="barcode" data-layout-resizable="barcode" aria-label="Atur posisi dan ukuran barcode"><b>QR</b><small>SIKAP-PU</small><span>Barcode</span></button>
+        </article>
+      </div>
+    </div>
+    <footer class="layout-preview-footer"><span><i></i> Nilai tersimpan akan digunakan pada preview dan hasil cetak P-16.</span><b>F4 · 8,5 × 13 inci</b></footer>
+  </section>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}<script src="{% static 'vendor/interact/interact.min.js' %}"></script><script src="{% static 'js/document-layout-designer.js' %}?v=20261005-1"></script>{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Integrasi CMS{% endblock %}
+{% block page_name %}Settings / Integrasi / CMS{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/integration.css' %}?v=20261018-3">{% endblock %}
+{% block content %}
+<section class="page-heading integration-page-heading">
+  <div><p class="kicker text-red-700">INTEGRASI LAYANAN</p><h1>Integrasi CMS</h1><p>Alamat CMS diatur bersama oleh admin; setiap pengguna cukup mengatur akun masing-masing.</p></div>
+  <span class="integration-heading-logo cms"><img src="{% static 'img/logo-kejaksaan-p16-clean.png' %}" alt="Logo CMS Kejaksaan"></span>
+</section>
+
+{% include 'configurations/includes/integration_switcher.html' with active_integration='cms' %}
+
+{% if is_integration_admin %}
+<section class="panel integration-admin-toolbar cms-admin-toolbar">
+  <div><span class="integration-service-logo cms"><img src="{% static 'img/logo-kejaksaan-p16-clean.png' %}" alt="Logo CMS"></span><div><b>Administrasi Integrasi CMS</b><small>Kelola dan pantau akun CMS seluruh pengguna dari tabel di bawah.</small></div></div>
+  <a class="primary-btn" href="{% url 'configurations:cms_integration' %}?user={{ request.user.pk }}">Konfigurasi Akun Saya</a>
+</section>
+<section class="panel integration-service-card">
+  <header class="integration-card-head">
+    <span class="integration-service-logo cms"><img src="{% static 'img/logo-kejaksaan-p16-clean.png' %}" alt="Logo CMS Kejaksaan"></span>
+    <div><h2>Alamat CMS Bersama</h2><p>Alamat layanan ini digunakan oleh semua pengguna.</p></div>
+    <em class="{% if cms_address %}configured{% endif %}">{% if cms_address %}Terkonfigurasi{% else %}Belum{% endif %}</em>
+  </header>
+  <form method="post" class="integration-form" autocomplete="off">
+    {% csrf_token %}<input type="hidden" name="action" value="save_cms_address">
+    <div class="form-grid">
+      {% for field in address_form %}<label>{{ field.label }}{{ field }}{{ field.errors }}<small>Masukkan alamat halaman utama CMS yang digunakan seluruh satuan kerja.</small></label>{% endfor %}
+    </div>
+    <button class="primary-btn" type="submit">Simpan Alamat CMS</button>
+  </form>
+</section>
+{% else %}
+<div class="integration-settings-layout">
+  <section class="panel integration-service-card">
+    <header class="integration-card-head">
+      <span class="integration-service-logo cms"><img src="{% static 'img/logo-kejaksaan-p16-clean.png' %}" alt="Logo CMS Kejaksaan"></span>
+      <div><h2>Akun CMS</h2><p>Masukkan kredensial akun CMS pribadi Anda.</p></div>
+      <em class="{% if integration %}configured{% endif %}">{% if integration %}Terkonfigurasi{% else %}Belum{% endif %}</em>
+    </header>
+    <form method="post" class="integration-form" autocomplete="off">
+      {% csrf_token %}
+      <div class="form-grid">
+        {% for field in form %}<label>{{ field.label }}{{ field }}{{ field.errors }}</label>{% endfor %}
+      </div>
+      <p class="integration-security-note"><span>✓</span>Password CMS disimpan dalam bentuk terenkripsi dan tidak ditampilkan kembali.</p>
+      <button class="primary-btn" type="submit">Simpan Akun CMS</button>
+    </form>
+  </section>
+
+  <section class="panel integration-session-card cms-status-card">
+    <div class="integration-session-icon"><span></span></div>
+    <p class="kicker text-red-700">STATUS KONFIGURASI</p>
+    <h2>Integrasi CMS</h2>
+    {% if integration %}
+      <p>{% if integration.connected_at %}Sesi CMS terhubung untuk <strong>{{ integration.username }}</strong>.{% else %}Kredensial CMS tersimpan untuk <strong>{{ integration.username }}</strong>. Hubungkan untuk mengambil cookie sesi.{% endif %}</p>
+      <dl><div><dt>Alamat CMS</dt><dd>{% if cms_address %}<a href="{{ cms_address }}" target="_blank" rel="noopener noreferrer">{{ cms_address }}</a>{% else %}Belum diatur admin{% endif %}</dd></div><div><dt>Terhubung</dt><dd>{% if integration.connected_at %}{{ integration.connected_at|date:'d M Y, H:i' }}{% else %}Belum terhubung{% endif %}</dd></div></dl>
+    {% else %}
+      <p>Akun CMS Anda belum dikonfigurasi. Alamat layanan{% if cms_address %} {{ cms_address }}{% else %} belum diatur admin{% endif %} dikelola oleh admin.</p>
+    {% endif %}
+    <button class="primary-btn integration-connect-btn" type="button" data-cms-connect data-target-user="{{ request.user.pk }}" data-connect-url="{% url 'configurations:cms_connect' %}" {% if not integration or not cms_address %}disabled{% endif %}>{% if integration.connected_at %}Periksa / Login Ulang{% else %}Hubungkan &amp; Ambil Sesi{% endif %}</button>
+    <small class="integration-connect-help" data-cms-status>Login dilakukan melalui request langsung tanpa membuka Chromium.</small>
+  </section>
+</div>
+{% endif %}
+
+{% if is_integration_admin %}
+<section class="panel cms-admin-accounts">
+  <header class="cms-admin-accounts-head">
+    <div><p class="kicker text-red-700">ADMINISTRASI AKUN</p><h2>Daftar Akun CMS Pengguna</h2><p>Admin dapat melihat status konfigurasi CMS seluruh pengguna aplikasi. Password tetap terenkripsi dan tidak pernah ditampilkan.</p></div>
+    <div class="cms-admin-summary"><span><b>{{ cms_connected_count }}</b><small>Terhubung</small></span><span><b>{{ cms_configured_count }}</b><small>Terkonfigurasi</small></span><span><b>{{ cms_user_rows|length }}</b><small>Total pengguna</small></span></div>
+  </header>
+  <div class="cms-admin-table-wrap">
+    <table class="cms-admin-table">
+      <thead><tr><th>Pengguna</th><th>Role</th><th>Akun CMS</th><th>Alamat CMS</th><th>Status</th><th>Diperbarui</th><th>Aksi</th></tr></thead>
+      <tbody>
+        {% for row in cms_user_rows %}
+        <tr>
+          <td><div class="cms-user-cell"><span>{{ row.user.display_name|slice:':1'|upper }}</span><div><b>{{ row.user.display_name }}</b><small>@{{ row.user.username }}</small></div></div></td>
+          <td><span class="cms-role-label">{{ row.roles }}</span></td>
+          <td>{% if row.integration %}<b class="cms-account-name">{{ row.integration.username }}</b>{% else %}<span class="cms-empty-value">Belum diisi</span>{% endif %}</td>
+          <td>{% if cms_address %}<a class="cms-url" href="{{ cms_address }}" target="_blank" rel="noopener noreferrer">{{ cms_address }}</a>{% else %}<span class="cms-empty-value">Belum diatur</span>{% endif %}</td>
+          <td><span class="cms-account-status {% if row.integration.connected_at %}ready{% elif row.integration %}waiting{% else %}empty{% endif %}">{% if row.integration.connected_at %}Terhubung{% elif row.integration %}Belum terhubung{% else %}Belum dikonfigurasi{% endif %}</span></td>
+          <td>{% if row.integration %}<span class="cms-updated">{{ row.integration.updated_at|date:'d M Y, H:i' }}</span>{% else %}<span class="cms-empty-value">—</span>{% endif %}</td>
+          <td><a class="cms-config-action" href="{% url 'configurations:cms_integration' %}?user={{ row.user.pk }}">Konfigurasi</a></td>
+        </tr>
+        {% empty %}<tr><td colspan="7" class="cms-admin-empty">Belum ada pengguna aktif.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+<div class="integration-settings-modal" data-integration-settings-modal data-open-on-load="{% if form.errors or manage_user_requested %}true{% else %}false{% endif %}" hidden>
+  <button type="button" class="integration-settings-backdrop" data-integration-settings-close aria-label="Tutup"></button>
+  <section class="integration-settings-dialog" role="dialog" aria-modal="true" aria-labelledby="cms-settings-title">
+    <button type="button" class="integration-settings-close" data-integration-settings-close aria-label="Tutup">&times;</button>
+    <header><span class="integration-service-logo cms"><img src="{% static 'img/logo-kejaksaan-p16-clean.png' %}" alt=""></span><div><small>AKUN PENGGUNA</small><h2 id="cms-settings-title">Konfigurasi CMS</h2><p>{{ managed_user.display_name }} · @{{ managed_user.username }}</p></div></header>
+    <form method="post" class="integration-form" autocomplete="off">
+      {% csrf_token %}<input type="hidden" name="target_user_id" value="{{ managed_user.pk }}"><div class="form-grid">{% for field in form %}<label>{{ field.label }}{{ field }}{{ field.errors }}</label>{% endfor %}</div>
+      <p class="integration-security-note"><span>✓</span>Password disimpan terenkripsi dan tidak ditampilkan kembali.</p>
+      <footer><button type="button" class="secondary-btn" data-integration-settings-close>Batal</button><button class="primary-btn" type="submit">Simpan</button></footer>
+    </form>
+    <div class="integration-modal-session"><div><b>Status sesi CMS</b><small data-cms-status>{% if integration.connected_at %}Terhubung pada {{ integration.connected_at|date:'d M Y, H:i' }}{% elif integration %}Kredensial tersimpan, sesi belum diambil{% else %}Belum ada kredensial{% endif %}</small></div><button class="primary-btn integration-connect-btn" type="button" data-cms-connect data-target-user="{{ managed_user.pk }}" data-connect-url="{% url 'configurations:cms_connect' %}" {% if not integration or not cms_address %}disabled{% endif %}>{% if integration.connected_at %}Periksa / Login Ulang{% else %}Hubungkan &amp; Ambil Sesi{% endif %}</button></div>
+  </section>
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_scripts %}<script src="{% static 'js/integration-settings.js' %}?v=20261018-2"></script><script src="{% static 'js/cms-integration.js' %}?v=20261018-1"></script>{% endblock %}

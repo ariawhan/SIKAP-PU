@@ -1,0 +1,246 @@
+{% load static %}
+<section class="p16-page-content" data-p16-page="1" data-p16-group="naskah">
+  <div class="p16-document-title">
+    <h2 class="p16-title-bold">SURAT PERINTAH</h2>
+    <h3 class="p16-title-bold">PENUNJUKAN PENUNTUT UMUM</h3>
+    <h3 class="p16-title-bold">UNTUK MENGIKUTI PERKEMBANGAN PENYIDIKAN PERKARA TINDAK PIDANA</h3>
+    <p><strong>NOMOR : <span data-p16-output="number">{{ draft.draft_number }}</span></strong></p>
+    <h3 class="p16-title-bold">{% if institution.leader_title %}{{ institution.leader_title|upper }}{% else %}KEPALA {{ institution.work_unit|default:institution.institution_name|upper }}{% endif %}</h3>
+  </div>
+
+  <table class="p16-clause-table p16-basis-table">
+    <tbody>
+      <tr>
+        <th>Menimbang</th>
+        <td>:</td>
+        <td>
+          <div data-p16-section="consideration">{{ draft.consideration_html|safe }}</div>
+        </td>
+      </tr>
+      <tr>
+        <th>Dasar</th>
+        <td>:</td>
+        <td>
+          <div data-p16-section="legal-basis">{{ draft.legal_basis_html|safe }}</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div data-p16-suspect-output>
+    {% for row in suspect_rows %}
+      <div class="p16-suspect-block{% if not forloop.first %} p16-additional-suspect{% endif %}">
+        <p class="p16-suspect-name-line"><span>{% if suspect_rows|length > 1 %}{{ forloop.counter }}.{% endif %}</span><strong>Nama Lengkap</strong><span>:</span><span>{{ row.suspect.front_title }} {{ row.suspect.name }}{% if row.suspect.back_title %}, {{ row.suspect.back_title }}{% endif %}</span></p>
+        <p><span></span><span>Nomor Identitas</span><span>:</span><span>{{ row.suspect.identity_number|default:'---' }}</span></p>
+        <p><span></span><span>Tempat lahir</span><span>:</span><span>{{ row.suspect.birth_place|default:'---' }}</span></p>
+        <p><span></span><span>Umur/tanggal lahir</span><span>:</span><span>{% if row.age != None %}{{ row.age }} Tahun / {% endif %}{{ row.suspect.birth_date|date:'d F Y'|default:'---' }}</span></p>
+        <p><span></span><span>Jenis Kelamin</span><span>:</span><span>{{ row.suspect.get_gender_display|default:'---' }}</span></p>
+        <p class="p16-nationality-line"><span></span><span>Kebangsaan/<br>Kewarganegaraan</span><span>:</span><span>{{ row.suspect.nationality|default:'---' }}</span></p>
+        <p><span></span><span>Tempat Tinggal</span><span>:</span><span>{{ row.suspect.address|default:'---' }}</span></p>
+        <p><span></span><span>A g a m a</span><span>:</span><span>{{ row.suspect.religion|default:'---' }}</span></p>
+        <p><span></span><span>Pekerjaan</span><span>:</span><span>{{ row.suspect.occupation|default:'---' }}</span></p>
+        <p><span></span><span>Pendidikan</span><span>:</span><span>{{ row.suspect.education|default:'---' }}</span></p>
+        <p><span></span><span>Lain-lain</span><span>:</span><span>---</span></p>
+      </div>
+    {% empty %}
+      <div class="p16-suspect-block">
+        <p><span></span><strong>Nama Lengkap</strong><span>:</span><span>---</span></p>
+        <p><span></span><span>Nomor Identitas</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Tempat lahir</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Umur/tanggal lahir</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Jenis Kelamin</span><span>:</span><span>---</span></p>
+        <p class="p16-nationality-line"><span></span><span>Kebangsaan/<br>Kewarganegaraan</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Tempat Tinggal</span><span>:</span><span>---</span></p>
+        <p><span></span><span>A g a m a</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Pekerjaan</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Pendidikan</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Lain-lain</span><span>:</span><span>---</span></p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="p16-justified p16-offense-summary" data-p16-section="offense-summary">{{ draft.offense_summary_html|safe }}</div>
+
+  <h2 class="p16-command-title">MEMERINTAHKAN:</h2>
+
+  <table class="p16-clause-table p16-order-table">
+    <tbody>
+      <tr>
+        <th>Kepada</th>
+        <td>:</td>
+        <td><div data-p16-section="recipient">{{ draft.recipient_html|safe }}</div></td>
+      </tr>
+      <tr>
+        <th>Untuk</th>
+        <td>:</td>
+        <td><div data-p16-section="instruction">{{ draft.instruction_html|safe }}</div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="p16-verification-mark{% if draft.barcode_image %} has-barcode{% endif %}" data-p16-barcode-mark aria-label="Tempat kode verifikasi SIKAP-PU">{% if draft.barcode_image %}<img src="{{ draft.barcode_image.url }}" alt="Barcode verifikasi SIKAP-PU">{% else %}<span>QR</span><small>SIKAP-PU</small>{% endif %}</div>
+</section>
+
+<section class="p16-page-content p16-page-administration" data-p16-page="4" data-p16-group="administrasi" data-p16-letterhead>
+  <div class="p16-document-title p16-administration-title">
+    <h2 class="p16-title-bold">SURAT PERINTAH</h2>
+    <h3 class="p16-title-bold">PENUNJUKAN PETUGAS ADMINISTRASI</h3>
+    <p><strong>NOMOR : <span data-p16-output="number">{{ draft.draft_number }}</span></strong></p>
+    <h3 class="p16-title-bold">{% if institution.leader_title %}{{ institution.leader_title|upper }}{% else %}KEPALA {{ institution.work_unit|default:institution.institution_name|upper }}{% endif %}</h3>
+  </div>
+
+  <table class="p16-clause-table p16-administration-basis">
+    <tbody>
+      <tr>
+        <th>Dasar</th>
+        <td>:</td>
+        <td><div data-p16-section="administration-legal-basis">{{ draft.administration_legal_basis_html|safe }}</div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div data-p16-suspect-output>
+    {% for row in suspect_rows %}
+      <div class="p16-suspect-block{% if not forloop.first %} p16-additional-suspect{% endif %}">
+        <p class="p16-suspect-name-line"><span>{% if suspect_rows|length > 1 %}{{ forloop.counter }}.{% endif %}</span><strong>Nama Lengkap</strong><span>:</span><span>{{ row.suspect.front_title }} {{ row.suspect.name }}{% if row.suspect.back_title %}, {{ row.suspect.back_title }}{% endif %}</span></p>
+        <p><span></span><span>Nomor Identitas</span><span>:</span><span>{{ row.suspect.identity_number|default:'---' }}</span></p>
+        <p><span></span><span>Tempat lahir</span><span>:</span><span>{{ row.suspect.birth_place|default:'---' }}</span></p>
+        <p><span></span><span>Umur/tanggal lahir</span><span>:</span><span>{% if row.age != None %}{{ row.age }} Tahun / {% endif %}{{ row.suspect.birth_date|date:'d F Y'|default:'---' }}</span></p>
+        <p><span></span><span>Jenis Kelamin</span><span>:</span><span>{{ row.suspect.get_gender_display|default:'---' }}</span></p>
+        <p class="p16-nationality-line"><span></span><span>Kebangsaan/<br>Kewarganegaraan</span><span>:</span><span>{{ row.suspect.nationality|default:'---' }}</span></p>
+        <p><span></span><span>Tempat Tinggal</span><span>:</span><span>{{ row.suspect.address|default:'---' }}</span></p>
+        <p><span></span><span>A g a m a</span><span>:</span><span>{{ row.suspect.religion|default:'---' }}</span></p>
+        <p><span></span><span>Pekerjaan</span><span>:</span><span>{{ row.suspect.occupation|default:'---' }}</span></p>
+        <p><span></span><span>Pendidikan</span><span>:</span><span>{{ row.suspect.education|default:'---' }}</span></p>
+        <p><span></span><span>Lain-lain</span><span>:</span><span>---</span></p>
+      </div>
+    {% empty %}
+      <div class="p16-suspect-block">
+        <p><span></span><strong>Nama Lengkap</strong><span>:</span><span>---</span></p>
+        <p><span></span><span>Nomor Identitas</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Tempat lahir</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Umur/tanggal lahir</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Jenis Kelamin</span><span>:</span><span>---</span></p>
+        <p class="p16-nationality-line"><span></span><span>Kebangsaan/<br>Kewarganegaraan</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Tempat Tinggal</span><span>:</span><span>---</span></p>
+        <p><span></span><span>A g a m a</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Pekerjaan</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Pendidikan</span><span>:</span><span>---</span></p>
+        <p><span></span><span>Lain-lain</span><span>:</span><span>---</span></p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <table class="p16-clause-table p16-administration-consideration">
+    <tbody>
+      <tr>
+        <th>Pertimbangan</th>
+        <td>:</td>
+        <td><div data-p16-section="administration-consideration">{{ draft.administration_consideration_html|safe }}</div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="p16-command-title">MEMERINTAHKAN:</h2>
+
+  <table class="p16-clause-table p16-order-table p16-administration-order">
+    <tbody>
+      <tr>
+        <th>Kepada</th>
+        <td>:</td>
+        <td>
+          <ol class="p16-admin-staff-list{% if assignment.administrative_staff.count <= 1 %} single{% endif %}" data-p16-admin-staff>
+            {% for staff in assignment.administrative_staff.all %}
+              <li>
+                <p><span>Nama</span><span>:</span><strong>{{ staff.display_name|upper }}</strong></p>
+                <p><span>Pangkat / NIP</span><span>:</span><span>{{ staff.rank|default:'---' }} / {{ staff.nip|default:'---' }}</span></p>
+                <p><span>Jabatan</span><span>:</span><span>{{ staff.role_labels|default:'Petugas Administrasi' }}</span></p>
+              </li>
+            {% empty %}
+              <li>Petugas administrasi belum ditunjuk.</li>
+            {% endfor %}
+          </ol>
+        </td>
+      </tr>
+      <tr>
+        <th>Untuk</th>
+        <td>:</td>
+        <td><div data-p16-section="administration-instruction">{{ draft.administration_instruction_html|safe }}</div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="p16-signature-block">
+    <p>Dikeluarkan di <span>:</span><span>{{ institution.city|default:'---' }}</span></p>
+    <p>Pada tanggal <span>:</span><span data-p16-output="date">{{ draft.letter_date|date:'d F Y' }}</span></p>
+    <p class="p16-signature-title"><strong><span data-p16-signature-position>{% if draft.acting_type %}{{ draft.get_acting_type_display }} {% endif %}{{ institution.leader_title|default:'Kepala Kejaksaan' }}</span><br>Selaku Penuntut Umum</strong></p>
+    <div class="p16-signature-space"><img src="{% static 'img/tte.png' %}" alt="Tanda tangan elektronik"></div>
+    <p class="p16-signer-name"><strong><u><span data-p16-signer-name>{% if draft.acting_type %}{{ draft.acting_name|default:'Nama pejabat belum diisi' }}{% else %}{{ institution.leader_name|default:'Nama pimpinan belum dikonfigurasi' }}{% endif %}</span></u></strong></p>
+    <p class="p16-signer-nip"><strong><span data-p16-signer-identity>{% if draft.acting_type %}{{ draft.acting_position|default:'Jabatan belum diisi' }} NIP.{{ draft.acting_nip|default:'belum diisi' }}{% else %}{% if institution.leader_rank %}{{ institution.leader_rank }} {% endif %}NIP.{{ institution.leader_nip|default:'belum dikonfigurasi' }}{% endif %}</span></strong></p>
+  </div>
+
+  <div class="p16-copies p16-administration-copies">
+    <p><u>Tembusan :</u></p>
+    <div class="p16-administration-copies-content" data-p16-section="administration-copies">{{ draft.administration_copies_html|safe }}</div>
+  </div>
+
+  <div class="p16-verification-mark{% if draft.barcode_image %} has-barcode{% endif %}" data-p16-barcode-mark aria-label="Tempat kode verifikasi SIKAP-PU">{% if draft.barcode_image %}<img src="{{ draft.barcode_image.url }}" alt="Barcode verifikasi SIKAP-PU">{% else %}<span>QR</span><small>SIKAP-PU</small>{% endif %}</div>
+</section>
+
+<section class="p16-page-content p16-page-two" data-p16-page="2" data-p16-group="naskah">
+  <div class="p16-signature-block">
+    <p>Dikeluarkan di <span>:</span><span>{{ institution.city|default:'---' }}</span></p>
+    <p>Pada tanggal <span>:</span><span data-p16-output="date">{{ draft.letter_date|date:'d F Y' }}</span></p>
+    <p class="p16-signature-title"><strong><span data-p16-signature-position>{% if draft.acting_type %}{{ draft.get_acting_type_display }} {% endif %}{% if draft.signatory %}Penuntut Umum{% else %}{{ institution.leader_title|default:'Kepala Kejaksaan' }}{% endif %}</span><br>Selaku Penuntut Umum</strong></p>
+    <div class="p16-signature-space"><img src="{% static 'img/tte.png' %}" alt="Tanda tangan elektronik"></div>
+    <p class="p16-signer-name"><strong><u><span data-p16-signer-name>{% if draft.acting_type %}{{ draft.acting_name|default:'Nama pejabat belum diisi' }}{% elif draft.signatory %}{{ draft.signatory.display_name }}{% else %}{{ institution.leader_name|default:'Nama pimpinan belum dikonfigurasi' }}{% endif %}</span></u></strong></p>
+    <p class="p16-signer-nip"><strong><span data-p16-signer-identity>{% if draft.acting_type %}{{ draft.acting_position|default:'Jabatan belum diisi' }} NIP.{{ draft.acting_nip|default:'belum diisi' }}{% elif draft.signatory %}{% if draft.signatory.rank %}{{ draft.signatory.rank }} {% endif %}NIP.{{ draft.signatory.nip|default:'belum diisi' }}{% else %}{% if institution.leader_rank %}{{ institution.leader_rank }} {% endif %}NIP.{{ institution.leader_nip|default:'belum dikonfigurasi' }}{% endif %}</span></strong></p>
+  </div>
+
+  <div class="p16-copies">
+    <p><u>Tembusan :</u></p>
+    <div data-p16-section="copies">{{ draft.copies_html|safe }}</div>
+  </div>
+
+  <div class="p16-verification-mark{% if draft.barcode_image %} has-barcode{% endif %}" data-p16-barcode-mark aria-label="Tempat kode verifikasi SIKAP-PU">{% if draft.barcode_image %}<img src="{{ draft.barcode_image.url }}" alt="Barcode verifikasi SIKAP-PU">{% else %}<span>QR</span><small>SIKAP-PU</small>{% endif %}</div>
+</section>
+
+<section class="p16-page-content p16-page-attachment" data-p16-page="3" data-p16-group="lampiran">
+  <div class="p16-attachment-heading">
+    <p>Lampiran Surat Perintah Penunjukan Penuntut Umum Untuk Mengikuti Perkembangan Penyidikan Perkara Tindak Pidana (P-16)</p>
+    <p>Nomor <span>:</span> <span data-p16-output="number">{{ draft.draft_number }}</span></p>
+    <p>Tanggal <span>:</span> <span data-p16-output="date">{{ draft.letter_date|date:'d F Y' }}</span></p>
+  </div>
+
+  <h2 class="p16-team-title">TIM PENUNTUT UMUM</h2>
+
+  <table class="p16-team-table">
+    <thead>
+      <tr>
+        <th>NO.</th>
+        <th>NAMA, PANGKAT, NIP/NRP, JABATAN</th>
+        <th>KEDUDUKAN DALAM TIM</th>
+      </tr>
+    </thead>
+    <tbody data-p16-team-body>
+      {% for prosecutor in assignment.prosecutors.all %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><strong>{{ prosecutor.display_name|upper }}</strong><br>{{ prosecutor.rank|default:'Pangkat belum diisi' }}<br>{% if prosecutor.nip %}NIP. {{ prosecutor.nip }}{% elif prosecutor.nrp %}NRP. {{ prosecutor.nrp }}{% else %}NIP/NRP belum diisi{% endif %}</td>
+          <td>Selaku Penuntut Umum</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="3">Jaksa belum ditunjuk.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="p16-signature-block">
+    <p class="p16-signature-title"><strong><span data-p16-signature-position>{% if draft.acting_type %}{{ draft.get_acting_type_display }} {% endif %}{% if draft.signatory %}Penuntut Umum{% else %}{{ institution.leader_title|default:'Kepala Kejaksaan' }}{% endif %}</span><br>Selaku Penuntut Umum</strong></p>
+    <div class="p16-signature-space"><img src="{% static 'img/tte.png' %}" alt="Tanda tangan elektronik"></div>
+    <p class="p16-signer-name"><strong><u><span data-p16-signer-name>{% if draft.acting_type %}{{ draft.acting_name|default:'Nama pejabat belum diisi' }}{% elif draft.signatory %}{{ draft.signatory.display_name }}{% else %}{{ institution.leader_name|default:'Nama pimpinan belum dikonfigurasi' }}{% endif %}</span></u></strong></p>
+    <p class="p16-signer-nip"><strong><span data-p16-signer-identity>{% if draft.acting_type %}{{ draft.acting_position|default:'Jabatan belum diisi' }} NIP.{{ draft.acting_nip|default:'belum diisi' }}{% elif draft.signatory %}{% if draft.signatory.rank %}{{ draft.signatory.rank }} {% endif %}NIP.{{ draft.signatory.nip|default:'belum diisi' }}{% else %}{% if institution.leader_rank %}{{ institution.leader_rank }} {% endif %}NIP.{{ institution.leader_nip|default:'belum dikonfigurasi' }}{% endif %}</span></strong></p>
+  </div>
+
+  <div class="p16-verification-mark{% if draft.barcode_image %} has-barcode{% endif %}" data-p16-barcode-mark aria-label="Tempat kode verifikasi SIKAP-PU">{% if draft.barcode_image %}<img src="{{ draft.barcode_image.url }}" alt="Barcode verifikasi SIKAP-PU">{% else %}<span>QR</span><small>SIKAP-PU</small>{% endif %}</div>
+</section>

@@ -1,0 +1,137 @@
+.sop-paper-frame {
+  width: 100%;
+  overflow: hidden;
+}
+
+.sop-paper-02,
+.sop-paper-03 {
+  box-sizing: border-box;
+  width: 8.5in;
+  min-width: 8.5in;
+  max-width: 8.5in;
+  height: 13in;
+  min-height: 13in;
+  max-height: 13in;
+  margin: 0;
+  padding: 1cm 2.09cm 2cm 2cm;
+  overflow: hidden;
+  aspect-ratio: 8.5 / 13;
+  font: 10pt/1.15 Arial, sans-serif;
+  transform-origin: top left;
+}
+
+.sop-paper-02 .sop-meta b, .sop-paper-03 .sop-meta b,
+.sop-paper-02 .sop-meta span, .sop-paper-03 .sop-meta span,
+.sop-paper-02 .sop-meta p, .sop-paper-03 .sop-meta p,
+.sop-paper-02 .sop-subject-row > div, .sop-paper-03 .sop-subject-row > div,
+.sop-paper-02 .sop-recipient, .sop-paper-03 .sop-recipient,
+.sop-paper-02 .sop-body, .sop-paper-03 .sop-body,
+.sop-paper-02 .sop-signature, .sop-paper-03 .sop-signature,
+.sop-paper-02 .sop-copies, .sop-paper-03 .sop-copies {
+  font-size: 10pt;
+  line-height: 1.15;
+}
+
+.sop-paper-02 .sop-place-date,
+.sop-paper-03 .sop-place-date {
+  right: 0;
+  width: 40%;
+  text-align: right;
+}
+
+.sop-paper-02 .sop-body p,
+.sop-paper-03 .sop-body p {
+  margin-bottom: 8pt;
+}
+
+.sop-paper-02 .sop-signature,
+.sop-paper-03 .sop-signature {
+  width: 58%;
+  margin: 28pt 21pt 15pt auto;
+}
+
+.sop-paper-02 .sop-signature-space,
+.sop-paper-03 .sop-signature-space {
+  height: 45pt;
+  display: grid;
+  place-items: center;
+}
+
+.sop-paper-02 .sop-signature-space img,
+.sop-paper-03 .sop-signature-space img {
+  width: auto;
+  height: 38pt;
+  object-fit: contain;
+}
+
+.sop-paper-02 .sop-copies,
+.sop-paper-03 .sop-copies {
+  margin-top: 18pt;
+}
+
+.sop-paper-02 .sop-copies ol,
+.sop-paper-03 .sop-copies ol {
+  margin: 4pt 0;
+  padding-left: 20pt;
+  list-style: decimal outside;
+}
+
+.sop-paper-02 .sop-copies li,
+.sop-paper-03 .sop-copies li {
+  margin: 0 0 3pt;
+  padding-left: 3pt;
+}
+
+.dark .sop-paper-02, .dark .sop-paper-02 *,
+.dark .sop-paper-03, .dark .sop-paper-03 * {
+  color: #080808;
+}
+
+@media print {
+  .sop-paper-frame {
+    width: 8.5in !important;
+    height: 13in !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
+
+  .sop-paper-02,
+  .sop-paper-03 {
+    width: 8.5in !important;
+    min-width: 8.5in !important;
+    max-width: 8.5in !important;
+    height: 13in !important;
+    min-height: 13in !important;
+    max-height: 13in !important;
+    margin: 0 !important;
+    padding: 1cm 2.09cm 2cm 2cm !important;
+    overflow: hidden !important;
+    font: 10pt/1.15 Arial, sans-serif !important;
+    transform: none !important;
+  }
+
+  .sop-paper-02 .sop-signature,
+  .sop-paper-03 .sop-signature {
+    width: 58% !important;
+    margin: 28pt 21pt 15pt auto !important;
+  }
+
+  .sop-paper-02 .sop-place-date,
+  .sop-paper-03 .sop-place-date {
+    right: 0 !important;
+    width: 40% !important;
+    text-align: right !important;
+  }
+
+  .sop-paper-02 .sop-signature-space,
+  .sop-paper-03 .sop-signature-space {
+    height: 45pt !important;
+  }
+
+  .sop-paper-02 .sop-signature-space img,
+  .sop-paper-03 .sop-signature-space img {
+    height: 38pt !important;
+  }
+}

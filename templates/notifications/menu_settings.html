@@ -1,0 +1,44 @@
+{% extends 'dashboard/layout.html' %}
+{% block title %}Konfigurasi Notifikasi{% endblock %}
+{% block page_name %}Konfigurasi / Notifikasi{% endblock %}
+{% block content %}
+<section class="notification-route-page">
+  <header class="notification-route-hero">
+    <div>
+      <span>SUPER ADMIN · PENGIRIMAN PER MENU</span>
+      <h1>Konfigurasi Notifikasi</h1>
+      <p>Tentukan kanal pengiriman reminder pada setiap tahapan perkara. Notifikasi aplikasi tetap dibuat untuk seluruh penerima.</p>
+    </div>
+    <a class="secondary-btn" href="{% url 'notifications:index' %}">Pengaturan Koneksi</a>
+  </header>
+
+  <section class="notification-route-status">
+    <article class="whatsapp"><b>WhatsApp Gateway</b><strong>{% if setting.whatsapp_enabled %}Aktif{% else %}Nonaktif{% endif %}</strong><small>{{ setting.get_whatsapp_connection_status_display }}</small></article>
+    <article class="telegram"><b>Bot Telegram</b><strong>{% if setting.telegram_enabled %}Aktif{% else %}Nonaktif{% endif %}</strong><small>{{ setting.telegram_status }}</small></article>
+  </section>
+
+  <form method="post" class="notification-route-card">
+    {% csrf_token %}
+    <div class="notification-route-card-head">
+      <div><span>RUTE PENGIRIMAN</span><h2>Kanal setiap menu</h2><p>Secara bawaan WhatsApp dan Telegram aktif bersamaan.</p></div>
+      <button type="submit" class="primary-btn">Simpan Konfigurasi</button>
+    </div>
+    <div class="notification-route-table-wrap">
+      <table class="notification-route-table">
+        <thead><tr><th>Menu</th><th>Keterangan</th><th>WhatsApp</th><th>Telegram</th></tr></thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            <td><b>{{ row.setting.get_menu_key_display }}</b></td>
+            <td><span>{{ row.description }}</span></td>
+            <td><label class="notification-route-toggle whatsapp"><input type="checkbox" name="whatsapp_{{ row.setting.menu_key }}"{% if row.setting.whatsapp_enabled %} checked{% endif %}><span></span><b>Kirim</b></label></td>
+            <td><label class="notification-route-toggle telegram"><input type="checkbox" name="telegram_{{ row.setting.menu_key }}"{% if row.setting.telegram_enabled %} checked{% endif %}><span></span><b>Kirim</b></label></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <footer><p>Pengiriman hanya berjalan jika koneksi kanal utama sudah diaktifkan dan data WhatsApp/Telegram penerima tersedia.</p><button type="submit" class="primary-btn">Simpan Konfigurasi</button></footer>
+  </form>
+</section>
+{% endblock %}

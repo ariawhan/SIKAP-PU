@@ -1,0 +1,53 @@
+<section class="suspect-card" data-victim-form>
+  <div class="suspect-head"><div><span data-victim-number>{{ number }}</span><b>Data Korban</b></div></div>
+  {{ victim_form.id }}
+  <div class="suspect-fieldsets">
+    <div class="suspect-fieldset">
+      <h4>Identitas Utama</h4>
+      <div class="case-form-grid three">
+        {% include 'cases/field.html' with field=victim_form.front_title %}
+        <div class="span-all">{% include 'cases/field.html' with field=victim_form.name %}</div>
+        {% include 'cases/field.html' with field=victim_form.back_title %}
+        {% include 'cases/field.html' with field=victim_form.alias %}
+        {% include 'cases/field.html' with field=victim_form.father_name %}
+        {% include 'cases/field.html' with field=victim_form.mother_name %}
+      </div>
+    </div>
+    <div class="suspect-fieldset">
+      <h4>Kelahiran & Identitas</h4>
+      <div class="case-form-grid three">
+        {% include 'cases/field.html' with field=victim_form.birth_place %}
+        {% include 'cases/field.html' with field=victim_form.birth_date %}
+        {% include 'cases/field.html' with field=victim_form.nationality %}
+        {% include 'cases/field.html' with field=victim_form.ethnicity %}
+        {% include 'cases/field.html' with field=victim_form.identity_type %}
+        {% include 'cases/field.html' with field=victim_form.identity_number %}
+        {% include 'cases/field.html' with field=victim_form.gender %}
+        {% include 'cases/field.html' with field=victim_form.marital_status %}
+      </div>
+    </div>
+    <div class="suspect-fieldset">
+      <h4>Alamat & Kontak</h4>
+      <div class="case-form-grid three">
+        <div class="span-all">{% include 'cases/field.html' with field=victim_form.address %}</div>
+        {% include 'cases/field.html' with field=victim_form.religion %}
+        {% include 'cases/field.html' with field=victim_form.phone %}
+      </div>
+    </div>
+    <div class="suspect-fieldset">
+      <h4>Pendidikan, Pekerjaan & Hubungan</h4>
+      <div class="case-form-grid two">
+        {% include 'cases/field.html' with field=victim_form.education %}
+        {% include 'cases/field.html' with field=victim_form.occupation %}
+        {% include 'cases/field.html' with field=victim_form.relationship %}
+        {% include 'cases/field.html' with field=victim_form.occupation_other %}
+        <div class="case-choice-group">
+          <b>{{ victim_form.disability_types.label }}</b>
+          {{ victim_form.disability_types }}
+          {{ victim_form.disability_types.errors }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="delete-field">{{ victim_form.DELETE }}</span>
+</section>

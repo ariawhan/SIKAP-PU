@@ -1,0 +1,30 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Tambah Tahap 1{% endblock %}
+{% block page_name %}Pra Penuntutan / Tahap 1 / Tambah{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/stage-one.css' %}?v=20261123-2">{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="kicker text-red-700">Pilih Perkara</p><h1>Tambah Tahap 1</h1><p>Cari berdasarkan nomor SPDP, nomor Sprindik, atau nama tersangka/terlapor.</p></div><a class="secondary-btn" href="{% url 'cases:stage_one_list' %}">← Daftar Tahap 1</a></section>
+<section class="panel stage-one-search-panel">
+  <form method="get" class="stage-one-case-search">
+    <label for="stage-one-query">Cari SPDP</label>
+    <div><input id="stage-one-query" type="search" name="q" value="{{ query }}" required autofocus placeholder="Masukkan nomor SPDP, Sprindik, atau nama pelaku"><button class="primary-btn" type="submit">Cari Perkara</button></div>
+    <small>SPDP yang sudah menerbitkan SOP Form 3 tidak dapat diproses ke Tahap 1.</small>
+  </form>
+</section>
+{% if query %}
+<section class="panel mt-4">
+  <div class="panel-head"><div><h3>Hasil Pencarian</h3><p>Hasil untuk “{{ query }}”.</p></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Nomor SPDP</th><th>Sprindik</th><th>Tersangka / Terlapor</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+    {% for item in results %}<tr>
+      <td><b>{{ item.letter_number }}</b><small>Diterima {{ item.received_date|date:'d M Y' }}</small></td>
+      <td>{{ item.investigation_order_number }}<small>{{ item.investigating_unit }}</small></td>
+      <td>{% for suspect in item.suspects.all %}<span class="stage-one-suspect-name">{{ suspect.name }}</span>{% empty %}<span class="muted">Belum ada pelaku</span>{% endfor %}</td>
+      <td>{% if item.stage_one %}<span class="badge green">Sudah Tahap 1</span>{% elif item.stage_one_blocked %}<span class="badge red">SOP Form 3 Terbit</span>{% else %}<span class="badge amber">Dapat Diproses</span>{% endif %}</td>
+      <td>{% if item.stage_one %}<a class="row-action" href="{% url 'cases:stage_one_detail' item.pk %}">Lihat / Edit →</a>{% elif item.stage_one_blocked %}<span class="stage-one-disabled-action">Tidak dapat diproses</span>{% else %}<a class="row-action" href="{% url 'cases:stage_one_detail' item.pk %}">Pilih SPDP →</a>{% endif %}</td>
+    </tr>{% empty %}<tr><td colspan="5"><div class="empty-table"><b>SPDP tidak ditemukan</b><p>Periksa kembali nomor atau nama yang dicari.</p></div></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% include 'includes/pagination.html' with page_obj=page_obj query=query %}
+</section>
+{% endif %}
+{% endblock %}

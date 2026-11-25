@@ -1,0 +1,10 @@
+<div class="letter-extras" data-letter-extras>
+  <div class="case-doc-separator">TUJUAN SURAT</div>
+  {{ form.recipient_html }}{{ form.recipients_json }}
+  <div class="letter-recipient-head"><div><b>Daftar Tujuan Surat</b><small>Tambahkan tujuan; Di / Tempat berlaku untuk semuanya.</small></div><button type="button" data-letter-add-recipient>+ Tambah Tujuan</button></div>
+  <div class="letter-recipient-rows" data-letter-recipient-rows></div>
+  <label class="letter-recipient-place">Di / Tempat<input type="text" maxlength="150" placeholder="Contoh: Singaraja" data-letter-recipient-place></label>
+  {{ form.recipient_html.errors }}{{ form.recipients_json.errors }}
+  <div class="case-doc-separator">BARCODE / QR FOOTER</div>
+  <div class="p16-barcode-field" data-letter-barcode-widget><span class="p16-field-label">{{ form.barcode_image.label }}</span><div class="p16-barcode-uploader" data-letter-barcode-dropzone role="button" tabindex="0" aria-label="Pilih gambar barcode atau QR"><div class="p16-barcode-preview" data-letter-barcode-preview>{% if draft.barcode_image %}<img src="{{ draft.barcode_image.url }}" alt="Barcode saat ini">{% else %}<span>QR</span>{% endif %}</div><div class="p16-barcode-copy"><b data-letter-barcode-title>{% if draft.barcode_image %}Barcode footer sudah terpasang{% else %}Upload barcode verifikasi footer{% endif %}</b><small data-letter-barcode-status>{% if draft.barcode_image %}{{ draft.barcode_image.name }}{% else %}Barcode tampil di footer; E-Sign tetap berada pada blok tanda tangan.{% endif %}</small></div></div><div class="p16-barcode-native">{{ form.barcode_image }}</div>{{ form.barcode_image.errors }}</div>
+</div>

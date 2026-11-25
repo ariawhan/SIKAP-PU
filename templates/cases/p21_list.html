@@ -1,0 +1,28 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}P-21{% endblock %}
+{% block page_name %}Pra Penuntutan / P-21{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/spdp-list.css' %}?v=20261124-1">{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="kicker text-red-700">Pra Penuntutan</p><h1>Daftar P-21</h1><p>Kelola pemberitahuan hasil penyidikan perkara yang sudah lengkap.</p></div>
+  {% if can_create %}<a class="primary-btn" href="{% url 'cases:p21_create' %}">+ Buat P-21</a>{% endif %}
+</section>
+{% include 'cases/includes/list_overview.html' %}
+<section class="panel">
+  <div class="case-toolbar"><form method="get"><span>⌕</span><input name="q" value="{{ query }}" placeholder="Cari nomor P-21, SPDP, atau pelaku"><button type="submit">Cari</button></form><span>{{ page_obj.paginator.count }} draf</span></div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Nomor P-21</th><th>Perkara / SPDP</th><th>Data Pelaku</th><th>Tanggal Surat</th><th>Sisa Hari</th><th>Status</th><th>Aksi</th></tr></thead>
+    <tbody>{% for draft in drafts %}<tr>
+      <td><b>{{ draft.letter_number }}</b><small>Diperbarui {{ draft.updated_at|date:'d M Y, H:i' }}</small></td>
+      <td><b>{{ draft.spdp.letter_number }}</b><small>Diterima {{ draft.spdp.received_date|date:'d M Y' }}</small></td>
+      <td>{% for suspect in draft.spdp.suspects.all %}<b>{{ suspect.name }}</b>{% empty %}<span>Belum ada data pelaku</span>{% endfor %}</td>
+      <td>{{ draft.letter_date|date:'d M Y' }}</td>
+      <td><span class="deadline-badge {{ draft.deadline_class }}"><span class="deadline-badge-label">{{ draft.deadline_title }}</span><span class="deadline-badge-value">{{ draft.deadline_value }}</span></span>{% if draft.deadline_detail %}<small>{{ draft.deadline_detail }}</small>{% endif %}</td>
+      <td>{% if draft.status == 'completed' %}<span class="badge green">Sudah P-21</span>{% elif draft.workflow_is_issued %}<span class="badge green">Terbit</span>{% else %}<span class="badge amber">Draf</span>{% endif %}</td>
+      <td>{% include 'cases/includes/workflow_action_menu.html' with item=draft detail_url_name='cases:p21_draft_detail' document_label='P-21' mark_p21_completed=True %}</td>
+    </tr>{% empty %}<tr><td colspan="7"><div class="empty-table"><span>✓</span><b>Belum ada draf P-21</b><p>Buat P-21 untuk perkara yang hasil penyidikannya sudah lengkap.</p></div></td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% include 'includes/pagination.html' with page_obj=page_obj query=query %}
+</section>
+{% endblock %}

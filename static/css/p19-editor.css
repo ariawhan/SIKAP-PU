@@ -1,0 +1,183 @@
+.case-doc-p19-warning,
+.case-doc-p19-readonly {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 17px;
+  padding: 13px 15px;
+  border: 1px solid #ecd7a8;
+  border-radius: 11px;
+  background: #fff9e9;
+  color: #72581f;
+}
+
+.case-doc-p19-warning > span,
+.case-doc-p19-readonly > span {
+  width: 25px;
+  height: 25px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #d59f33;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.case-doc-p19-warning b,
+.case-doc-p19-warning p,
+.case-doc-p19-readonly b,
+.case-doc-p19-readonly p {
+  display: block;
+  margin: 0;
+}
+
+.case-doc-p19-warning b,
+.case-doc-p19-readonly b {
+  font-size: 11px;
+}
+
+.case-doc-p19-warning p,
+.case-doc-p19-readonly p {
+  margin-top: 2px;
+  font-size: 9px;
+}
+
+.case-doc-p19-warning a {
+  margin-left: auto;
+  color: #8c671e;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.case-doc-p19-readonly {
+  margin: 0;
+  border-color: #cbdfea;
+  background: #edf7fc;
+  color: #36647d;
+}
+
+.case-doc-p19-readonly > span {
+  background: #4a86a5;
+}
+
+.case-doc-workspace[data-document-type="p19"] .case-doc-meta-fields input {
+  outline: 0;
+  font-size: 12px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.case-doc-workspace[data-document-type="p19"] .case-doc-meta-fields input:focus,
+.case-doc-workspace[data-document-type="p19"] .case-doc-rich .jodit-container:not(.jodit_disabled):focus-within {
+  border-color: #b4232f !important;
+  box-shadow: 0 0 0 3px rgba(180, 35, 47, .09);
+}
+
+.case-doc-workspace[data-document-type="p19"] .case-doc-meta-fields .errorlist,
+.case-doc-workspace[data-document-type="p19"] .case-doc-rich .errorlist {
+  margin: 6px 0 0;
+  padding: 0;
+  color: #b4232f;
+  font-size: 9px;
+  list-style: none;
+}
+
+.case-doc-workspace[data-document-type="p19"] .case-doc-rich > textarea {
+  width: 100%;
+  min-height: 180px;
+}
+
+.dark .case-doc-p19-warning {
+  border-color: #594721;
+  background: #292417;
+  color: #e2c477;
+}
+
+.dark .case-doc-p19-readonly {
+  border-color: #294556;
+  background: #17242b;
+  color: #a9d0e2;
+}
+
+@media (max-width: 700px) {
+  .case-doc-p19-warning {
+    align-items: flex-start;
+  }
+
+  .case-doc-p19-warning a {
+    align-self: center;
+  }
+}
+
+/* P-19 memakai satu editor Isi; tembusan dan e-sign mengikuti susunan P-16. */
+.case-doc-workspace[data-document-type="p19"] .case-doc-copies-editor .jodit-wysiwyg ol {
+  display: block !important;
+  margin: 0 !important;
+  padding-left: 29px !important;
+  list-style: decimal outside !important;
+}
+
+.case-doc-workspace[data-document-type="p19"] .case-doc-copies-editor .jodit-wysiwyg li {
+  display: list-item !important;
+  margin: 0 !important;
+  padding-left: 3px !important;
+  line-height: 1.15 !important;
+}
+
+.case-doc-paper[data-document-type="p19"] .case-doc-signature {
+  width: 52%;
+  margin: 24pt 0 0 auto;
+  text-align: center;
+}
+
+.case-doc-paper[data-document-type="p19"] .case-doc-signature p {
+  margin: 0;
+  line-height: 1.15;
+}
+
+.case-doc-paper[data-document-type="p19"] .case-doc-signature-space {
+  height: 46pt;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.case-doc-paper[data-document-type="p19"] .case-doc-signature-space img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 43.3pt;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.case-doc-paper[data-document-type="p19"] .case-doc-copies {
+  margin-top: 18pt;
+}
+
+.case-doc-paper[data-document-type="p19"] .case-doc-copies ol {
+  display: block !important;
+  margin: 0 !important;
+  padding-left: 29px !important;
+  list-style: decimal outside !important;
+}
+
+.case-doc-paper[data-document-type="p19"] .case-doc-copies li {
+  display: list-item !important;
+  margin: 0 !important;
+  padding-left: 3px !important;
+  line-height: 1.15 !important;
+}
+
+.case-doc-paper[data-document-type="p19"] .case-doc-letterhead-rule strong {
+  padding-left: 0;
+  text-align: left;
+}
+
+.case-doc-paper[data-document-type="p19"] .case-doc-date {
+  right: auto;
+  left: 70%;
+  width: 30%;
+  text-align: left;
+}

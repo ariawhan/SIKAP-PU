@@ -1,0 +1,41 @@
+.p21-paper{box-sizing:border-box;aspect-ratio:8.5/13;padding:7.2% 9.26% 9.26%;font:9px/1.25 Arial,sans-serif}.p21-paper *{box-sizing:border-box;font-family:Arial,sans-serif}.p21-letterhead{margin-bottom:11px}.p21-letterhead-main{display:grid;grid-template-columns:17.36% 82.64%;align-items:center;min-height:66px;text-align:center}.p21-letterhead-main>span{width:110%;height:auto;aspect-ratio:1.25/1;display:grid;place-items:center;transform:translateX(-3%)}.p21-letterhead-main img{width:100%;height:100%;object-fit:contain}.p21-letterhead-main b,.p21-letterhead-main strong{display:block;margin:0;font-size:10px;line-height:1.08}.p21-letterhead-main p{margin:4px 0 0;font-size:8px;line-height:1.1}.p21-letterhead-rule{display:grid;grid-template-columns:43.18% 56.82%;align-items:center;margin-top:3px;border-top:1px solid #111;border-bottom:1px solid #111}.p21-letterhead-rule em{padding:4px 3px;text-align:center;font-size:8px;font-style:normal;font-weight:700;line-height:1.1}.p21-letterhead-rule strong{display:flex;justify-content:flex-end;padding-right:2px;font-size:10px}.p21-meta{position:relative;padding-right:41.8%}.p21-meta>div{display:grid;grid-template-columns:14% 3% minmax(0,1fr);align-items:start;margin-bottom:1px}.p21-meta b,.p21-meta span,.p21-meta p,.p21-subject-row>div{margin:0;font-size:9px;font-weight:400;line-height:1.2}.p21-subject-row>div,.p21-subject-row>div p{text-align:justify}.p21-place-date{position:absolute;top:0;right:0;width:37%;text-align:left;white-space:nowrap}.p21-recipient{margin:13px 0 14px;font-size:9px;line-height:1.35}.p21-recipient u{display:inline-block;margin-left:22px}.p21-clause{display:grid;grid-template-columns:16px 35px 8px minmax(0,1fr);align-items:start;font-size:9px;line-height:1.35}.p21-clause>b{font-weight:400}.p21-clause ol{margin:0;padding-left:19px;list-style-type:lower-alpha}.p21-clause li{margin:0 0 5px;padding-left:4px;text-align:justify}.p21-body{font-size:9px;line-height:1.35}.p21-body>ol{margin:0;padding-left:16px}.p21-body>ol>li{margin:0 0 5px;padding-left:5px;text-align:justify}.p21-body li p{margin:5px 0 0;text-align:left}.p21-body>p{margin:7px 0 0;text-align:left}.p21-signature{width:51%;margin:11px 0 0 auto;text-align:center;font-size:9px;line-height:1.2}.p21-signature p{margin:0}.p21-signature>div{height:55px}.p21-copies{margin-top:10px;font-size:9px;line-height:1.2}.p21-copies>p{margin:0}.p21-copies ol{margin:2px 0 0;padding-left:19px}.p21-copies li{margin:0;padding-left:3px}.dark .p21-paper,.dark .p21-paper *{color:#080808}
+@page{size:8.5in 13in;margin:0}@media print{.p21-paper{width:8.5in!important;height:13in!important;min-height:13in!important;max-height:13in!important;padding:1.55cm 2cm 2cm!important;overflow:hidden!important;box-shadow:none!important;font:9.5pt/1.25 Arial,sans-serif!important}.p21-letterhead-main{grid-template-columns:3.09cm 14.5cm!important;min-height:2.68cm!important}.p21-letterhead-main>span{width:3.35cm!important;height:2.68cm!important;transform:translateX(-.09cm)!important}.p21-letterhead-main b,.p21-letterhead-main strong{font-size:10pt!important}.p21-letterhead-main p,.p21-letterhead-rule em{font-size:8pt!important}.p21-letterhead-rule strong,.p21-meta b,.p21-meta span,.p21-meta p,.p21-subject-row>div,.p21-recipient,.p21-clause,.p21-body,.p21-signature,.p21-copies{font-size:9.5pt!important}.p21-signature>div{height:2cm!important}}
+
+/* Tata letak mengikuti naskah P-21 referensi dan blok e-sign P-20. */
+.p21-place-date{right:0;width:auto;text-align:right}
+.p21-recipient,.p21-recipient strong{font-weight:400}
+.p21-clause{grid-template-columns:20pt 38pt 9pt minmax(0,1fr);line-height:1.15}
+.p21-clause ol{padding-left:20pt}
+.p21-clause li,.p21-body>ol>li{margin-bottom:3pt;line-height:1.15}
+.p21-body{line-height:1.15}
+.p21-clause>span{display:block;width:20pt;text-align:left}
+.p21-body>ol{margin:0;padding-left:0;list-style:none}
+.p21-body>ol>li{display:grid;grid-template-columns:20pt minmax(0,1fr);padding-left:0;text-align:justify}
+.p21-body>ol>li::before{content:attr(data-p21-list-number) ".";grid-column:1;grid-row:1;text-align:left}
+.p21-body>ol>li>p,.p21-body>ol>li>ol,.p21-body>ol>li>ul,.p21-body>ol>li>div{grid-column:2}
+.p21-signature{width:58%;margin:22pt 21pt 0 auto;line-height:1.15}
+.p21-signature p{margin:0;line-height:1.15}
+.p21-signature>div{height:45pt;display:flex;align-items:center;justify-content:center}
+.p21-signature>div img{display:block;width:auto;max-width:100%;height:38pt;margin:0 auto;object-fit:contain}
+.p21-copies{margin-top:18pt;line-height:1.15}
+.p21-copies>p{margin:0 0 3pt}
+.p21-copies ol{display:block!important;margin:0!important;padding-left:22pt!important;list-style:decimal outside!important}
+.p21-copies li{display:list-item!important;margin:0 0 3pt!important;padding-left:3pt!important;list-style:decimal outside!important}
+
+@media print{
+  .jodit-ui-tooltip,.jodit-ui-popup,.jodit-ui-list{display:none!important}
+  body>.min-h-screen,body>.min-h-screen>.content-frame,body>.min-h-screen>.content-frame>main,.p21-workspace,.p21-preview-column,.p21-preview-stage{display:contents!important}
+  .p21-paper{height:32.9cm!important;min-height:32.9cm!important;max-height:32.9cm!important;font:10pt/1.15 Arial,sans-serif!important;break-inside:avoid-page!important;page-break-inside:avoid!important}
+  .p21-letterhead-rule strong,.p21-meta b,.p21-meta span,.p21-meta p,.p21-subject-row>div,.p21-recipient,.p21-clause,.p21-body,.p21-signature,.p21-copies{font-size:10pt!important;line-height:1.15!important}
+  .p21-signature{width:58%!important;margin:22pt 21pt 0 auto!important}
+  .p21-signature>div{height:45pt!important}
+  .p21-signature>div img{height:38pt!important}
+}
+
+/* E-Sign berada di blok penandatangan; Barcode/QR selalu berada di footer. */
+.p21-signature-space{display:flex;align-items:center;justify-content:center}
+.p21-signature-space img{display:block;width:auto;max-width:100%;height:38pt;margin:0 auto;object-fit:contain}
+.p21-verification-mark{position:absolute;left:50%;bottom:.45cm;width:38.4pt;height:43.3pt;display:grid;place-items:center;transform:translateX(-50%);color:#777;text-align:center}
+.p21-verification-mark img{display:block;width:100%;height:100%;object-fit:contain}
+.p21-verification-mark .verification-code-placeholder{width:100%;height:100%;display:grid;place-items:center;border:1px dashed #999;font:8pt/1 Arial,sans-serif}
+.p21-verification-mark .verification-code-placeholder small{display:block;font-size:5.5pt}

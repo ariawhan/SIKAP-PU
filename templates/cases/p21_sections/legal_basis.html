@@ -1,0 +1,6 @@
+<ol type="a">
+  <li>Undang-Undang Nomor 20 Tahun 2025 tentang Kitab Undang-Undang Hukum Acara Pidana;</li>
+  <li>Undang-Undang Nomor 16 Tahun 2004 tentang Kejaksaan Republik Indonesia sebagaimana telah diubah dengan Undang-Undang Nomor 11 Tahun 2021;</li>
+  <li>Berkas Perkara Nomor: {% if case_file_receipt and case_file_receipt.cover_letter_number %}{{ case_file_receipt.cover_letter_number }}{% else %}{{ spdp.letter_number }}{% endif %} Tanggal {% if case_file_receipt and case_file_receipt.cover_letter_date %}{{ case_file_receipt.cover_letter_date|date:'d F Y' }}{% else %}{{ spdp.letter_date|date:'d F Y' }}{% endif %} yang kami terima tanggal {% if case_file_receipt and case_file_receipt.received_at %}{{ case_file_receipt.received_at|date:'d F Y' }}{% else %}{{ spdp.received_date|date:'d F Y' }}{% endif %};</li>
+  <li>Hasil Penelitian Berkas Perkara oleh Penuntut Umum yang menyimpulkan bahwa hasil penyidikan telah lengkap.</li>
+</ol>

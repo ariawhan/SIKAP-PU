@@ -1,0 +1,106 @@
+{% extends 'dashboard/layout.html' %}
+{% load static %}
+{% block title %}Integrasi SIPede{% endblock %}
+{% block page_name %}Settings / Integrasi / SIPede{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/integration.css' %}?v=20261018-3"><link rel="stylesheet" href="{% static 'css/sipede-integration.css' %}?v=20261018-1">{% endblock %}
+{% block content %}
+<section class="page-heading integration-page-heading">
+  <div><p class="kicker text-red-700">INTEGRASI LAYANAN</p><h1>Integrasi SIPede</h1><p>Simpan kredensial dan hubungkan akun SIPede untuk proses administrasi surat.</p></div>
+  <span class="integration-heading-logo sipede"><img src="{% static 'img/sipede-color.png' %}" alt="Logo SIPede"></span>
+</section>
+
+{% include 'configurations/includes/integration_switcher.html' with active_integration='sipede' %}
+
+{% if is_integration_admin %}
+<section class="panel integration-admin-toolbar sipede-admin-toolbar">
+  <div><span class="integration-service-logo sipede"><img src="{% static 'img/sipede-color.png' %}" alt="Logo SIPede"></span><div><b>Administrasi Integrasi SIPede</b><small>Pantau konfigurasi dan status sesi seluruh pengguna dari tabel di bawah.</small></div></div>
+  <a class="primary-btn" href="{% url 'configurations:sipede_integration' %}?user={{ request.user.pk }}">Konfigurasi Akun Saya</a>
+</section>
+{% else %}
+<div class="integration-settings-layout">
+  <section class="panel integration-service-card">
+    <header class="integration-card-head">
+      <span class="integration-service-logo sipede"><img src="{% static 'img/sipede-color.png' %}" alt="Logo SIPede"></span>
+      <div><h2>SIPede</h2><p>Kredensial automasi dan sesi layanan persuratan.</p></div>
+      <em class="{% if integration %}configured{% endif %}">{% if integration.connected_at %}Terhubung{% elif integration %}Terkonfigurasi{% else %}Belum{% endif %}</em>
+    </header>
+    <form method="post" class="integration-form" autocomplete="off">
+      {% csrf_token %}
+      <div class="form-grid">
+        {% for field in form %}<label>{{ field.label }}{{ field }}{{ field.errors }}</label>{% endfor %}
+      </div>
+      <p class="integration-security-note"><span>✓</span>Password dan cookie sesi disimpan dalam bentuk terenkripsi.</p>
+      <button class="primary-btn" type="submit">Simpan Kredensial SIPede</button>
+    </form>
+  </section>
+
+  <section class="panel integration-session-card">
+    <div class="integration-session-icon"><span></span></div>
+    <p class="kicker text-red-700">STATUS KONEKSI</p>
+    <h2>Sesi SIPede</h2>
+    <p id="sipede-status">{% if integration.connected_at %}Terhubung pada {{ integration.connected_at|date:'d M Y, H:i' }}.{% elif integration %}Kredensial tersimpan. Hubungkan untuk mengambil sesi.{% else %}Belum ada kredensial SIPede.{% endif %}</p>
+    <button class="primary-btn integration-connect-btn" type="button" data-sipede-connect {% if not integration %}disabled{% endif %}><span class="integration-connect-icon">↗</span>{% if integration.connected_at %}Hubungkan Ulang{% else %}Hubungkan & Ambil Sesi{% endif %}</button>
+    <small class="integration-connect-help">Google Chrome akan berjalan aman di komputer server. Anda hanya perlu memasukkan CAPTCHA.</small>
+  </section>
+</div>
+{% endif %}
+
+{% if is_integration_admin %}
+<section class="panel cms-admin-accounts sipede-admin-accounts">
+  <header class="cms-admin-accounts-head">
+    <div><p class="kicker text-red-700">ADMINISTRASI AKUN</p><h2>Daftar Akun SIPede Pengguna</h2><p>Status konfigurasi dan sesi SIPede seluruh pengguna. Password dan cookie sesi tidak pernah ditampilkan.</p></div>
+    <div class="cms-admin-summary"><span><b>{{ sipede_connected_count }}</b><small>Terhubung</small></span><span><b>{{ sipede_configured_count }}</b><small>Terkonfigurasi</small></span><span><b>{{ sipede_user_rows|length }}</b><small>Total pengguna</small></span></div>
+  </header>
+  <div class="cms-admin-table-wrap"><table class="cms-admin-table">
+    <thead><tr><th>Pengguna</th><th>Role</th><th>Akun SIPede</th><th>Status sesi</th><th>Terhubung pada</th><th>Diperbarui</th><th>Aksi</th></tr></thead>
+    <tbody>{% for row in sipede_user_rows %}<tr>
+      <td><div class="cms-user-cell"><span>{{ row.user.display_name|slice:':1'|upper }}</span><div><b>{{ row.user.display_name }}</b><small>@{{ row.user.username }}</small></div></div></td>
+      <td><span class="cms-role-label">{{ row.roles }}</span></td>
+      <td>{% if row.integration %}<b class="cms-account-name">{{ row.integration.username }}</b>{% else %}<span class="cms-empty-value">Belum diisi</span>{% endif %}</td>
+      <td><span class="cms-account-status {% if row.integration.connected_at %}ready{% elif row.integration %}waiting{% else %}empty{% endif %}">{% if row.integration.connected_at %}Terhubung{% elif row.integration %}Belum terhubung{% else %}Belum dikonfigurasi{% endif %}</span></td>
+      <td>{% if row.integration.connected_at %}<span class="cms-updated">{{ row.integration.connected_at|date:'d M Y, H:i' }}</span>{% else %}<span class="cms-empty-value">—</span>{% endif %}</td>
+      <td>{% if row.integration %}<span class="cms-updated">{{ row.integration.updated_at|date:'d M Y, H:i' }}</span>{% else %}<span class="cms-empty-value">—</span>{% endif %}</td>
+      <td><a class="cms-config-action" href="{% url 'configurations:sipede_integration' %}?user={{ row.user.pk }}">Konfigurasi</a></td>
+    </tr>{% empty %}<tr><td colspan="7" class="cms-admin-empty">Belum ada pengguna aktif.</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+
+<div class="integration-settings-modal" data-integration-settings-modal data-open-on-load="{% if form.errors or manage_user_requested %}true{% else %}false{% endif %}" hidden>
+  <button type="button" class="integration-settings-backdrop" data-integration-settings-close aria-label="Tutup"></button>
+  <section class="integration-settings-dialog" role="dialog" aria-modal="true" aria-labelledby="sipede-settings-title">
+    <button type="button" class="integration-settings-close" data-integration-settings-close aria-label="Tutup">&times;</button>
+    <header><span class="integration-service-logo sipede"><img src="{% static 'img/sipede-color.png' %}" alt=""></span><div><small>AKUN PENGGUNA</small><h2 id="sipede-settings-title">Konfigurasi SIPede</h2><p>{{ managed_user.display_name }} · @{{ managed_user.username }}</p></div></header>
+    <form method="post" class="integration-form" autocomplete="off">
+      {% csrf_token %}<input type="hidden" name="target_user_id" value="{{ managed_user.pk }}"><div class="form-grid">{% for field in form %}<label>{{ field.label }}{{ field }}{{ field.errors }}</label>{% endfor %}</div>
+      <p class="integration-security-note"><span>✓</span>Password dan cookie sesi disimpan terenkripsi.</p>
+      <footer><button type="button" class="secondary-btn" data-integration-settings-close>Batal</button><button class="primary-btn" type="submit">Simpan</button></footer>
+    </form>
+    <div class="integration-modal-session"><div><b>Status sesi</b><small id="sipede-status">{% if integration.connected_at %}Terhubung pada {{ integration.connected_at|date:'d M Y, H:i' }}{% elif integration %}Kredensial tersimpan, sesi belum diambil{% else %}Belum ada kredensial{% endif %}</small></div><button class="primary-btn integration-connect-btn" type="button" data-sipede-connect data-target-user="{{ managed_user.pk }}" {% if not integration %}disabled{% endif %}>{% if integration.connected_at %}Hubungkan Ulang{% else %}Hubungkan &amp; Ambil Sesi{% endif %}</button></div>
+  </section>
+</div>
+{% endif %}
+
+<div class="sipede-auth-modal" data-sipede-modal data-reload-on-success="true" data-start-url="{% url 'configurations:sipede_connect_start' %}" data-status-url="{% url 'configurations:sipede_connect_status' '__AUTH_ID__' %}" data-captcha-url="{% url 'configurations:sipede_connect_captcha' '__AUTH_ID__' %}" data-cancel-url="{% url 'configurations:sipede_connect_cancel' '__AUTH_ID__' %}" hidden>
+  <button type="button" class="sipede-auth-backdrop" data-sipede-close aria-label="Tutup popup"></button>
+  <section class="sipede-auth-dialog" role="dialog" aria-modal="true" aria-labelledby="sipede-auth-title">
+    <button type="button" class="sipede-auth-close" data-sipede-close aria-label="Tutup">&times;</button>
+    <header class="sipede-auth-head">
+      <span><img src="{% static 'img/sipede-color.png' %}" alt=""></span>
+      <div><p class="kicker text-red-700">LOGIN OTOMATIS</p><h2 id="sipede-auth-title">Hubungkan SIPede</h2></div>
+    </header>
+    <div class="sipede-auth-body" data-sipede-state="starting">
+      <p class="sipede-auth-message" data-sipede-message>Menyiapkan Google Chrome di komputer server…</p>
+      <div class="sipede-auth-loading" data-sipede-loading><i></i><div><b>Mohon tunggu</b><small>Jangan tutup popup selama proses berjalan.</small></div></div>
+      <form class="sipede-auth-captcha" data-sipede-captcha-form hidden>
+        <div class="sipede-captcha-frame"><span>CAPTCHA SIPede</span><img data-sipede-captcha-image alt="Gambar CAPTCHA SIPede"></div>
+        <label>Kode CAPTCHA<input name="captcha" required autocomplete="off" maxlength="32" placeholder="Ketik kode pada gambar"></label>
+        <button class="primary-btn" type="submit">Kirim CAPTCHA</button>
+      </form>
+      <div class="sipede-auth-success" data-sipede-success hidden><span>✓</span><div><b>SIPede terhubung</b><p>Cookie dan sesi telah disimpan terenkripsi.</p></div></div>
+      <div class="sipede-auth-error" data-sipede-error hidden><span>!</span><div><b>Koneksi belum berhasil</b><p data-sipede-error-message></p><button type="button" data-sipede-retry>Coba Lagi</button></div></div>
+    </div>
+    <footer class="sipede-auth-footer"><span>🔒</span>Password tidak ditampilkan dan sesi disimpan terenkripsi.</footer>
+  </section>
+</div>
+{% endblock %}
+{% block extra_scripts %}<script src="{% static 'js/integration-settings.js' %}?v=20261018-2"></script><script src="{% static 'js/sipede-integration.js' %}?v=20261018-2"></script>{% endblock %}

@@ -1,0 +1,7 @@
+{% load static %}
+<nav class="integration-switcher" aria-label="Pilih layanan integrasi">
+  <a class="{% if active_integration == 'sipede' %}active{% endif %}" href="{% url 'configurations:sipede_integration' %}">
+    <span class="sipede"><img src="{% static 'img/sipede-color.png' %}" alt=""></span>
+    <div><b>Integrasi SIPede</b><small>Layanan persuratan elektronik</small></div>
+  </a>
+</nav>

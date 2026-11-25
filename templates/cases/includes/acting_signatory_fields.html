@@ -1,0 +1,21 @@
+<section class="acting-signatory-config"
+         data-acting-signatory
+         data-default-title="{{ institution.leader_title|default:'Kepala Kejaksaan Negeri' }}"
+         data-default-name="{{ institution.leader_name|default:'Nama pimpinan belum dikonfigurasi' }}"
+         data-default-position="{{ institution.leader_rank|default:'Pangkat belum dikonfigurasi' }}"
+         data-default-nip="{{ institution.leader_nip|default:'' }}">
+  {{ form.acting_type }}
+  <div class="acting-signatory-heading">
+    <div><b>Status Penandatangan</b><small>Kosongkan jika ditandatangani pejabat definitif.</small></div>
+    {{ form.acting_type.errors }}
+  </div>
+  <div class="acting-signatory-options">
+    <label><input type="checkbox" value="plt" data-acting-choice{% if form.acting_type.value == 'plt' %} checked{% endif %}><span aria-hidden="true">✓</span><span><b>PLT</b><small>Pelaksana Tugas</small></span></label>
+    <label><input type="checkbox" value="plh" data-acting-choice{% if form.acting_type.value == 'plh' %} checked{% endif %}><span aria-hidden="true">✓</span><span><b>PLH</b><small>Pelaksana Harian</small></span></label>
+  </div>
+  <div class="acting-signatory-identity" data-acting-fields{% if not form.acting_type.value %} hidden{% endif %}>
+    <label>Nama pejabat{{ form.acting_name }}{{ form.acting_name.errors }}</label>
+    <label>Jabatan/Pangkat{{ form.acting_position }}{{ form.acting_position.errors }}</label>
+    <label>NIP{{ form.acting_nip }}{{ form.acting_nip.errors }}</label>
+  </div>
+</section>
