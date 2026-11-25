@@ -9,10 +9,12 @@ from django.urls import reverse
 from django.utils import timezone
 
 from accounts.models import Role, User
-from cases.models import CaseDocumentDraft, P16Assignment, P16Draft, P21Draft, SOPForm03Draft, SPDP, StageOne
+from cases.models import CaseDocumentDraft, P16Assignment, P16Draft, P21Draft, SOPForm03Draft, SPDP, StageOne, Suspect
 from cases.reminders import case_deadline_for_spdp
 from .models import CaseReminderDispatch, DocumentIssuedDispatch, NotificationLog, NotificationMenuSetting, NotificationSetting, NotificationTemplate, WebNotification
 from .services import (
+    build_p16_assignment_messages,
+    case_detail_template_context,
     process_due_case_deadline_reminders,
     process_notification_queue,
     render_notification_template,
@@ -73,6 +75,83 @@ class CaseDeadlineReminderTests(TestCase):
         self.draft.draft_number = "PRINT-REMINDER/N.1.11/Um.1/10/2026"
         self.draft.letter_date = self.today - timedelta(days=28)
         self.draft.save(update_fields=("draft_number", "letter_date", "updated_at"))
+
+    def test_case_messages_list_all_suspects_prosecutors_and_staff(self):
+        self.prosecutor.first_name = "I Made"
+        self.prosecutor.last_name = "Jaksa Pertama"
+        self.prosecutor.save(update_fields=("first_name", "last_name"))
+        self.staff.first_name = "Ni Luh"
+        self.staff.last_name = "Petugas Pertama"
+        self.staff.save(update_fields=("first_name", "last_name"))
+        second_prosecutor = User.objects.create_user(
+            "reminder-jaksa-2", "reminder-jaksa-2@test.id", "rahasia-kuat",
+            first_name="Komang", last_name="Jaksa Kedua",
+        )
+        second_staff = User.objects.create_user(
+            "reminder-staff-2", "reminder-staff-2@test.id", "rahasia-kuat",
+            first_name="Kadek", last_name="Petugas Kedua",
+        )
+        self.assignment.prosecutors.add(second_prosecutor)
+        self.assignment.appointed_prosecutors.add(self.prosecutor, second_prosecutor)
+        self.assignment.administrative_staff.add(second_staff)
+        Suspect.objects.create(
+            spdp=self.spdp, sequence=1, name="I Made Pelaku",
+            suspect_type=Suspect.SuspectType.SUSPECT,
+        )
+        Suspect.objects.create(
+            spdp=self.spdp, sequence=2, name="Komang Terlapor", alias="Komang",
+            suspect_type=Suspect.SuspectType.REPORTED,
+        )
+
+        details = case_detail_template_context(self.spdp, self.assignment)
+        self.assertEqual(
+            details["daftar_pelaku"],
+            "1. I Made Pelaku (Tersangka); 2. Komang Terlapor alias Komang (Terlapor)",
+        )
+        self.assertEqual(
+            details["daftar_jaksa"],
+            "1. I Made Jaksa Pertama; 2. Komang Jaksa Kedua",
+        )
+        self.assertEqual(
+            details["daftar_pegawai"],
+            "1. Ni Luh Petugas Pertama; 2. Kadek Petugas Kedua",
+        )
+
+        assignment_message = build_p16_assignment_messages(self.assignment)["whatsapp"]
+        for expected in (
+            "I Made Pelaku", "Komang Terlapor", "I Made Jaksa Pertama",
+            "Komang Jaksa Kedua", "Ni Luh Petugas Pertama", "Kadek Petugas Kedua",
+        ):
+            self.assertIn(expected, assignment_message)
+
+        deadline = case_deadline_for_spdp(self.spdp, self.today)
+        send_case_deadline_reminder(deadline, self.actor)
+        web_message = WebNotification.objects.filter(spdp=self.spdp).first().message
+        self.assertIn("Komang Terlapor", web_message)
+        self.assertIn("Komang Jaksa Kedua", web_message)
+        self.assertIn("Kadek Petugas Kedua", web_message)
+
+    def test_case_detail_uses_reported_fallback_before_names_are_available(self):
+        empty_spdp = SPDP.objects.create(
+            directorate="Direktorat Umum",
+            investigator_agency="Kepolisian RI",
+            investigating_unit="Satreskrim Polres Buleleng",
+            investigation_order_number="SP.Sidik/KOSONG/XI/2026",
+            investigation_order_date=self.today,
+            letter_number="B/SPDP/KOSONG/2026",
+            letter_date=self.today,
+            received_date=self.today,
+            case_type="Penyelidikan",
+            case_summary="Pelaku masih terlapor.",
+            laws_and_articles="Dalam penyelidikan",
+            created_by=self.actor,
+        )
+        details = case_detail_template_context(empty_spdp)
+        self.assertEqual(details["daftar_pelaku"], "Masih terlapor (nama belum tersedia)")
+        self.assertEqual(details["daftar_jaksa"], "Belum ada Jaksa yang ditunjuk")
+        self.assertEqual(
+            details["daftar_pegawai"], "Belum ada petugas administrasi yang ditunjuk",
+        )
 
     def test_deadline_colors_follow_day_28_29_and_30_rules(self):
         deadline = case_deadline_for_spdp(self.spdp, self.today)
@@ -409,11 +488,21 @@ class NotificationSettingAccessTests(TestCase):
                 key = f"{stage_key}_deadline_{channel}"
                 self.assertIn(key, TEMPLATE_DEFINITIONS)
                 self.assertTrue(NotificationTemplate.objects.filter(key=key).exists())
+                self.assertTrue(
+                    {"daftar_pelaku", "daftar_jaksa", "daftar_pegawai"}.issubset(
+                        TEMPLATE_DEFINITIONS[key]["variables"],
+                    ),
+                )
         for stage_key in DOCUMENT_ISSUED_STAGES:
             for channel in ("web", "whatsapp", "telegram"):
                 key = issued_template_key(stage_key, channel)
                 self.assertIn(key, TEMPLATE_DEFINITIONS)
                 self.assertTrue(NotificationTemplate.objects.filter(key=key).exists())
+                self.assertTrue(
+                    {"daftar_pelaku", "daftar_jaksa", "daftar_pegawai"}.issubset(
+                        TEMPLATE_DEFINITIONS[key]["variables"],
+                    ),
+                )
 
         self.assertEqual(
             set(NotificationMenuSetting.objects.values_list("menu_key", flat=True)),

@@ -90,6 +90,48 @@ def render_notification_template(key, context):
         }
 
 
+def _numbered_names(users, empty_text):
+    names = []
+    seen = set()
+    for user in users:
+        if not user or not getattr(user, "is_active", True):
+            continue
+        identity = getattr(user, "pk", None) or user.display_name.casefold()
+        if identity in seen:
+            continue
+        seen.add(identity)
+        names.append(user.display_name)
+    return "; ".join(
+        f"{index}. {name}" for index, name in enumerate(names, start=1)
+    ) or empty_text
+
+
+def case_detail_template_context(spdp, assignment=None):
+    """Data pelaku/terlapor dan seluruh tim yang dapat dipakai semua template perkara."""
+    suspects = list(spdp.suspects.all())
+    suspect_names = []
+    for index, suspect in enumerate(suspects, start=1):
+        label = suspect.get_suspect_type_display() or "Pelaku/Terlapor"
+        alias = f" alias {suspect.alias}" if suspect.alias else ""
+        suspect_names.append(f"{index}. {suspect.name}{alias} ({label})")
+    daftar_pelaku = "; ".join(suspect_names) or "Masih terlapor (nama belum tersedia)"
+
+    assignment = assignment or getattr(spdp, "p16_assignment", None)
+    prosecutors = []
+    administrative_staff = []
+    if assignment:
+        prosecutors.extend(assignment.prosecutors.all())
+        prosecutors.extend(assignment.appointed_prosecutors.all())
+        administrative_staff.extend(assignment.administrative_staff.all())
+    return {
+        "daftar_pelaku": daftar_pelaku,
+        "daftar_jaksa": _numbered_names(prosecutors, "Belum ada Jaksa yang ditunjuk"),
+        "daftar_pegawai": _numbered_names(
+            administrative_staff, "Belum ada petugas administrasi yang ditunjuk",
+        ),
+    }
+
+
 def send_telegram_message(bot_token, chat_id, text, success_message):
     bot_token = str(bot_token or "").strip()
     chat_id = str(chat_id or "").strip()
@@ -452,7 +494,7 @@ def send_document_issued_notifications(
     assignment = (
         P16Assignment.objects.filter(spdp_id=spdp_id)
         .select_related("kasi_pidum")
-        .prefetch_related("prosecutors", "administrative_staff")
+        .prefetch_related("prosecutors", "appointed_prosecutors", "administrative_staff")
         .first()
     )
     recipients = {}
@@ -478,6 +520,7 @@ def send_document_issued_notifications(
     )
     context_label = f"{stage_label} Terbit | {spdp.letter_number}"
     target_url = _issued_document_target_url(stage_key, document_id, spdp_id)
+    case_details = case_detail_template_context(spdp, assignment)
 
     for recipient in recipients.values():
         context = {
@@ -486,6 +529,7 @@ def send_document_issued_notifications(
             "nomor_surat": str(document_number or "-").strip() or "-",
             "nomor_spdp": spdp.letter_number,
             "tanggal_surat": formatted_date,
+            **case_details,
         }
         if menu_channels["web"]:
             rendered = render_notification_template(
@@ -585,6 +629,7 @@ def build_p16_assignment_messages(assignment):
         "batas_p16": formatted_due_date,
         "status_waktu": deadline_status,
         "diteruskan_oleh": actor,
+        **case_detail_template_context(spdp, assignment),
     }
     web = render_notification_template("p16_assignment_web", context)
     whatsapp = render_notification_template("p16_assignment_whatsapp", context)
@@ -677,6 +722,7 @@ def _case_deadline_context(deadline, recipient):
         "masa_hari": deadline.period_days,
         "status_waktu": deadline.status_text,
         "tindak_lanjut": deadline.action_text,
+        **case_detail_template_context(deadline.spdp),
     }
 
 

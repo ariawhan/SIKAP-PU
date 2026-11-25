@@ -2,6 +2,14 @@
 
 APP_NAME = "SIKAP-PU"
 
+CASE_DETAIL_BLOCK = (
+    "\n\nData penanganan perkara:\n"
+    "Pelaku / terlapor    : {daftar_pelaku}\n"
+    "Jaksa yang menangani : {daftar_jaksa}\n"
+    "Petugas administrasi : {daftar_pegawai}"
+)
+CASE_DETAIL_VARIABLES = ("daftar_pelaku", "daftar_jaksa", "daftar_pegawai")
+
 TEMPLATE_DEFINITIONS = {
     "p16_assignment_web": {
         "name": "Penunjukan Jaksa P-16 - Aplikasi Web",
@@ -11,11 +19,11 @@ TEMPLATE_DEFINITIONS = {
         "body": (
             "SPDP {nomor_spdp} menunggu penunjukan Jaksa. "
             "Batas penerbitan P-16 {batas_p16} ({status_waktu})."
-        ),
+        ) + CASE_DETAIL_BLOCK,
         "variables": (
             "nama_aplikasi", "nama_penerima", "nomor_spdp", "tanggal_diterima",
             "jumlah_pelaku", "batas_p16", "status_waktu", "diteruskan_oleh",
-        ),
+        ) + CASE_DETAIL_VARIABLES,
     },
     "p16_assignment_whatsapp": {
         "name": "Penunjukan Jaksa P-16 - WhatsApp",
@@ -34,11 +42,11 @@ TEMPLATE_DEFINITIONS = {
             "Silakan masuk ke {nama_aplikasi}, buka Data Perkara, lalu pilih aksi Tunjuk Jaksa.\n\n"
             "Diteruskan oleh: {diteruskan_oleh}\n"
             "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
-        ),
+        ) + CASE_DETAIL_BLOCK,
         "variables": (
             "nama_aplikasi", "nama_penerima", "nomor_spdp", "tanggal_diterima",
             "jumlah_pelaku", "batas_p16", "status_waktu", "diteruskan_oleh",
-        ),
+        ) + CASE_DETAIL_VARIABLES,
     },
     "p16_assignment_telegram": {
         "name": "Penunjukan Jaksa P-16 - Telegram",
@@ -57,11 +65,11 @@ TEMPLATE_DEFINITIONS = {
             "Silakan masuk ke {nama_aplikasi}, buka Data Perkara, lalu pilih aksi Tunjuk Jaksa.\n\n"
             "Diteruskan oleh: {diteruskan_oleh}\n"
             "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
-        ),
+        ) + CASE_DETAIL_BLOCK,
         "variables": (
             "nama_aplikasi", "nama_penerima", "nomor_spdp", "tanggal_diterima",
             "jumlah_pelaku", "batas_p16", "status_waktu", "diteruskan_oleh",
-        ),
+        ) + CASE_DETAIL_VARIABLES,
     },
     "sop_form_03_issued_whatsapp": {
         "name": "SOP Form 3 Terbit - WhatsApp",
@@ -76,11 +84,11 @@ TEMPLATE_DEFINITIONS = {
             "Nomor SPDP       : {nomor_spdp}\n"
             "Tanggal surat    : {tanggal_surat}\n\n"
             "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
-        ),
+        ) + CASE_DETAIL_BLOCK,
         "variables": (
             "nama_aplikasi", "nama_penerima", "nomor_surat", "nomor_spdp",
             "tanggal_surat",
-        ),
+        ) + CASE_DETAIL_VARIABLES,
     },
     "sop_form_03_issued_telegram": {
         "name": "SOP Form 3 Terbit - Telegram",
@@ -95,19 +103,19 @@ TEMPLATE_DEFINITIONS = {
             "Nomor SPDP       : {nomor_spdp}\n"
             "Tanggal surat    : {tanggal_surat}\n\n"
             "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
-        ),
+        ) + CASE_DETAIL_BLOCK,
         "variables": (
             "nama_aplikasi", "nama_penerima", "nomor_surat", "nomor_spdp",
             "tanggal_surat",
-        ),
+        ) + CASE_DETAIL_VARIABLES,
     },
     "case_deadline_web": {
         "name": "Reminder Tenggat Perkara - Aplikasi Web",
         "description": "Reminder otomatis tiga hari terakhir pada setiap tahapan perkara.",
         "channel": "web",
         "subject": "Reminder {tahapan} Hari ke-{hari_ke}",
-        "body": "Perkara {nomor_spdp} pada {tahapan} telah {status_waktu}. Batas {masa_hari} hari: {tanggal_batas}. {tindak_lanjut}",
-        "variables": ("nama_aplikasi", "nama_penerima", "tahapan", "hari_ke", "nomor_spdp", "nomor_surat", "tanggal_surat", "tanggal_batas", "masa_hari", "status_waktu", "tindak_lanjut"),
+        "body": "Perkara {nomor_spdp} pada {tahapan} telah {status_waktu}. Batas {masa_hari} hari: {tanggal_batas}. {tindak_lanjut}" + CASE_DETAIL_BLOCK,
+        "variables": ("nama_aplikasi", "nama_penerima", "tahapan", "hari_ke", "nomor_spdp", "nomor_surat", "tanggal_surat", "tanggal_batas", "masa_hari", "status_waktu", "tindak_lanjut") + CASE_DETAIL_VARIABLES,
     },
     "case_deadline_whatsapp": {
         "name": "Reminder Tenggat Perkara - WhatsApp",
@@ -120,8 +128,8 @@ TEMPLATE_DEFINITIONS = {
             "Nomor surat : {nomor_surat}\nTanggal surat: {tanggal_surat}\n"
             "Batas {masa_hari} hari: {tanggal_batas}\nStatus: {status_waktu}\n\n"
             "{tindak_lanjut}"
-        ),
-        "variables": ("nama_aplikasi", "nama_penerima", "tahapan", "hari_ke", "nomor_spdp", "nomor_surat", "tanggal_surat", "tanggal_batas", "masa_hari", "status_waktu", "tindak_lanjut"),
+        ) + CASE_DETAIL_BLOCK,
+        "variables": ("nama_aplikasi", "nama_penerima", "tahapan", "hari_ke", "nomor_spdp", "nomor_surat", "tanggal_surat", "tanggal_batas", "masa_hari", "status_waktu", "tindak_lanjut") + CASE_DETAIL_VARIABLES,
     },
     "case_deadline_telegram": {
         "name": "Reminder Tenggat Perkara - Telegram",
@@ -134,8 +142,8 @@ TEMPLATE_DEFINITIONS = {
             "Nomor surat : {nomor_surat}\nTanggal surat: {tanggal_surat}\n"
             "Batas {masa_hari} hari: {tanggal_batas}\nStatus: {status_waktu}\n\n"
             "{tindak_lanjut}"
-        ),
-        "variables": ("nama_aplikasi", "nama_penerima", "tahapan", "hari_ke", "nomor_spdp", "nomor_surat", "tanggal_surat", "tanggal_batas", "masa_hari", "status_waktu", "tindak_lanjut"),
+        ) + CASE_DETAIL_BLOCK,
+        "variables": ("nama_aplikasi", "nama_penerima", "tahapan", "hari_ke", "nomor_spdp", "nomor_surat", "tanggal_surat", "tanggal_batas", "masa_hari", "status_waktu", "tindak_lanjut") + CASE_DETAIL_VARIABLES,
     },
     "whatsapp_logout_telegram": {
         "name": "WhatsApp Logout - Telegram Admin",
@@ -222,7 +230,7 @@ for stage_key, stage_label in DOCUMENT_ISSUED_STAGES.items():
             body = (
                 "{tahapan} nomor {nomor_surat} untuk perkara {nomor_spdp} "
                 "telah berstatus terbit pada {tanggal_surat}."
-            )
+            ) + CASE_DETAIL_BLOCK
         else:
             body = (
                 "{nama_aplikasi} | {tahapan} TERBIT\n\n"
@@ -232,7 +240,7 @@ for stage_key, stage_label in DOCUMENT_ISSUED_STAGES.items():
                 "Nomor SPDP  : {nomor_spdp}\n"
                 "Tanggal     : {tanggal_surat}\n\n"
                 "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
-            )
+            ) + CASE_DETAIL_BLOCK
         TEMPLATE_DEFINITIONS[key] = {
             "name": f"{stage_label} Terbit - {channel_label}",
             "description": (
@@ -244,7 +252,7 @@ for stage_key, stage_label in DOCUMENT_ISSUED_STAGES.items():
             "variables": (
                 "nama_aplikasi", "nama_penerima", "tahapan", "nomor_surat",
                 "nomor_spdp", "tanggal_surat",
-            ),
+            ) + CASE_DETAIL_VARIABLES,
             "menu_key": stage_key,
         }
 
