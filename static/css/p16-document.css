@@ -378,7 +378,7 @@
 }
 
 .p16-suspect-block {
-  margin: 2pt 0 3pt var(--p16-suspect-indent,142.1pt);
+  margin: 2pt 0 3pt var(--p16-suspect-indent,88pt);
   padding: 0;
 }
 
@@ -930,7 +930,7 @@
   }
 
   .p16-suspect-block {
-    margin-left: var(--p16-suspect-indent,142.1pt);
+    margin-left: var(--p16-suspect-indent,88pt);
   }
 
   .p16-suspect-block p,

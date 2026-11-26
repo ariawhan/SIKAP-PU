@@ -309,6 +309,8 @@ class ConfigurationAccessTests(TestCase):
         layout, errors = validate_document_layout("p16", {**P16_LAYOUT_DEFAULTS, "font_family": "url(evil)"})
         self.assertIn("font_family", errors)
         self.assertNotIn("url", document_layout_style("p16", layout))
+        self.assertEqual(P16_LAYOUT_DEFAULTS["suspect_indent_pt"], 88)
+        self.assertIn("--p16-suspect-indent:88pt", document_layout_style("p16", P16_LAYOUT_DEFAULTS))
 
     def test_superadmin_can_save_single_institution_configuration(self):
         self.client.force_login(self.superadmin)

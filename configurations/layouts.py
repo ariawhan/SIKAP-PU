@@ -100,7 +100,9 @@ P16_LAYOUT_DEFAULTS = {
     "clause_colon_width_pt": 12,
     "body_indent_pt": 117.2,
     "continuation_indent_pt": 89.8,
-    "suspect_indent_pt": 142.1,
+    # Dengan kolom nomor 16pt pada blok identitas, nilai 88pt membuat awal
+    # label sejajar dengan awal teks butir dasar (termasuk Surat Pemberitahuan).
+    "suspect_indent_pt": 88,
     "copies_top_pt": 34,
     "signature_width_pct": 58,
     "signature_top_pt": 28,
