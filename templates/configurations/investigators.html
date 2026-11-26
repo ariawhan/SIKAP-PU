@@ -42,10 +42,10 @@
       <div class="investigator-unit-item">
         <div>
           <b>{{ unit.name }}</b>
-          <small>{% if unit.is_active %}Aktif{% else %}Nonaktif{% endif %}</small>
+          <small>Tempat: {{ unit.place|default:'Belum diisi' }} · {% if unit.is_active %}Aktif{% else %}Nonaktif{% endif %}</small>
         </div>
         <div class="investigator-actions">
-          <button type="button" class="letter-number-action edit" data-edit-investigator-unit data-id="{{ unit.pk }}" data-institution-id="{{ institution.pk }}" data-institution-name="{{ institution.name }}" data-name="{{ unit.name }}" data-active="{{ unit.is_active|yesno:'true,false' }}">Edit</button>
+          <button type="button" class="letter-number-action edit" data-edit-investigator-unit data-id="{{ unit.pk }}" data-institution-id="{{ institution.pk }}" data-institution-name="{{ institution.name }}" data-name="{{ unit.name }}" data-place="{{ unit.place }}" data-active="{{ unit.is_active|yesno:'true,false' }}">Edit</button>
           <form method="post" onsubmit="return confirm('Hapus instansi pelaksana penyidik ini?');">
             {% csrf_token %}
             <input type="hidden" name="action" value="delete_unit">
@@ -123,6 +123,12 @@
         {{ unit_form.name }}
         {{ unit_form.name.errors }}
       </label>
+      <label>
+        <span>{{ unit_form.place.label }}</span>
+        {{ unit_form.place }}
+        <small>Dipakai pada baris tujuan surat, contoh: Di - Buleleng.</small>
+        {{ unit_form.place.errors }}
+      </label>
       <label class="investigator-toggle">
         {{ unit_form.is_active }}
         <span>Aktif</span>
@@ -170,6 +176,7 @@
     unitForm.querySelector('[data-investigator-unit-id]').value = editing ? data.id : '';
     unitForm.querySelector('[name="institution"]').value = data.institutionId || '';
     unitForm.querySelector('[name="name"]').value = editing ? data.name : '';
+    unitForm.querySelector('[name="place"]').value = editing ? (data.place || '') : '';
     setChecked(unitForm, 'is_active', editing ? data.active : 'true');
     unitModal.querySelector('[data-investigator-unit-parent]').textContent = data.institutionName || '—';
     unitModal.querySelector('#investigator-unit-title').textContent = editing ? 'Edit Instansi Pelaksana Penyidik' : 'Tambah Instansi Pelaksana Penyidik';

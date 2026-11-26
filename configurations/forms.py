@@ -161,11 +161,15 @@ class InvestigatorInstitutionForm(forms.ModelForm):
 class InvestigatorUnitForm(forms.ModelForm):
     class Meta:
         model = InvestigatorUnit
-        fields = ("institution", "name", "is_active")
+        fields = ("institution", "name", "place", "is_active")
         widgets = {
             "institution": forms.HiddenInput(),
             "name": forms.TextInput(attrs={
                 "placeholder": "Contoh: Satreskrim Polres Buleleng",
+                "autocomplete": "off",
+            }),
+            "place": forms.TextInput(attrs={
+                "placeholder": "Contoh: Buleleng",
                 "autocomplete": "off",
             }),
         }

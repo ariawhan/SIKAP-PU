@@ -5,14 +5,19 @@ from .p16_content import sanitize_p16_html
 
 def sop_context(draft):
     from configurations.models import InstitutionConfiguration
+    from configurations.investigator_places import investigator_destination_place
 
     suspects = list(draft.spdp.suspects.all())
     latest_p17 = draft.spdp.p17_drafts.order_by("-sequence").first()
     sop_form_02 = getattr(draft.spdp, "sop_form_02_draft", None)
+    institution = InstitutionConfiguration.objects.first() or InstitutionConfiguration()
     return {
         "draft": draft,
         "spdp": draft.spdp,
-        "institution": InstitutionConfiguration.objects.first() or InstitutionConfiguration(),
+        "institution": institution,
+        "investigator_place": investigator_destination_place(
+            draft.spdp, institution.city or "Tempat",
+        ),
         "suspect_names": ", ".join(suspect.name for suspect in suspects) or "---",
         "latest_p17": latest_p17,
         "sop_form_02": sop_form_02,

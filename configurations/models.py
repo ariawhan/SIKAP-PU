@@ -256,6 +256,7 @@ class InvestigatorUnit(models.Model):
         verbose_name="Instansi penyidik",
     )
     name = models.CharField("Instansi pelaksana penyidik", max_length=180)
+    place = models.CharField("Tempat", max_length=150, blank=True)
     is_active = models.BooleanField("Aktif", default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -280,6 +281,7 @@ class InvestigatorUnit(models.Model):
 
     def save(self, *args, **kwargs):
         self.name = " ".join(self.name.split())
+        self.place = " ".join(self.place.split())
         super().save(*args, **kwargs)
 
     def __str__(self):

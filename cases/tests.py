@@ -27,7 +27,7 @@ from notifications.models import NotificationLog, NotificationSetting, WebNotifi
 from notifications.services import process_notification_queue
 from .forms import SPDPForm
 from .models import CaseDocumentDraft, CaseInvestigator, CoordinationMinutesDraft, P16Assignment, P16Draft, P17Draft, P21Draft, Receipt, SOPForm02Draft, SOPForm03Draft, SOPForm1BDraft, SPDP, StageOne, Suspect, Victim
-from .p17_content import build_p17_preview
+from .p17_content import build_p17_preview, p17_recipients_for_editor
 from .reminders import case_deadline_for_spdp
 
 
@@ -45,7 +45,11 @@ class SPDPTests(TestCase):
             institution_code="N.1.11",
         )
         investigator = InvestigatorInstitution.objects.create(name="Kepolisian Negara Republik Indonesia")
-        InvestigatorUnit.objects.create(institution=investigator, name="Satreskrim Polres Buleleng")
+        InvestigatorUnit.objects.create(
+            institution=investigator,
+            name="Satreskrim Polres Buleleng",
+            place="Buleleng",
+        )
         letter_number_code = LetterNumberCode.objects.create(directorate="Direktorat Umum", code="Um")
         LetterNumberCaseType.objects.create(letter_number=letter_number_code, name="Pencurian")
         self.client.force_login(self.user)
@@ -1717,6 +1721,7 @@ class SPDPTests(TestCase):
         self.assertIn(spdp.letter_number, draft.body_html)
         self.assertIn("Permintaan Perkembangan Hasil Penyidikan", draft.subject_html)
         self.assertIn("A r s i p.", draft.copies_html)
+        self.assertEqual(p17_recipients_for_editor(draft)[0]["place"], "Buleleng")
 
     def test_p17_editor_has_three_sections_and_live_folio_preview(self):
         spdp = self.create_spdp()

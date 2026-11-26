@@ -1,7 +1,7 @@
 {% load static %}<section class="case-doc-page-content">
   {% if draft.document_type == 'p18' %}
     <p class="case-doc-p18-date">{{ institution.city|default:'Singaraja' }}, <span data-document-output="date">{{ draft.letter_date|date:'d F Y' }}</span></p>
-    <div class="case-doc-recipient" data-document-section="recipient">{% if draft.recipient_html %}{{ draft.recipient_html|safe }}{% else %}Yth. Kepala {{ spdp.investigating_unit|default:spdp.investigator_agency }}<br>di -<br><u>{{ institution.city|default:'Tempat' }}</u>{% endif %}</div>
+    <div class="case-doc-recipient" data-document-section="recipient">{% if draft.recipient_html %}{{ draft.recipient_html|safe }}{% else %}Yth. Kepala {{ spdp.investigating_unit|default:spdp.investigator_agency }}<br>Di -<br><u>{{ investigator_place|default:'Tempat' }}</u>{% endif %}</div>
     <div class="case-doc-p18-title"><h2>SURAT PENGANTAR</h2><p>Nomor: <span data-document-output="number">{{ draft.letter_number }}</span></p></div>
     <div class="case-doc-p18-table" data-document-section="body">{{ draft.body_html|safe }}</div>
   {% else %}

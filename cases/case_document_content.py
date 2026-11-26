@@ -5,6 +5,7 @@ from .p16_content import sanitize_p16_html
 
 def document_context(draft):
     from configurations.models import InstitutionConfiguration
+    from configurations.investigator_places import investigator_destination_place
     from .models import CaseDocumentDraft
 
     suspects = list(draft.spdp.suspects.all())
@@ -14,9 +15,13 @@ def document_context(draft):
     case_file_receipt = draft.spdp.receipts.filter(
         receipt_type="hasil_penyidikan",
     ).order_by("-received_at", "-id").first()
+    institution = InstitutionConfiguration.objects.first() or InstitutionConfiguration()
     return {
         "draft": draft, "spdp": draft.spdp,
-        "institution": InstitutionConfiguration.objects.first() or InstitutionConfiguration(),
+        "institution": institution,
+        "investigator_place": investigator_destination_place(
+            draft.spdp, institution.city or "Tempat",
+        ),
         "suspect_names": ", ".join(item.name for item in suspects) or "---",
         "p18": p18, "p19": p19, "p21": p21,
         "case_file_receipt": case_file_receipt,

@@ -21,13 +21,18 @@ def request_label(sequence):
 
 def p17_context(draft):
     from configurations.models import InstitutionConfiguration
+    from configurations.investigator_places import investigator_destination_place
 
     suspects = list(draft.spdp.suspects.all())
     suspect_names = ", ".join(suspect.name for suspect in suspects) or "---"
+    institution = InstitutionConfiguration.objects.first() or InstitutionConfiguration()
     return {
         "draft": draft,
         "spdp": draft.spdp,
-        "institution": InstitutionConfiguration.objects.first() or InstitutionConfiguration(),
+        "institution": institution,
+        "investigator_place": investigator_destination_place(
+            draft.spdp, institution.city or "Tempat",
+        ),
         "suspects": suspects,
         "suspect_names": suspect_names,
         "request_label": request_label(draft.sequence),
@@ -36,12 +41,15 @@ def p17_context(draft):
 
 def default_p17_recipients(draft):
     from configurations.models import InstitutionConfiguration
+    from configurations.investigator_places import investigator_destination_place
 
     institution = InstitutionConfiguration.objects.first() or InstitutionConfiguration()
     unit = (draft.spdp.investigating_unit or draft.spdp.investigator_agency or "Penyidik").strip()
     return [{
         "recipient": unit if unit.lower().startswith("kepala ") else f"Kepala {unit}",
-        "place": (institution.city or "Tempat").strip(),
+        "place": investigator_destination_place(
+            draft.spdp, institution.city or "Tempat",
+        ),
     }]
 
 

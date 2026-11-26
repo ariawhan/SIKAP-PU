@@ -47,6 +47,27 @@ INVESTIGATOR_DATA = (
     ),
 )
 
+UNIT_PLACES = {
+    "Satreskrim Polres Buleleng": "Buleleng",
+    "Polres Buleleng": "Buleleng",
+    "Polsek Banjar": "Banjar",
+    "Polsek Buleleng": "Buleleng",
+    "Polsek Busungbiu": "Busungbiu",
+    "Polsek Gerokgak": "Gerokgak",
+    "Polsek Kubutambahan": "Kubutambahan",
+    "Polsek Sawan": "Sawan",
+    "Polsek Seririt": "Seririt",
+    "Polsek Sukasada": "Sukasada",
+    "Polsek Tejakula": "Tejakula",
+    "BNN Provinsi Bali": "Denpasar",
+    "BNN Kabupaten Buleleng": "Buleleng",
+    "Kantor Imigrasi Kelas II TPI Singaraja": "Singaraja",
+    "Kantor Pengawasan dan Pelayanan Bea dan Cukai Tipe Madya Pabean A Denpasar": "Denpasar",
+    "Satuan Polisi Pamong Praja Kabupaten Buleleng": "Buleleng",
+    "Dinas Perhubungan Kabupaten Buleleng": "Buleleng",
+    "Dinas Lingkungan Hidup Kabupaten Buleleng": "Buleleng",
+}
+
 
 class Command(BaseCommand):
     help = "Mengisi data awal instansi dan unit pelaksana penyidik tanpa duplikasi."
@@ -75,12 +96,27 @@ class Command(BaseCommand):
             institution_created += int(created)
 
             for unit_name in units:
-                _, created = InvestigatorUnit.objects.get_or_create(
+                unit, created = InvestigatorUnit.objects.get_or_create(
                     institution=institution,
                     name=unit_name,
-                    defaults={"is_active": True},
+                    defaults={
+                        "is_active": True,
+                        "place": UNIT_PLACES.get(unit_name, ""),
+                    },
                 )
+                if not created and not unit.place and UNIT_PLACES.get(unit_name):
+                    unit.place = UNIT_PLACES[unit_name]
+                    unit.save(update_fields=("place", "updated_at"))
                 unit_created += int(created)
+
+        for name_fragment, place in (
+            ("Buleleng", "Buleleng"),
+            ("Singaraja", "Singaraja"),
+            ("Denpasar", "Denpasar"),
+        ):
+            InvestigatorUnit.objects.filter(
+                name__icontains=name_fragment, place="",
+            ).update(place=place)
 
         self.stdout.write(
             self.style.SUCCESS(

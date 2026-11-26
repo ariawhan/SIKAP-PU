@@ -340,11 +340,14 @@ class ConfigurationAccessTests(TestCase):
     def test_investigator_configuration_page_shows_nested_units(self):
         self.client.force_login(self.superadmin)
         institution = InvestigatorInstitution.objects.create(name="Kepolisian Negara Republik Indonesia")
-        InvestigatorUnit.objects.create(institution=institution, name="Satreskrim Polres Buleleng")
+        InvestigatorUnit.objects.create(
+            institution=institution, name="Satreskrim Polres Buleleng", place="Buleleng",
+        )
         response = self.client.get(reverse("configurations:investigators"))
         self.assertContains(response, "Konfigurasi Instansi Penyidik")
         self.assertContains(response, "Kepolisian Negara Republik Indonesia")
         self.assertContains(response, "Satreskrim Polres Buleleng")
+        self.assertContains(response, "Tempat: Buleleng")
         self.assertContains(response, "Tambah Pelaksana")
 
     def test_superadmin_can_add_investigator_institution(self):
@@ -366,12 +369,14 @@ class ConfigurationAccessTests(TestCase):
             "action": "add_unit",
             "institution": institution.pk,
             "name": "Satreskrim Polres Buleleng",
+            "place": "Buleleng",
             "is_active": "on",
         })
         self.assertRedirects(response, reverse("configurations:investigators"))
         unit = InvestigatorUnit.objects.get()
         self.assertEqual(unit.institution, institution)
         self.assertEqual(unit.name, "Satreskrim Polres Buleleng")
+        self.assertEqual(unit.place, "Buleleng")
         self.assertEqual(unit.created_by, self.superadmin)
 
     def test_duplicate_investigator_unit_is_rejected_in_same_institution(self):
