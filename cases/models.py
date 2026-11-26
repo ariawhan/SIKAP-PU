@@ -232,6 +232,7 @@ class CaseInvestigator(models.Model):
     sequence = models.PositiveSmallIntegerField("Urutan", default=1)
     name = models.CharField("Nama penyidik", max_length=180)
     phone = models.CharField("Nomor HP", max_length=30)
+    telegram_chat_id = models.CharField("ID Telegram", max_length=120, blank=True)
 
     class Meta:
         ordering = ("sequence", "id")

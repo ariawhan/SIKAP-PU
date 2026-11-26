@@ -79,6 +79,6 @@
 
 <article class="panel mt-4">
   <div class="panel-head"><div><h3>Data Penyidik</h3><p>{{ spdp.investigators.count }} orang tercatat</p></div></div>
-  <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama Penyidik</th><th>Nomor HP</th></tr></thead><tbody>{% for investigator in spdp.investigators.all %}<tr><td>{{ investigator.sequence }}</td><td><b>{{ investigator.name }}</b></td><td>{{ investigator.phone }}</td></tr>{% empty %}<tr><td colspan="3"><div class="empty-table"><b>Belum ada data penyidik yang dicatat.</b></div></td></tr>{% endfor %}</tbody></table></div>
+  <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama Penyidik</th><th>Nomor HP</th><th>ID Telegram</th></tr></thead><tbody>{% for investigator in spdp.investigators.all %}<tr><td>{{ investigator.sequence }}</td><td><b>{{ investigator.name }}</b></td><td>{{ investigator.phone }}</td><td>{{ investigator.telegram_chat_id|default:'-' }}</td></tr>{% empty %}<tr><td colspan="4"><div class="empty-table"><b>Belum ada data penyidik yang dicatat.</b></div></td></tr>{% endfor %}</tbody></table></div>
 </article>
 {% endblock %}

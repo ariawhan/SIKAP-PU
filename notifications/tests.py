@@ -344,6 +344,43 @@ class CaseDeadlineReminderTests(TestCase):
             4,
         )
 
+    def test_investigator_telegram_is_queued_only_when_chat_id_is_filled(self):
+        with_telegram = CaseInvestigator.objects.create(
+            spdp=self.spdp, sequence=1, name="Penyidik Telegram",
+            phone="081234567890", telegram_chat_id="7788990011",
+        )
+        without_telegram = CaseInvestigator.objects.create(
+            spdp=self.spdp, sequence=2, name="Penyidik Tanpa Telegram",
+            phone="081298765432", telegram_chat_id="",
+        )
+        NotificationSetting.objects.update_or_create(
+            pk=1, defaults={"whatsapp_enabled": False, "telegram_enabled": True},
+        )
+        NotificationMenuSetting.objects.update_or_create(
+            menu_key="p17",
+            defaults={"whatsapp_enabled": False, "telegram_enabled": True},
+        )
+
+        send_document_issued_notifications(
+            spdp_id=self.spdp.pk,
+            stage_key="p17",
+            document_id=991,
+            document_number="B-991/N.1.11/2026",
+            document_date=self.today,
+            actor_id=self.actor.pk,
+        )
+
+        investigator_logs = NotificationLog.objects.filter(
+            channel=NotificationLog.Channel.TELEGRAM,
+            context_label__startswith="P-17 Terbit untuk Penyidik",
+        )
+        self.assertEqual(investigator_logs.count(), 1)
+        log = investigator_logs.get()
+        self.assertEqual(log.recipient, with_telegram.telegram_chat_id)
+        self.assertEqual(log.recipient_name, with_telegram.name)
+        self.assertNotEqual(log.recipient_name, without_telegram.name)
+        self.assertEqual(log.status, NotificationLog.Status.QUEUED)
+
     def test_spdp_reminder_starts_at_h_minus_two_before_p16_is_issued(self):
         self.actor.roles.add(Role.objects.get(code=Role.ADMIN))
         spdp = SPDP.objects.create(

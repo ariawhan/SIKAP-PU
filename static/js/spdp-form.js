@@ -340,6 +340,7 @@
     emptyDetails: 'Nomor HP belum diisi',
     detailFields: [
       { field: 'phone', label: 'Nomor HP' },
+      { field: 'telegram_chat_id', label: 'ID Telegram' },
     ],
   });
 

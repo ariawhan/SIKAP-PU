@@ -323,6 +323,20 @@ for assignment_key in (
 for channel in ("whatsapp", "telegram"):
     TEMPLATE_DEFINITIONS[f"sop_form_03_issued_{channel}"]["menu_key"] = "sop03"
 
+# Penyidik memiliki template Telegram tersendiri. Isi awal mengikuti pesan
+# WhatsApp, tetapi dapat disunting secara terpisah melalui konfigurasi notifikasi.
+for _investigator_stage in ("p16", "p17", "sop02", "sop03", "p21"):
+    _whatsapp_key = f"{_investigator_stage}_investigator_issued_whatsapp"
+    _telegram_key = f"{_investigator_stage}_investigator_issued_telegram"
+    _whatsapp_definition = TEMPLATE_DEFINITIONS[_whatsapp_key]
+    _stage_label = DOCUMENT_ISSUED_STAGES[_investigator_stage]
+    TEMPLATE_DEFINITIONS[_telegram_key] = {
+        **_whatsapp_definition,
+        "name": f"{_stage_label} Terbit untuk Penyidik - Telegram",
+        "description": f"Pesan khusus Telegram kepada penyidik saat {_stage_label} perkara terbit.",
+        "channel": "telegram",
+    }
+
 
 def issued_template_key(stage_key, channel):
     # Pertahankan kode template SOP Form 3 yang sudah digunakan pada instalasi lama.

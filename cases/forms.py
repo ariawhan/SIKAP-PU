@@ -568,6 +568,11 @@ class CaseInvestigatorForm(forms.ModelForm):
                 "inputmode": "tel",
                 "placeholder": "Contoh: 081234567890",
             }),
+            "telegram_chat_id": forms.TextInput(attrs={
+                "autocomplete": "off",
+                "inputmode": "numeric",
+                "placeholder": "Opsional, contoh: 123456789",
+            }),
         }
 
     def clean_phone(self):

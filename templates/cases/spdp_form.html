@@ -121,7 +121,7 @@
       <div>
         <span>06</span>
         <h3>Data Penyidik</h3>
-        <p>Tambahkan satu atau lebih penyidik beserta nomor HP yang dapat dihubungi.</p>
+        <p>Tambahkan penyidik beserta nomor HP. ID Telegram dapat dikosongkan.</p>
       </div>
       <button type="button" class="secondary-btn suspect-add-button" data-add-investigator>+ Tambah Penyidik</button>
     </div>
@@ -175,7 +175,7 @@
   <dialog class="suspect-dialog" data-investigator-dialog aria-labelledby="investigator-dialog-title">
     <div class="suspect-dialog-shell">
       <header class="suspect-dialog-head">
-        <div><span>DATA PERKARA</span><h2 id="investigator-dialog-title">Data Penyidik</h2><p>Isi nama dan nomor HP penyidik. Anda dapat menambahkan lebih dari satu.</p></div>
+        <div><span>DATA PERKARA</span><h2 id="investigator-dialog-title">Data Penyidik</h2><p>Isi nama dan nomor HP penyidik. ID Telegram bersifat opsional.</p></div>
         <button type="button" data-cancel-investigator-dialog aria-label="Tutup popup">&times;</button>
       </header>
       <div class="suspect-dialog-body"><div class="suspect-list" data-investigator-list>{% for investigator_form in investigator_formset %}{% include 'cases/investigator_form.html' with investigator_form=investigator_form number=forloop.counter %}{% endfor %}</div></div>

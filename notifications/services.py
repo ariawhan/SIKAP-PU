@@ -573,19 +573,8 @@ def send_document_issued_notifications(
             )
 
     investigator_recipient_count = 0
-    investigator_template_keys = {
-        "p16": "p16_investigator_issued_whatsapp",
-        "p17": "p17_investigator_issued_whatsapp",
-        "sop02": "sop02_investigator_issued_whatsapp",
-        "sop03": "sop03_investigator_issued_whatsapp",
-        "p21": "p21_investigator_issued_whatsapp",
-    }
-    investigator_template_key = investigator_template_keys.get(stage_key)
-    if (
-        investigator_template_key
-        and setting.whatsapp_enabled
-        and menu_channels["whatsapp"]
-    ):
+    investigator_notification_stages = {"p16", "p17", "sop02", "sop03", "p21"}
+    if stage_key in investigator_notification_stages:
         investigator_context_label = (
             f"{stage_label} Terbit untuk Penyidik | {spdp.letter_number}"
         )
@@ -598,19 +587,42 @@ def send_document_issued_notifications(
                 "daftar_pelaku": case_details["daftar_pelaku"],
                 "daftar_jaksa": case_details["daftar_jaksa"],
             }
-            rendered = render_notification_template(
-                investigator_template_key, context,
-            )
-            enqueue_external_notification(
-                channel=NotificationLog.Channel.WHATSAPP,
-                recipient=normalize_whatsapp_number(investigator.phone),
-                recipient_name=investigator.name,
-                subject=rendered["subject"],
-                message=rendered["body"],
-                context_label=investigator_context_label,
-                actor=actor,
-            )
-            investigator_recipient_count += 1
+            queued_for_investigator = False
+            if setting.whatsapp_enabled and menu_channels["whatsapp"]:
+                rendered = render_notification_template(
+                    f"{stage_key}_investigator_issued_whatsapp", context,
+                )
+                enqueue_external_notification(
+                    channel=NotificationLog.Channel.WHATSAPP,
+                    recipient=normalize_whatsapp_number(investigator.phone),
+                    recipient_name=investigator.name,
+                    subject=rendered["subject"],
+                    message=rendered["body"],
+                    context_label=investigator_context_label,
+                    actor=actor,
+                )
+                queued_for_investigator = True
+            investigator_telegram_id = str(investigator.telegram_chat_id or "").strip()
+            if (
+                investigator_telegram_id
+                and setting.telegram_enabled
+                and menu_channels["telegram"]
+            ):
+                rendered = render_notification_template(
+                    f"{stage_key}_investigator_issued_telegram", context,
+                )
+                enqueue_external_notification(
+                    channel=NotificationLog.Channel.TELEGRAM,
+                    recipient=investigator_telegram_id,
+                    recipient_name=investigator.name,
+                    subject=rendered["subject"],
+                    message=rendered["body"],
+                    context_label=investigator_context_label,
+                    actor=actor,
+                )
+                queued_for_investigator = True
+            if queued_for_investigator:
+                investigator_recipient_count += 1
 
     total_recipient_count = len(recipients) + investigator_recipient_count
     dispatch.recipient_count = total_recipient_count

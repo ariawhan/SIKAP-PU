@@ -127,6 +127,7 @@ class SPDPTests(TestCase):
         self.assertContains(response, "data-investigator-summary")
         self.assertContains(response, "investigators-0-name")
         self.assertContains(response, "investigators-0-phone")
+        self.assertContains(response, "investigators-0-telegram_chat_id")
         self.assertContains(response, "spdp-form.css?v=20261126-1")
         self.assertNotContains(response, "Asal Surat")
         self.assertNotContains(response, 'name="origin"')
@@ -267,6 +268,7 @@ class SPDPTests(TestCase):
             "investigators-TOTAL_FORMS": "2",
             "investigators-0-name": "IPDA I Made Penyidik",
             "investigators-0-phone": "0812-3456-7890",
+            "investigators-0-telegram_chat_id": "123456789",
             "investigators-1-name": "AIPDA Komang Penyidik",
             "investigators-1-phone": "0813 4567 8901",
         }
@@ -274,10 +276,10 @@ class SPDPTests(TestCase):
         spdp = SPDP.objects.get()
         self.assertRedirects(response, reverse("cases:spdp_detail", args=[spdp.pk]))
         self.assertEqual(
-            list(spdp.investigators.values_list("name", "phone")),
+            list(spdp.investigators.values_list("name", "phone", "telegram_chat_id")),
             [
-                ("IPDA I Made Penyidik", "0812-3456-7890"),
-                ("AIPDA Komang Penyidik", "0813 4567 8901"),
+                ("IPDA I Made Penyidik", "0812-3456-7890", "123456789"),
+                ("AIPDA Komang Penyidik", "0813 4567 8901", ""),
             ],
         )
 
@@ -292,6 +294,7 @@ class SPDPTests(TestCase):
             "investigators-0-id": str(first.pk),
             "investigators-0-name": "IPDA I Made Diperbarui",
             "investigators-0-phone": "081299999999",
+            "investigators-0-telegram_chat_id": "987654321",
             "investigators-1-id": str(second.pk),
             "investigators-1-name": second.name,
             "investigators-1-phone": second.phone,
@@ -302,6 +305,7 @@ class SPDPTests(TestCase):
         self.assertEqual(spdp.investigators.count(), 1)
         self.assertEqual(spdp.investigators.get().name, "IPDA I Made Diperbarui")
         self.assertEqual(spdp.investigators.get().phone, "081299999999")
+        self.assertEqual(spdp.investigators.get().telegram_chat_id, "987654321")
 
     def test_investigator_phone_is_validated(self):
         payload = {

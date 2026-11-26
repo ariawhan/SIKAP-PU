@@ -4,9 +4,10 @@
   <div class="suspect-fieldsets">
     <div class="suspect-fieldset">
       <h4>Identitas Penyidik</h4>
-      <div class="case-form-grid two">
+      <div class="case-form-grid three">
         {% include 'cases/field.html' with field=investigator_form.name %}
         {% include 'cases/field.html' with field=investigator_form.phone %}
+        {% include 'cases/field.html' with field=investigator_form.telegram_chat_id %}
       </div>
     </div>
   </div>
