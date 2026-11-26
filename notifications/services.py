@@ -735,7 +735,7 @@ def case_deadline_recipients(spdp, stage_key=None):
     if stage_key == "spdp":
         for user in get_user_model().objects.filter(
             is_active=True,
-            roles__code__in=(Role.KASI_PIDUM, Role.ADMIN, Role.EMPLOYEE),
+            roles__code=Role.KASI_PIDUM,
         ).distinct():
             users[user.pk] = user
     return list(users.values())

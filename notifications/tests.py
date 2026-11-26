@@ -293,6 +293,7 @@ class CaseDeadlineReminderTests(TestCase):
         )
 
     def test_spdp_reminder_starts_at_h_minus_two_before_p16_is_issued(self):
+        self.actor.roles.add(Role.objects.get(code=Role.ADMIN))
         spdp = SPDP.objects.create(
             directorate="Direktorat Umum",
             investigator_agency="Kepolisian RI",
@@ -316,10 +317,10 @@ class CaseDeadlineReminderTests(TestCase):
         self.assertEqual(deadline.remaining_days, 2)
         self.assertEqual(deadline.color_class, "warning")
         self.assertTrue(deadline.automatic_due)
-        self.assertEqual(send_case_deadline_reminder(deadline, self.actor), 3)
+        self.assertEqual(send_case_deadline_reminder(deadline, self.actor), 2)
         self.assertEqual(
             set(WebNotification.objects.filter(spdp=spdp).values_list("recipient_id", flat=True)),
-            {self.kasi.pk, self.staff.pk, self.kasubsi.pk},
+            {self.kasi.pk, self.kasubsi.pk},
         )
 
     @patch("notifications.services.send_whatsapp_message")
