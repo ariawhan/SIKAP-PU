@@ -706,8 +706,12 @@ class SPDPTests(TestCase):
         second = User.objects.create_user(
             "jaksa-dua", "j2@test.id", "rahasia-kuat", rank="Ajun Jaksa", nrp="61234567",
         )
-        staff_one = User.objects.create_user("pegawai-satu", "p1@test.id", "rahasia-kuat")
-        staff_two = User.objects.create_user("pegawai-dua", "p2@test.id", "rahasia-kuat")
+        staff_one = User.objects.create_user(
+            "pegawai-satu", "p1@test.id", "rahasia-kuat", position="Pengelola Penanganan Perkara",
+        )
+        staff_two = User.objects.create_user(
+            "pegawai-dua", "p2@test.id", "rahasia-kuat", position="Pengadministrasi Perkara",
+        )
         first.roles.add(self.prosecutor_role)
         second.roles.add(self.prosecutor_role)
         staff_one.roles.add(self.employee_role)
@@ -743,6 +747,8 @@ class SPDPTests(TestCase):
         self.assertIn("PENUNJUKAN PETUGAS ADMINISTRASI", draft.content_html)
         self.assertIn(staff_one.display_name.upper(), draft.content_html)
         self.assertIn(staff_two.display_name.upper(), draft.content_html)
+        self.assertIn(staff_one.position, draft.content_html)
+        self.assertIn(staff_two.position, draft.content_html)
         self.assertIn("Jaksa Muda", draft.content_html)
         self.assertIn("NIP. 198001012005011001", draft.content_html)
         self.assertIn("Ajun Jaksa", draft.content_html)
@@ -1189,8 +1195,12 @@ class SPDPTests(TestCase):
         spdp = self.create_spdp()
         kasi = User.objects.create_user("kasi-admin-staff", "kasi-admin-staff@test.id", "rahasia-kuat")
         prosecutor = User.objects.create_user("jaksa-admin-staff", "jaksa-admin-staff@test.id", "rahasia-kuat")
-        staff_one = User.objects.create_user("staff-admin-satu", "staff-admin-satu@test.id", "rahasia-kuat")
-        staff_two = User.objects.create_user("staff-admin-dua", "staff-admin-dua@test.id", "rahasia-kuat")
+        staff_one = User.objects.create_user(
+            "staff-admin-satu", "staff-admin-satu@test.id", "rahasia-kuat", position="Pengelola Perkara",
+        )
+        staff_two = User.objects.create_user(
+            "staff-admin-dua", "staff-admin-dua@test.id", "rahasia-kuat", position="Pengadministrasi Perkara",
+        )
         kasi.roles.add(self.kasi_role)
         prosecutor.roles.add(self.prosecutor_role)
         staff_one.roles.add(self.employee_role)
@@ -1222,6 +1232,8 @@ class SPDPTests(TestCase):
         self.assertNotIn('class="p16-admin-staff-list single"', draft.content_html)
         self.assertIn(staff_one.display_name.upper(), draft.content_html)
         self.assertIn(staff_two.display_name.upper(), draft.content_html)
+        self.assertIn(staff_one.position, draft.content_html)
+        self.assertIn(staff_two.position, draft.content_html)
 
     def test_p16_editor_sanitizes_html_before_saving(self):
         spdp = self.create_spdp()

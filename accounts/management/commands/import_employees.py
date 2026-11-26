@@ -54,6 +54,7 @@ class Command(BaseCommand):
                     "nrp": nrp,
                     "rank": rank,
                     "grade": grade,
+                    "position": position,
                     "is_active": True,
                 }
                 user = User.objects.filter(nip=nip).first()

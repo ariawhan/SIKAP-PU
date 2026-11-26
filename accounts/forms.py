@@ -44,6 +44,7 @@ class StaffCreationForm(UserCreationForm):
     nrp = forms.CharField(label="NRP", required=False)
     rank = forms.CharField(label="Pangkat", required=False, widget=forms.TextInput(attrs={"placeholder": "cth. Jaksa Utama Pratama"}))
     grade = forms.ChoiceField(label="Golongan", required=False, choices=GRADE_CHOICES)
+    position = forms.CharField(label="Jabatan", required=False, widget=forms.TextInput(attrs={"placeholder": "cth. Pengelola Penanganan Perkara"}))
     email = forms.EmailField(label="Email")
     whatsapp_number = forms.CharField(label="Nomor WhatsApp", required=False, widget=forms.TextInput(attrs={"placeholder": "cth. 62812xxxx"}))
     telegram_chat_id = forms.CharField(label="ID Telegram", required=False, widget=forms.TextInput(attrs={"placeholder": "Chat ID Telegram"}))
@@ -54,7 +55,7 @@ class StaffCreationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("first_name", "nip", "nrp", "rank", "grade", "username", "email", "whatsapp_number", "telegram_chat_id", "photo", "photo_position_x", "photo_position_y", "roles")
+        fields = ("first_name", "nip", "nrp", "rank", "grade", "position", "username", "email", "whatsapp_number", "telegram_chat_id", "photo", "photo_position_x", "photo_position_y", "roles")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -92,6 +93,7 @@ class StaffUpdateForm(forms.ModelForm):
     nrp = forms.CharField(label="NRP", required=False)
     rank = forms.CharField(label="Pangkat", required=False, widget=forms.TextInput(attrs={"placeholder": "cth. Jaksa Utama Pratama"}))
     grade = forms.ChoiceField(label="Golongan", required=False, choices=GRADE_CHOICES)
+    position = forms.CharField(label="Jabatan", required=False, widget=forms.TextInput(attrs={"placeholder": "cth. Pengelola Penanganan Perkara"}))
     email = forms.EmailField(label="Email")
     whatsapp_number = forms.CharField(label="Nomor WhatsApp", required=False, widget=forms.TextInput(attrs={"placeholder": "cth. 62812xxxx"}))
     telegram_chat_id = forms.CharField(label="ID Telegram", required=False, widget=forms.TextInput(attrs={"placeholder": "Chat ID Telegram"}))
@@ -102,7 +104,7 @@ class StaffUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ("first_name", "nip", "nrp", "rank", "grade", "username", "email", "whatsapp_number", "telegram_chat_id", "photo", "photo_position_x", "photo_position_y", "roles")
+        fields = ("first_name", "nip", "nrp", "rank", "grade", "position", "username", "email", "whatsapp_number", "telegram_chat_id", "photo", "photo_position_x", "photo_position_y", "roles")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

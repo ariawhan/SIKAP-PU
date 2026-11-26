@@ -27,6 +27,7 @@ class User(AbstractUser):
     nrp = models.CharField("NRP", max_length=30, blank=True)
     rank = models.CharField("Pangkat", max_length=120, blank=True)
     grade = models.CharField("Golongan", max_length=10, blank=True)
+    position = models.CharField("Jabatan", max_length=160, blank=True)
     whatsapp_number = models.CharField("Nomor WhatsApp", max_length=30, blank=True)
     photo = models.ImageField("Foto", upload_to="users/photos/", blank=True, null=True)
     photo_position_x = models.PositiveSmallIntegerField("Posisi foto X", default=50)

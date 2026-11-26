@@ -291,7 +291,7 @@
       const item = document.createElement('li');
       appendLine(item, 'Nama', (option.dataset.name || option.textContent.trim()).toUpperCase(), true);
       appendLine(item, 'Pangkat / NIP', `${option.dataset.rank || '---'} / ${option.dataset.nip || '---'}`);
-      appendLine(item, 'Jabatan', option.dataset.roles || 'Petugas Administrasi');
+      appendLine(item, 'Jabatan', option.dataset.position || 'Petugas Administrasi');
       staffList.appendChild(item);
     });
   }

@@ -154,7 +154,7 @@
               <li>
                 <p><span>Nama</span><span>:</span><strong>{{ staff.display_name|upper }}</strong></p>
                 <p><span>Pangkat / NIP</span><span>:</span><span>{{ staff.rank|default:'---' }} / {{ staff.nip|default:'---' }}</span></p>
-                <p><span>Jabatan</span><span>:</span><span>{{ staff.role_labels|default:'Petugas Administrasi' }}</span></p>
+                <p><span>Jabatan</span><span>:</span><span>{{ staff.position|default:'Petugas Administrasi' }}</span></p>
               </li>
             {% empty %}
               <li>Petugas administrasi belum ditunjuk.</li>

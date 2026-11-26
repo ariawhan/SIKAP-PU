@@ -399,6 +399,7 @@ def users(request):
             | Q(email__icontains=keyword)
             | Q(nip__icontains=keyword)
             | Q(nrp__icontains=keyword)
+            | Q(position__icontains=keyword)
             | Q(whatsapp_number__icontains=keyword)
             | Q(telegram_chat_id__icontains=keyword)
             | Q(roles__name__icontains=keyword)

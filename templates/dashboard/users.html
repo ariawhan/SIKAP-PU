@@ -69,6 +69,7 @@
             </td>
             <td>
               <b>{{ account.rank|default:"-" }}{% if account.grade %} / {{ account.grade }}{% endif %}</b>
+              <small>Jabatan: {{ account.position|default:"-" }}</small>
               <small>NIP: {{ account.nip|default:"-" }} · NRP: {{ account.nrp|default:"-" }}</small>
             </td>
             <td>
@@ -138,6 +139,7 @@
           <label>NRP{{ form.nrp }}{{ form.nrp.errors }}</label>
           <label>Pangkat{{ form.rank }}{{ form.rank.errors }}</label>
           <label>Golongan{{ form.grade }}{{ form.grade.errors }}</label>
+          <label>Jabatan{{ form.position }}{{ form.position.errors }}</label>
           <label>Username{{ form.username }}<small>{{ form.username.help_text }}</small>{{ form.username.errors }}</label>
           <label>Email{{ form.email }}{{ form.email.errors }}</label>
           <label>Nomor WhatsApp{{ form.whatsapp_number }}{{ form.whatsapp_number.errors }}</label>
@@ -200,6 +202,7 @@
           <label>NIP<input type="text" name="nip" value="{{ account.nip }}" class="user-field"></label>
           <label>NRP<input type="text" name="nrp" value="{{ account.nrp }}" class="user-field"></label>
           <label>Pangkat<input type="text" name="rank" value="{{ account.rank }}" class="user-field" placeholder="cth. Jaksa Utama Pratama"></label>
+          <label>Jabatan<input type="text" name="position" value="{{ account.position }}" class="user-field" placeholder="cth. Pengelola Penanganan Perkara"></label>
           <label>Golongan
             <select name="grade" class="user-field">
               <option value="">Pilih golongan</option>

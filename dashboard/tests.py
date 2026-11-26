@@ -405,12 +405,31 @@ class AccessTests(TestCase):
                 "last_name": "Pidum",
                 "username": f"new-{role}",
                 "email": f"new-{role}@test.id",
+                "position": f"Jabatan {role.title()}",
                 "roles": [self.roles[role].pk],
                 "password1": "Sandi-kuat-12345",
                 "password2": "Sandi-kuat-12345",
             })
             self.assertRedirects(response, reverse("dashboard:users"))
-            self.assertTrue(User.objects.filter(username=f"new-{role}", roles__code=role).exists())
+            account = User.objects.get(username=f"new-{role}", roles__code=role)
+            self.assertEqual(account.position, f"Jabatan {role.title()}")
+
+    def test_superadmin_can_update_user_position(self):
+        self.client.force_login(self.superadmin)
+        response = self.client.post(reverse("dashboard:users"), {
+            "action": "edit",
+            "user_id": self.employee.pk,
+            "first_name": "Pegawai Pidum",
+            "username": self.employee.username,
+            "email": self.employee.email,
+            "position": "Pengelola Penanganan Perkara",
+            "roles": [self.roles[Role.EMPLOYEE].pk],
+            "photo_position_x": "50",
+            "photo_position_y": "50",
+        })
+        self.assertRedirects(response, reverse("dashboard:users"))
+        self.employee.refresh_from_db()
+        self.assertEqual(self.employee.position, "Pengelola Penanganan Perkara")
 
     def test_user_can_have_kasi_pidum_and_jaksa_roles(self):
         kasi_jaksa = self.make_user("kasi-jaksa", "kasi-jaksa@test.id", Role.KASI_PIDUM, Role.PROSECUTOR)

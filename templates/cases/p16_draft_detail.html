@@ -158,7 +158,7 @@
                 <label class="p16-prosecutor-select-field">Pegawai
                   <select data-p16-administrative-staff-select {% if not can_edit %}disabled{% endif %}>
                     <option value="">Pilih Petugas Administrasi</option>
-                    {% for option in administrative_staff_options %}<option value="{{ option.user.pk }}" data-name="{{ option.user.display_name }}" data-initials="{{ option.user.display_name|slice:':2'|upper }}" data-rank="{{ option.user.rank|default:'Pangkat belum diisi' }}" data-nip="{{ option.user.nip|default:'' }}" data-roles="{{ option.user.role_labels|default:'Petugas Administrasi' }}"{% if option.selected %} disabled{% endif %}>{{ option.user.display_name }}</option>{% endfor %}
+                    {% for option in administrative_staff_options %}<option value="{{ option.user.pk }}" data-name="{{ option.user.display_name }}" data-initials="{{ option.user.display_name|slice:':2'|upper }}" data-rank="{{ option.user.rank|default:'Pangkat belum diisi' }}" data-nip="{{ option.user.nip|default:'' }}" data-position="{{ option.user.position|default:'Petugas Administrasi' }}"{% if option.selected %} disabled{% endif %}>{{ option.user.display_name }}</option>{% endfor %}
                   </select>
                 </label>
                 {% if can_edit %}<button type="button" class="p16-prosecutor-add-btn" data-p16-administrative-staff-add>+ Tambah</button>{% endif %}
