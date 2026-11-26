@@ -146,6 +146,20 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
+.suspect-dialog[data-investigator-dialog] {
+  width: min(720px, calc(100vw - 32px));
+}
+
+.suspect-dialog[data-investigator-dialog] .suspect-dialog-shell {
+  height: auto;
+  max-height: calc(100dvh - 32px);
+  grid-template-rows: auto auto auto;
+}
+
+.suspect-dialog[data-investigator-dialog] .suspect-dialog-body {
+  max-height: min(360px, calc(100dvh - 190px));
+}
+
 .suspect-dialog-head {
   display: flex;
   align-items: center;

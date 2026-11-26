@@ -127,6 +127,7 @@ class SPDPTests(TestCase):
         self.assertContains(response, "data-investigator-summary")
         self.assertContains(response, "investigators-0-name")
         self.assertContains(response, "investigators-0-phone")
+        self.assertContains(response, "spdp-form.css?v=20261126-1")
         self.assertNotContains(response, "Asal Surat")
         self.assertNotContains(response, 'name="origin"')
         self.assertNotContains(response, "Kode pidana")
