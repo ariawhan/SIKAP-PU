@@ -479,7 +479,7 @@ def send_document_issued_notifications(
     if stage_key not in DOCUMENT_ISSUED_STAGES:
         raise ValueError(f"Tahapan notifikasi terbit tidak dikenal: {stage_key}")
 
-    spdp = SPDP.objects.get(pk=spdp_id)
+    spdp = SPDP.objects.prefetch_related("suspects", "investigators").get(pk=spdp_id)
     dispatch, created = DocumentIssuedDispatch.objects.get_or_create(
         stage_key=stage_key,
         document_id=document_id,
@@ -572,9 +572,40 @@ def send_document_issued_notifications(
                 actor=actor,
             )
 
-    dispatch.recipient_count = len(recipients)
+    investigator_recipient_count = 0
+    if (
+        stage_key == NotificationMenuSetting.Menu.P16
+        and setting.whatsapp_enabled
+        and menu_channels["whatsapp"]
+    ):
+        investigator_context_label = f"P-16 Terbit untuk Penyidik | {spdp.letter_number}"
+        for investigator in spdp.investigators.all():
+            context = {
+                "nama_penyidik": investigator.name,
+                "nomor_surat": str(document_number or "-").strip() or "-",
+                "nomor_spdp": spdp.letter_number,
+                "tanggal_surat": formatted_date,
+                "daftar_pelaku": case_details["daftar_pelaku"],
+                "daftar_jaksa": case_details["daftar_jaksa"],
+            }
+            rendered = render_notification_template(
+                "p16_investigator_issued_whatsapp", context,
+            )
+            enqueue_external_notification(
+                channel=NotificationLog.Channel.WHATSAPP,
+                recipient=normalize_whatsapp_number(investigator.phone),
+                recipient_name=investigator.name,
+                subject=rendered["subject"],
+                message=rendered["body"],
+                context_label=investigator_context_label,
+                actor=actor,
+            )
+            investigator_recipient_count += 1
+
+    total_recipient_count = len(recipients) + investigator_recipient_count
+    dispatch.recipient_count = total_recipient_count
     dispatch.save(update_fields=("recipient_count",))
-    return len(recipients)
+    return total_recipient_count
 
 
 def _issued_document_target_url(stage_key, document_id, spdp_id):

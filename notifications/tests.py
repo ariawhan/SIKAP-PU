@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from accounts.models import Role, User
-from cases.models import CaseDocumentDraft, P16Assignment, P16Draft, P21Draft, SOPForm03Draft, SPDP, StageOne, Suspect
+from cases.models import CaseDocumentDraft, CaseInvestigator, P16Assignment, P16Draft, P21Draft, SOPForm03Draft, SPDP, StageOne, Suspect
 from cases.reminders import case_deadline_for_spdp
 from .models import CaseReminderDispatch, DocumentIssuedDispatch, NotificationLog, NotificationMenuSetting, NotificationSetting, NotificationTemplate, WebNotification
 from .services import (
@@ -19,6 +19,7 @@ from .services import (
     process_notification_queue,
     render_notification_template,
     send_case_deadline_reminder,
+    send_document_issued_notifications,
     send_sop_form_03_issued_notifications,
 )
 from .template_defaults import DEADLINE_TEMPLATE_STAGES, DOCUMENT_ISSUED_STAGES, TEMPLATE_DEFINITIONS, issued_template_key
@@ -232,6 +233,64 @@ class CaseDeadlineReminderTests(TestCase):
         # Simpan lalu upload dapat memanggil layanan yang sama, tetapi tidak boleh menggandakan pesan.
         send_sop_form_03_issued_notifications(draft.pk, self.actor.pk)
         self.assertEqual(logs.count(), 8)
+
+    def test_p16_issued_notification_is_queued_for_every_investigator(self):
+        self.prosecutor.first_name = "I Made"
+        self.prosecutor.last_name = "Jaksa Penuntut"
+        self.prosecutor.save(update_fields=("first_name", "last_name"))
+        Suspect.objects.create(
+            spdp=self.spdp, sequence=1, name="Komang Terlapor",
+            suspect_type=Suspect.SuspectType.REPORTED,
+        )
+        CaseInvestigator.objects.create(
+            spdp=self.spdp, sequence=1, name="IPDA I Nyoman Penyidik",
+            phone="081234567890",
+        )
+        CaseInvestigator.objects.create(
+            spdp=self.spdp, sequence=2, name="AIPDA Kadek Penyidik",
+            phone="081398765432",
+        )
+        NotificationSetting.objects.update_or_create(
+            pk=1, defaults={"whatsapp_enabled": True, "telegram_enabled": False},
+        )
+        NotificationMenuSetting.objects.update_or_create(
+            menu_key=NotificationMenuSetting.Menu.P16,
+            defaults={"whatsapp_enabled": True},
+        )
+
+        recipient_count = send_document_issued_notifications(
+            spdp_id=self.spdp.pk,
+            stage_key=NotificationMenuSetting.Menu.P16,
+            document_id=self.draft.pk,
+            document_number=self.draft.draft_number,
+            document_date=self.draft.letter_date,
+            actor_id=self.actor.pk,
+        )
+
+        investigator_logs = NotificationLog.objects.filter(
+            context_label__startswith="P-16 Terbit untuk Penyidik",
+        ).order_by("pk")
+        self.assertEqual(investigator_logs.count(), 2)
+        self.assertEqual(
+            set(investigator_logs.values_list("recipient", flat=True)),
+            {"6281234567890", "6281398765432"},
+        )
+        self.assertEqual(
+            set(investigator_logs.values_list("recipient_name", flat=True)),
+            {"IPDA I Nyoman Penyidik", "AIPDA Kadek Penyidik"},
+        )
+        self.assertTrue(all(
+            "Komang Terlapor" in message and "I Made Jaksa Penuntut" in message
+            for message in investigator_logs.values_list("message", flat=True)
+        ))
+        self.assertTrue(all(
+            item.status == NotificationLog.Status.QUEUED for item in investigator_logs
+        ))
+        self.assertEqual(recipient_count, 6)
+        self.assertEqual(
+            DocumentIssuedDispatch.objects.get(stage_key="p16", document_id=self.draft.pk).recipient_count,
+            6,
+        )
 
     def test_spdp_reminder_starts_at_h_minus_two_before_p16_is_issued(self):
         spdp = SPDP.objects.create(
@@ -508,6 +567,13 @@ class NotificationSettingAccessTests(TestCase):
             set(NotificationMenuSetting.objects.values_list("menu_key", flat=True)),
             {key for key, _ in NotificationMenuSetting.Menu.choices},
         )
+        investigator_template = NotificationTemplate.objects.get(
+            key="p16_investigator_issued_whatsapp",
+        )
+        self.assertEqual(investigator_template.menu_key, "p16")
+        self.assertIn("{nama_penyidik}", investigator_template.body_template)
+        self.assertIn("{daftar_pelaku}", investigator_template.body_template)
+        self.assertIn("{daftar_jaksa}", investigator_template.body_template)
 
     def test_superadmin_can_update_and_reset_notification_template(self):
         self.client.force_login(self.superadmin)
