@@ -93,6 +93,101 @@ TEMPLATE_DEFINITIONS = {
         ),
         "menu_key": "p16",
     },
+    "p17_investigator_issued_whatsapp": {
+        "name": "P-17 Terbit untuk Penyidik - WhatsApp",
+        "description": "Pesan khusus kepada penyidik saat P-17 perkara terbit.",
+        "channel": "whatsapp",
+        "subject": "P-17 Terbit - {nomor_spdp}",
+        "body": (
+            "{nama_aplikasi} | INFORMASI P-17 TERBIT\n\n"
+            "Yth. Bapak/Ibu {nama_penyidik},\n"
+            "Kami informasikan bahwa surat P-17 untuk perkara yang Saudara tangani "
+            "telah diterbitkan.\n\n"
+            "Nomor P-17 : {nomor_surat}\n"
+            "Nomor SPDP : {nomor_spdp}\n"
+            "Tanggal    : {tanggal_surat}\n\n"
+            "Tersangka / terlapor:\n{daftar_pelaku}\n\n"
+            "Jaksa Penuntut Umum yang menangani:\n{daftar_jaksa}\n\n"
+            "Mohon menyampaikan perkembangan hasil penyidikan dan berkoordinasi dengan "
+            "Jaksa Penuntut Umum yang menangani perkara."
+        ),
+        "variables": (
+            "nama_aplikasi", "nama_penyidik", "nomor_surat", "nomor_spdp",
+            "tanggal_surat", "daftar_pelaku", "daftar_jaksa",
+        ),
+        "menu_key": "p17",
+    },
+    "sop02_investigator_issued_whatsapp": {
+        "name": "SOP Form 2 Terbit untuk Penyidik - WhatsApp",
+        "description": "Pesan khusus kepada penyidik saat SOP Form 2 perkara terbit.",
+        "channel": "whatsapp",
+        "subject": "SOP Form 2 Terbit - {nomor_spdp}",
+        "body": (
+            "{nama_aplikasi} | INFORMASI SOP FORM 2 TERBIT\n\n"
+            "Yth. Bapak/Ibu {nama_penyidik},\n"
+            "Kami informasikan bahwa SOP Form 2 untuk perkara yang Saudara tangani "
+            "telah diterbitkan.\n\n"
+            "Nomor surat : {nomor_surat}\n"
+            "Nomor SPDP  : {nomor_spdp}\n"
+            "Tanggal     : {tanggal_surat}\n\n"
+            "Tersangka / terlapor:\n{daftar_pelaku}\n\n"
+            "Jaksa Penuntut Umum yang menangani:\n{daftar_jaksa}\n\n"
+            "Mohon menindaklanjuti surat tersebut dan berkoordinasi dengan Jaksa Penuntut "
+            "Umum yang menangani perkara."
+        ),
+        "variables": (
+            "nama_aplikasi", "nama_penyidik", "nomor_surat", "nomor_spdp",
+            "tanggal_surat", "daftar_pelaku", "daftar_jaksa",
+        ),
+        "menu_key": "sop02",
+    },
+    "sop03_investigator_issued_whatsapp": {
+        "name": "SOP Form 3 Terbit untuk Penyidik - WhatsApp",
+        "description": "Pesan khusus kepada penyidik saat SOP Form 3 perkara terbit.",
+        "channel": "whatsapp",
+        "subject": "SOP Form 3 Terbit - {nomor_spdp}",
+        "body": (
+            "{nama_aplikasi} | INFORMASI SOP FORM 3 TERBIT\n\n"
+            "Yth. Bapak/Ibu {nama_penyidik},\n"
+            "Kami informasikan bahwa SOP Form 3 untuk perkara yang Saudara tangani "
+            "telah diterbitkan.\n\n"
+            "Nomor surat : {nomor_surat}\n"
+            "Nomor SPDP  : {nomor_spdp}\n"
+            "Tanggal     : {tanggal_surat}\n\n"
+            "Tersangka / terlapor:\n{daftar_pelaku}\n\n"
+            "Jaksa Penuntut Umum yang menangani:\n{daftar_jaksa}\n\n"
+            "Mohon memperhatikan dan menindaklanjuti surat tersebut sesuai penanganan perkara."
+        ),
+        "variables": (
+            "nama_aplikasi", "nama_penyidik", "nomor_surat", "nomor_spdp",
+            "tanggal_surat", "daftar_pelaku", "daftar_jaksa",
+        ),
+        "menu_key": "sop03",
+    },
+    "p21_investigator_issued_whatsapp": {
+        "name": "P-21 Terbit untuk Penyidik - WhatsApp",
+        "description": "Pesan khusus kepada penyidik saat P-21 perkara terbit.",
+        "channel": "whatsapp",
+        "subject": "P-21 Terbit - {nomor_spdp}",
+        "body": (
+            "{nama_aplikasi} | INFORMASI P-21 TERBIT\n\n"
+            "Yth. Bapak/Ibu {nama_penyidik},\n"
+            "Kami informasikan bahwa surat P-21 untuk perkara yang Saudara tangani "
+            "telah diterbitkan dan hasil penyidikan telah dinyatakan lengkap.\n\n"
+            "Nomor P-21 : {nomor_surat}\n"
+            "Nomor SPDP : {nomor_spdp}\n"
+            "Tanggal    : {tanggal_surat}\n\n"
+            "Tersangka / terlapor:\n{daftar_pelaku}\n\n"
+            "Jaksa Penuntut Umum yang menangani:\n{daftar_jaksa}\n\n"
+            "Mohon berkoordinasi dengan Jaksa Penuntut Umum untuk tindak lanjut penyerahan "
+            "tersangka dan barang bukti."
+        ),
+        "variables": (
+            "nama_aplikasi", "nama_penyidik", "nomor_surat", "nomor_spdp",
+            "tanggal_surat", "daftar_pelaku", "daftar_jaksa",
+        ),
+        "menu_key": "p21",
+    },
     "sop_form_03_issued_whatsapp": {
         "name": "SOP Form 3 Terbit - WhatsApp",
         "description": "Notifikasi WhatsApp saat SOP Form 3 berstatus terbit.",

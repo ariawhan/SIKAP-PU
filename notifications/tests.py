@@ -292,6 +292,58 @@ class CaseDeadlineReminderTests(TestCase):
             6,
         )
 
+    def test_selected_issued_documents_queue_special_whatsapp_for_investigator(self):
+        investigator = CaseInvestigator.objects.create(
+            spdp=self.spdp,
+            sequence=1,
+            name="IPDA I Nyoman Penyidik",
+            phone="081234567890",
+        )
+        Suspect.objects.create(
+            spdp=self.spdp,
+            sequence=1,
+            name="Komang Terlapor",
+            suspect_type=Suspect.SuspectType.REPORTED,
+        )
+        NotificationSetting.objects.update_or_create(
+            pk=1, defaults={"whatsapp_enabled": True, "telegram_enabled": False},
+        )
+        expected_labels = {
+            "p17": "P-17",
+            "sop02": "SOP Form 2",
+            "sop03": "SOP Form 3",
+            "p21": "P-21",
+        }
+        for index, (stage_key, stage_label) in enumerate(expected_labels.items(), start=100):
+            NotificationMenuSetting.objects.update_or_create(
+                menu_key=stage_key,
+                defaults={"whatsapp_enabled": True},
+            )
+            send_document_issued_notifications(
+                spdp_id=self.spdp.pk,
+                stage_key=stage_key,
+                document_id=index,
+                document_number=f"B-{index}/N.1.11/2026",
+                document_date=self.today,
+                actor_id=self.actor.pk,
+            )
+            log = NotificationLog.objects.get(
+                context_label__startswith=f"{stage_label} Terbit untuk Penyidik",
+                recipient_name=investigator.name,
+            )
+            self.assertEqual(log.recipient, "6281234567890")
+            self.assertIn(stage_label.upper(), log.message.upper())
+            self.assertIn("INFORMASI", log.message.upper())
+            self.assertIn("Komang Terlapor", log.message)
+
+        self.assertEqual(
+            NotificationLog.objects.filter(
+                recipient_name=investigator.name,
+                context_label__contains="Terbit untuk Penyidik",
+            ).count(),
+            4,
+        )
+
     def test_spdp_reminder_starts_at_h_minus_two_before_p16_is_issued(self):
         self.actor.roles.add(Role.objects.get(code=Role.ADMIN))
         spdp = SPDP.objects.create(

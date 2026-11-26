@@ -573,12 +573,22 @@ def send_document_issued_notifications(
             )
 
     investigator_recipient_count = 0
+    investigator_template_keys = {
+        "p16": "p16_investigator_issued_whatsapp",
+        "p17": "p17_investigator_issued_whatsapp",
+        "sop02": "sop02_investigator_issued_whatsapp",
+        "sop03": "sop03_investigator_issued_whatsapp",
+        "p21": "p21_investigator_issued_whatsapp",
+    }
+    investigator_template_key = investigator_template_keys.get(stage_key)
     if (
-        stage_key == NotificationMenuSetting.Menu.P16
+        investigator_template_key
         and setting.whatsapp_enabled
         and menu_channels["whatsapp"]
     ):
-        investigator_context_label = f"P-16 Terbit untuk Penyidik | {spdp.letter_number}"
+        investigator_context_label = (
+            f"{stage_label} Terbit untuk Penyidik | {spdp.letter_number}"
+        )
         for investigator in spdp.investigators.all():
             context = {
                 "nama_penyidik": investigator.name,
@@ -589,7 +599,7 @@ def send_document_issued_notifications(
                 "daftar_jaksa": case_details["daftar_jaksa"],
             }
             rendered = render_notification_template(
-                "p16_investigator_issued_whatsapp", context,
+                investigator_template_key, context,
             )
             enqueue_external_notification(
                 channel=NotificationLog.Channel.WHATSAPP,
