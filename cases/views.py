@@ -23,7 +23,7 @@ from notifications.services import (
     send_document_issued_notifications,
     send_p16_assignment_external_notifications,
 )
-from .forms import CaseDocumentDraftForm, CoordinationMinutesDraftForm, P16DraftForm, P17CreateForm, P17DraftForm, P21CreateForm, P21DraftForm, ReceiptFormSet, SOPForm02DraftForm, SOPForm03DraftForm, SOPForm1BDraftForm, SOPFormCreateForm, SPDPForm, StageOneForm, SuspectFormSet, VictimFormSet
+from .forms import CaseDocumentDraftForm, CaseInvestigatorFormSet, CoordinationMinutesDraftForm, P16DraftForm, P17CreateForm, P17DraftForm, P21CreateForm, P21DraftForm, ReceiptFormSet, SOPForm02DraftForm, SOPForm03DraftForm, SOPForm1BDraftForm, SOPFormCreateForm, SPDPForm, StageOneForm, SuspectFormSet, VictimFormSet
 from .models import CaseDocumentDraft, CoordinationMinutesDraft, P16Assignment, P16Draft, P17Draft, P21Draft, SOPForm02Draft, SOPForm03Draft, SPDP, StageOne
 from .p16_content import build_default_p16_content, ensure_p16_sections
 from .p17_content import build_p17_preview, ensure_p17_sections, p17_recipients_for_editor, request_label
@@ -1714,7 +1714,13 @@ def spdp_create(request):
     formset = SuspectFormSet(request.POST or None, instance=instance, prefix="suspects")
     victim_formset = VictimFormSet(request.POST or None, instance=instance, prefix="victims")
     receipt_formset = ReceiptFormSet(request.POST or None, instance=instance, prefix="receipts")
-    if request.method == "POST" and form.is_valid() and formset.is_valid() and victim_formset.is_valid() and receipt_formset.is_valid():
+    investigator_formset = CaseInvestigatorFormSet(
+        request.POST or None, instance=instance, prefix="investigators",
+    )
+    if request.method == "POST" and all((
+        form.is_valid(), formset.is_valid(), victim_formset.is_valid(),
+        receipt_formset.is_valid(), investigator_formset.is_valid(),
+    )):
         spdp = form.save(commit=False)
         spdp.created_by = request.user
         spdp.save()
@@ -1739,6 +1745,13 @@ def spdp_create(request):
             receipt.spdp = spdp
             receipt.sequence = index
             receipt.save()
+        investigators = investigator_formset.save(commit=False)
+        for deleted in investigator_formset.deleted_objects:
+            deleted.delete()
+        for index, investigator in enumerate(investigators, start=1):
+            investigator.spdp = spdp
+            investigator.sequence = index
+            investigator.save()
         messages.success(request, f"SPDP {spdp.letter_number} berhasil disimpan.")
         return redirect("cases:spdp_detail", pk=spdp.pk)
     receipt_prosecutor_profiles = [
@@ -1755,7 +1768,8 @@ def spdp_create(request):
         ).distinct().order_by("first_name", "last_name", "username")
     ]
     return render(request, "cases/spdp_form.html", {
-        "form": form, "formset": formset, "victim_formset": victim_formset, "receipt_formset": receipt_formset,
+        "form": form, "formset": formset, "victim_formset": victim_formset,
+        "receipt_formset": receipt_formset, "investigator_formset": investigator_formset,
         "case_types_by_directorate": form.case_types_by_directorate,
         "investigator_units_by_institution": form.investigator_units_by_institution,
         "receipt_prosecutor_profiles": receipt_prosecutor_profiles,
@@ -1780,17 +1794,22 @@ def spdp_edit(request, pk):
     receipt_formset = ReceiptFormSet(
         request.POST or None, instance=spdp, prefix="receipts",
     )
+    investigator_formset = CaseInvestigatorFormSet(
+        request.POST or None, instance=spdp, prefix="investigators",
+    )
     if (
         request.method == "POST"
         and form.is_valid()
         and formset.is_valid()
         and victim_formset.is_valid()
         and receipt_formset.is_valid()
+        and investigator_formset.is_valid()
     ):
         form.save()
         _save_spdp_related_formset(formset, spdp)
         _save_spdp_related_formset(victim_formset, spdp)
         _save_spdp_related_formset(receipt_formset, spdp)
+        _save_spdp_related_formset(investigator_formset, spdp)
         messages.success(request, f"Data perkara {spdp.letter_number} berhasil diperbarui.")
         return redirect("cases:spdp_detail", pk=spdp.pk)
 
@@ -1811,6 +1830,7 @@ def spdp_edit(request, pk):
         "formset": formset,
         "victim_formset": victim_formset,
         "receipt_formset": receipt_formset,
+        "investigator_formset": investigator_formset,
         "case_types_by_directorate": form.case_types_by_directorate,
         "investigator_units_by_institution": form.investigator_units_by_institution,
         "receipt_prosecutor_profiles": receipt_prosecutor_profiles,
@@ -1851,6 +1871,7 @@ def spdp_detail(request, pk):
             "suspects",
             "victims",
             "receipts",
+            "investigators",
             "p17_drafts",
             "case_document_drafts",
         ),

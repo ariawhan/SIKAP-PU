@@ -1,0 +1,14 @@
+<section class="suspect-card" data-investigator-form>
+  <div class="suspect-head"><div><span data-investigator-number>{{ number }}</span><b>Penyidik</b></div></div>
+  {{ investigator_form.id }}
+  <div class="suspect-fieldsets">
+    <div class="suspect-fieldset">
+      <h4>Identitas Penyidik</h4>
+      <div class="case-form-grid two">
+        {% include 'cases/field.html' with field=investigator_form.name %}
+        {% include 'cases/field.html' with field=investigator_form.phone %}
+      </div>
+    </div>
+  </div>
+  <span class="delete-field">{{ investigator_form.DELETE }}</span>
+</section>

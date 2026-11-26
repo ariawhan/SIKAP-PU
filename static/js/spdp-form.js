@@ -322,6 +322,27 @@
     },
   });
 
+  setupPersonCollection({
+    list: '[data-investigator-list]',
+    summary: '[data-investigator-summary]',
+    empty: '[data-investigator-empty]',
+    addButton: '[data-add-investigator]',
+    dialog: '[data-investigator-dialog]',
+    totalInput: '#id_investigators-TOTAL_FORMS',
+    template: '#empty-investigator-form',
+    card: '[data-investigator-form]',
+    number: '[data-investigator-number]',
+    finishButton: '[data-finish-investigator-dialog]',
+    cancelButton: '[data-cancel-investigator-dialog]',
+    summaryItem: '[data-investigator-summary-item]',
+    summaryDataset: 'investigatorSummaryItem',
+    fallbackName: 'Nama penyidik belum diisi',
+    emptyDetails: 'Nomor HP belum diisi',
+    detailFields: [
+      { field: 'phone', label: 'Nomor HP' },
+    ],
+  });
+
   function setupInvestigatorCascade() {
     const agencySelect = form.querySelector('[name="investigator_agency"]');
     const unitSelect = form.querySelector('[name="investigating_unit"]');

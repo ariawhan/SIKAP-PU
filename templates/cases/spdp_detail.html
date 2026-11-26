@@ -76,4 +76,9 @@
   <div class="panel-head"><div><h3>Tanda Terima</h3><p>{{ spdp.receipts.count }} data tercatat</p></div></div>
   <div class="table-wrap"><table><thead><tr><th>No.</th><th>Jenis</th><th>Tanggal Diterima</th><th>Penerima</th><th>Penyidik</th><th>NRP</th></tr></thead><tbody>{% for receipt in spdp.receipts.all %}<tr><td>{{ receipt.sequence }}</td><td>{{ receipt.get_receipt_type_display }}</td><td>{{ receipt.received_at|date:'d M Y, H:i'|default:'-' }}</td><td><b>{{ receipt.recipient_name|default:'-' }}</b><small>{{ receipt.recipient_rank }}{% if receipt.recipient_position %} - {{ receipt.recipient_position }}{% endif %}</small></td><td>{{ receipt.investigator_name|default:'-' }}<small>{{ receipt.investigator_rank }}{% if receipt.investigator_position %} - {{ receipt.investigator_position }}{% endif %}</small></td><td>{{ receipt.investigator_nrp|default:'-' }}</td></tr>{% empty %}<tr><td colspan="6"><div class="empty-table"><b>Belum ada tanda terima yang dicatat.</b></div></td></tr>{% endfor %}</tbody></table></div>
 </article>
+
+<article class="panel mt-4">
+  <div class="panel-head"><div><h3>Data Penyidik</h3><p>{{ spdp.investigators.count }} orang tercatat</p></div></div>
+  <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama Penyidik</th><th>Nomor HP</th></tr></thead><tbody>{% for investigator in spdp.investigators.all %}<tr><td>{{ investigator.sequence }}</td><td><b>{{ investigator.name }}</b></td><td>{{ investigator.phone }}</td></tr>{% empty %}<tr><td colspan="3"><div class="empty-table"><b>Belum ada data penyidik yang dicatat.</b></div></td></tr>{% endfor %}</tbody></table></div>
+</article>
 {% endblock %}

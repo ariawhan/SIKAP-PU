@@ -7,7 +7,7 @@ from django.forms import inlineformset_factory
 from django.utils.html import strip_tags
 
 from accounts.models import Role, User
-from .models import CaseDocumentDraft, CoordinationMinutesDraft, P16Draft, P17Draft, P21Draft, Receipt, SOPForm02Draft, SOPForm03Draft, SOPForm1BDraft, SPDP, StageOne, Suspect, Victim
+from .models import CaseDocumentDraft, CaseInvestigator, CoordinationMinutesDraft, P16Draft, P17Draft, P21Draft, Receipt, SOPForm02Draft, SOPForm03Draft, SOPForm1BDraft, SPDP, StageOne, Suspect, Victim
 from .p16_content import sanitize_p16_html
 from .p16_numbering import P16NumberingError, build_p16_number, extract_p16_sequence, p16_number_parts
 from .p17_numbering import P17NumberingError, build_p17_number, extract_p17_sequence, p17_number_parts
@@ -551,6 +551,36 @@ class ReceiptForm(forms.ModelForm):
 
 ReceiptFormSet = inlineformset_factory(
     SPDP, Receipt, form=ReceiptForm, extra=1, can_delete=True, min_num=0, validate_min=False
+)
+
+
+class CaseInvestigatorForm(forms.ModelForm):
+    class Meta:
+        model = CaseInvestigator
+        exclude = ("spdp", "sequence")
+        widgets = {
+            "name": forms.TextInput(attrs={
+                "autocomplete": "name",
+                "placeholder": "Nama lengkap penyidik",
+            }),
+            "phone": forms.TextInput(attrs={
+                "autocomplete": "tel",
+                "inputmode": "tel",
+                "placeholder": "Contoh: 081234567890",
+            }),
+        }
+
+    def clean_phone(self):
+        phone = (self.cleaned_data.get("phone") or "").strip()
+        compact = phone.replace(" ", "").replace("-", "")
+        if compact and (not compact.lstrip("+").isdigit() or len(compact.lstrip("+")) < 8):
+            raise forms.ValidationError("Nomor HP penyidik tidak valid.")
+        return phone
+
+
+CaseInvestigatorFormSet = inlineformset_factory(
+    SPDP, CaseInvestigator, form=CaseInvestigatorForm,
+    extra=1, can_delete=True, min_num=0, validate_min=False,
 )
 
 

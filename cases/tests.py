@@ -26,7 +26,7 @@ from configurations.models import (
 from notifications.models import NotificationLog, NotificationSetting, WebNotification
 from notifications.services import process_notification_queue
 from .forms import SPDPForm
-from .models import CaseDocumentDraft, CoordinationMinutesDraft, P16Assignment, P16Draft, P17Draft, P21Draft, Receipt, SOPForm02Draft, SOPForm03Draft, SOPForm1BDraft, SPDP, StageOne, Suspect, Victim
+from .models import CaseDocumentDraft, CaseInvestigator, CoordinationMinutesDraft, P16Assignment, P16Draft, P17Draft, P21Draft, Receipt, SOPForm02Draft, SOPForm03Draft, SOPForm1BDraft, SPDP, StageOne, Suspect, Victim
 from .p17_content import build_p17_preview
 from .reminders import case_deadline_for_spdp
 
@@ -85,6 +85,10 @@ class SPDPTests(TestCase):
             "receipts-INITIAL_FORMS": "0",
             "receipts-MIN_NUM_FORMS": "0",
             "receipts-MAX_NUM_FORMS": "1000",
+            "investigators-TOTAL_FORMS": "1",
+            "investigators-INITIAL_FORMS": "0",
+            "investigators-MIN_NUM_FORMS": "0",
+            "investigators-MAX_NUM_FORMS": "1000",
         }
 
     def test_login_is_required(self):
@@ -117,6 +121,12 @@ class SPDPTests(TestCase):
         self.assertContains(response, "Tambah Tanda Terima")
         self.assertContains(response, "receipts-0-received_at")
         self.assertContains(response, "receipts-0-investigator_nrp")
+        self.assertContains(response, "Data Penyidik")
+        self.assertContains(response, "Tambah Penyidik")
+        self.assertContains(response, "data-investigator-dialog")
+        self.assertContains(response, "data-investigator-summary")
+        self.assertContains(response, "investigators-0-name")
+        self.assertContains(response, "investigators-0-phone")
         self.assertNotContains(response, "Asal Surat")
         self.assertNotContains(response, 'name="origin"')
         self.assertNotContains(response, "Kode pidana")
@@ -249,6 +259,59 @@ class SPDPTests(TestCase):
         self.assertEqual(receipt.receipt_type, Receipt.ReceiptType.ADDITIONAL_INVESTIGATION_RESULT)
         self.assertEqual(receipt.recipient_name, "I Made Penerima")
         self.assertEqual(receipt.investigator_nrp, "88001122")
+
+    def test_create_and_edit_spdp_with_multiple_investigators(self):
+        payload = {
+            **self.data,
+            "investigators-TOTAL_FORMS": "2",
+            "investigators-0-name": "IPDA I Made Penyidik",
+            "investigators-0-phone": "0812-3456-7890",
+            "investigators-1-name": "AIPDA Komang Penyidik",
+            "investigators-1-phone": "0813 4567 8901",
+        }
+        response = self.client.post(reverse("cases:spdp_create"), payload)
+        spdp = SPDP.objects.get()
+        self.assertRedirects(response, reverse("cases:spdp_detail", args=[spdp.pk]))
+        self.assertEqual(
+            list(spdp.investigators.values_list("name", "phone")),
+            [
+                ("IPDA I Made Penyidik", "0812-3456-7890"),
+                ("AIPDA Komang Penyidik", "0813 4567 8901"),
+            ],
+        )
+
+        first, second = list(spdp.investigators.all())
+        suspect = spdp.suspects.get()
+        edit_payload = {
+            **self.data,
+            "suspects-INITIAL_FORMS": "1",
+            "suspects-0-id": str(suspect.pk),
+            "investigators-TOTAL_FORMS": "2",
+            "investigators-INITIAL_FORMS": "2",
+            "investigators-0-id": str(first.pk),
+            "investigators-0-name": "IPDA I Made Diperbarui",
+            "investigators-0-phone": "081299999999",
+            "investigators-1-id": str(second.pk),
+            "investigators-1-name": second.name,
+            "investigators-1-phone": second.phone,
+            "investigators-1-DELETE": "on",
+        }
+        response = self.client.post(reverse("cases:spdp_edit", args=[spdp.pk]), edit_payload)
+        self.assertRedirects(response, reverse("cases:spdp_detail", args=[spdp.pk]))
+        self.assertEqual(spdp.investigators.count(), 1)
+        self.assertEqual(spdp.investigators.get().name, "IPDA I Made Diperbarui")
+        self.assertEqual(spdp.investigators.get().phone, "081299999999")
+
+    def test_investigator_phone_is_validated(self):
+        payload = {
+            **self.data,
+            "investigators-0-name": "Penyidik Uji",
+            "investigators-0-phone": "nomor salah",
+        }
+        response = self.client.post(reverse("cases:spdp_create"), payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(CaseInvestigator.objects.exists())
+        self.assertContains(response, "Nomor HP penyidik tidak valid")
 
     def test_receipt_recipient_dropdown_uses_prosecutor_profile(self):
         prosecutor = User.objects.create_user(

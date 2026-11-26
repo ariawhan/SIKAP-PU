@@ -224,6 +224,30 @@ class Receipt(models.Model):
         return f"{self.get_receipt_type_display()} - {self.spdp.letter_number}"
 
 
+class CaseInvestigator(models.Model):
+    spdp = models.ForeignKey(
+        SPDP, on_delete=models.CASCADE, related_name="investigators",
+        verbose_name="Perkara / SPDP",
+    )
+    sequence = models.PositiveSmallIntegerField("Urutan", default=1)
+    name = models.CharField("Nama penyidik", max_length=180)
+    phone = models.CharField("Nomor HP", max_length=30)
+
+    class Meta:
+        ordering = ("sequence", "id")
+        verbose_name = "Penyidik Perkara"
+        verbose_name_plural = "Penyidik Perkara"
+        constraints = [
+            models.UniqueConstraint(
+                fields=("spdp", "sequence"),
+                name="unique_case_investigator_sequence_per_spdp",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.name} - {self.spdp.letter_number}"
+
+
 class StageOne(models.Model):
     spdp = models.OneToOneField(
         SPDP, on_delete=models.CASCADE, related_name="stage_one", verbose_name="Perkara",
