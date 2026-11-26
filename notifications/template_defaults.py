@@ -40,8 +40,7 @@ TEMPLATE_DEFINITIONS = {
             "Batas P-16       : {batas_p16}\n"
             "Status waktu     : {status_waktu}\n\n"
             "Silakan masuk ke {nama_aplikasi}, buka Data Perkara, lalu pilih aksi Tunjuk Jaksa.\n\n"
-            "Diteruskan oleh: {diteruskan_oleh}\n"
-            "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
+            "Diteruskan oleh: {diteruskan_oleh}"
         ) + CASE_DETAIL_BLOCK,
         "variables": (
             "nama_aplikasi", "nama_penerima", "nomor_spdp", "tanggal_diterima",
@@ -63,8 +62,7 @@ TEMPLATE_DEFINITIONS = {
             "Batas P-16       : {batas_p16}\n"
             "Status waktu     : {status_waktu}\n\n"
             "Silakan masuk ke {nama_aplikasi}, buka Data Perkara, lalu pilih aksi Tunjuk Jaksa.\n\n"
-            "Diteruskan oleh: {diteruskan_oleh}\n"
-            "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
+            "Diteruskan oleh: {diteruskan_oleh}"
         ) + CASE_DETAIL_BLOCK,
         "variables": (
             "nama_aplikasi", "nama_penerima", "nomor_spdp", "tanggal_diterima",
@@ -87,8 +85,7 @@ TEMPLATE_DEFINITIONS = {
             "Tersangka / terlapor:\n{daftar_pelaku}\n\n"
             "Jaksa Penuntut Umum yang menangani:\n{daftar_jaksa}\n\n"
             "Mohon berkoordinasi dengan Jaksa Penuntut Umum tersebut untuk perkembangan "
-            "penyidikan perkara.\n\n"
-            "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
+            "penyidikan perkara."
         ),
         "variables": (
             "nama_aplikasi", "nama_penyidik", "nomor_surat", "nomor_spdp",
@@ -107,8 +104,7 @@ TEMPLATE_DEFINITIONS = {
             "SOP Form 3 telah berstatus terbit.\n\n"
             "Nomor SOP Form 3 : {nomor_surat}\n"
             "Nomor SPDP       : {nomor_spdp}\n"
-            "Tanggal surat    : {tanggal_surat}\n\n"
-            "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
+            "Tanggal surat    : {tanggal_surat}"
         ) + CASE_DETAIL_BLOCK,
         "variables": (
             "nama_aplikasi", "nama_penerima", "nomor_surat", "nomor_spdp",
@@ -126,8 +122,7 @@ TEMPLATE_DEFINITIONS = {
             "SOP Form 3 telah berstatus terbit.\n\n"
             "Nomor SOP Form 3 : {nomor_surat}\n"
             "Nomor SPDP       : {nomor_spdp}\n"
-            "Tanggal surat    : {tanggal_surat}\n\n"
-            "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
+            "Tanggal surat    : {tanggal_surat}"
         ) + CASE_DETAIL_BLOCK,
         "variables": (
             "nama_aplikasi", "nama_penerima", "nomor_surat", "nomor_spdp",
@@ -136,7 +131,7 @@ TEMPLATE_DEFINITIONS = {
     },
     "case_deadline_web": {
         "name": "Reminder Tenggat Perkara - Aplikasi Web",
-        "description": "Reminder otomatis tiga hari terakhir pada setiap tahapan perkara.",
+        "description": "Reminder tenggat tiga hari terakhir pada setiap tahapan perkara.",
         "channel": "web",
         "subject": "Reminder {tahapan} Hari ke-{hari_ke}",
         "body": "Perkara {nomor_spdp} pada {tahapan} telah {status_waktu}. Batas {masa_hari} hari: {tanggal_batas}. {tindak_lanjut}" + CASE_DETAIL_BLOCK,
@@ -144,7 +139,7 @@ TEMPLATE_DEFINITIONS = {
     },
     "case_deadline_whatsapp": {
         "name": "Reminder Tenggat Perkara - WhatsApp",
-        "description": "Reminder otomatis tiga hari terakhir melalui WhatsApp.",
+        "description": "Reminder tenggat tiga hari terakhir melalui WhatsApp.",
         "channel": "whatsapp",
         "subject": "Reminder {tahapan} Hari ke-{hari_ke}",
         "body": (
@@ -158,7 +153,7 @@ TEMPLATE_DEFINITIONS = {
     },
     "case_deadline_telegram": {
         "name": "Reminder Tenggat Perkara - Telegram",
-        "description": "Reminder otomatis tiga hari terakhir melalui Telegram.",
+        "description": "Reminder tenggat tiga hari terakhir melalui Telegram.",
         "channel": "telegram",
         "subject": "Reminder {tahapan} Hari ke-{hari_ke}",
         "body": (
@@ -263,8 +258,7 @@ for stage_key, stage_label in DOCUMENT_ISSUED_STAGES.items():
                 "{tahapan} untuk perkara yang Anda tangani telah berstatus terbit.\n\n"
                 "Nomor surat : {nomor_surat}\n"
                 "Nomor SPDP  : {nomor_spdp}\n"
-                "Tanggal     : {tanggal_surat}\n\n"
-                "Pesan ini dikirim otomatis oleh {nama_aplikasi}."
+                "Tanggal     : {tanggal_surat}"
             ) + CASE_DETAIL_BLOCK
         TEMPLATE_DEFINITIONS[key] = {
             "name": f"{stage_label} Terbit - {channel_label}",

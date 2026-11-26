@@ -574,6 +574,18 @@ class NotificationSettingAccessTests(TestCase):
         self.assertIn("{nama_penyidik}", investigator_template.body_template)
         self.assertIn("{daftar_pelaku}", investigator_template.body_template)
         self.assertIn("{daftar_jaksa}", investigator_template.body_template)
+        for key, definition in TEMPLATE_DEFINITIONS.items():
+            combined = " ".join((
+                definition["name"], definition["description"],
+                definition["subject"], definition["body"],
+            )).casefold()
+            self.assertNotIn("otomatis", combined, key)
+        for template in NotificationTemplate.objects.all():
+            combined = " ".join((
+                template.name, template.description,
+                template.subject_template, template.body_template,
+            )).casefold()
+            self.assertNotIn("otomatis", combined, template.key)
 
     def test_superadmin_can_update_and_reset_notification_template(self):
         self.client.force_login(self.superadmin)
