@@ -188,6 +188,54 @@ TEMPLATE_DEFINITIONS = {
         ),
         "menu_key": "p21",
     },
+    "p18_investigator_issued_whatsapp": {
+        "name": "P-18 Terbit untuk Penyidik - WhatsApp",
+        "description": "Pesan khusus kepada penyidik saat P-18 perkara terbit.",
+        "channel": "whatsapp",
+        "subject": "P-18 Terbit - {nomor_spdp}",
+        "body": (
+            "{nama_aplikasi} | INFORMASI P-18 TERBIT\n\n"
+            "Yth. Bapak/Ibu {nama_penyidik},\n"
+            "Kami informasikan bahwa surat P-18 untuk perkara yang Saudara tangani "
+            "telah diterbitkan. Hasil penyidikan dinyatakan belum lengkap.\n\n"
+            "Nomor P-18 : {nomor_surat}\n"
+            "Nomor SPDP : {nomor_spdp}\n"
+            "Tanggal    : {tanggal_surat}\n\n"
+            "Tersangka / terlapor:\n{daftar_pelaku}\n\n"
+            "Jaksa Penuntut Umum yang menangani:\n{daftar_jaksa}\n\n"
+            "Mohon berkoordinasi dengan Jaksa Penuntut Umum dan menindaklanjuti petunjuk "
+            "kelengkapan berkas perkara."
+        ),
+        "variables": (
+            "nama_aplikasi", "nama_penyidik", "nomor_surat", "nomor_spdp",
+            "tanggal_surat", "daftar_pelaku", "daftar_jaksa",
+        ),
+        "menu_key": "p18",
+    },
+    "p19_investigator_issued_whatsapp": {
+        "name": "P-19 Terbit untuk Penyidik - WhatsApp",
+        "description": "Pesan khusus kepada penyidik saat P-19 perkara terbit.",
+        "channel": "whatsapp",
+        "subject": "P-19 Terbit - {nomor_spdp}",
+        "body": (
+            "{nama_aplikasi} | INFORMASI P-19 TERBIT\n\n"
+            "Yth. Bapak/Ibu {nama_penyidik},\n"
+            "Kami informasikan bahwa surat P-19 berisi petunjuk kelengkapan berkas untuk "
+            "perkara yang Saudara tangani telah diterbitkan.\n\n"
+            "Nomor P-19 : {nomor_surat}\n"
+            "Nomor SPDP : {nomor_spdp}\n"
+            "Tanggal    : {tanggal_surat}\n\n"
+            "Tersangka / terlapor:\n{daftar_pelaku}\n\n"
+            "Jaksa Penuntut Umum yang menangani:\n{daftar_jaksa}\n\n"
+            "Mohon menindaklanjuti petunjuk formil dan materiil serta berkoordinasi dengan "
+            "Jaksa Penuntut Umum sebelum berkas diserahkan kembali."
+        ),
+        "variables": (
+            "nama_aplikasi", "nama_penyidik", "nomor_surat", "nomor_spdp",
+            "tanggal_surat", "daftar_pelaku", "daftar_jaksa",
+        ),
+        "menu_key": "p19",
+    },
     "sop_form_03_issued_whatsapp": {
         "name": "SOP Form 3 Terbit - WhatsApp",
         "description": "Notifikasi WhatsApp saat SOP Form 3 berstatus terbit.",
@@ -325,7 +373,7 @@ for channel in ("whatsapp", "telegram"):
 
 # Penyidik memiliki template Telegram tersendiri. Isi awal mengikuti pesan
 # WhatsApp, tetapi dapat disunting secara terpisah melalui konfigurasi notifikasi.
-for _investigator_stage in ("p16", "p17", "sop02", "sop03", "p21"):
+for _investigator_stage in ("p16", "p17", "sop02", "sop03", "p18", "p19", "p21"):
     _whatsapp_key = f"{_investigator_stage}_investigator_issued_whatsapp"
     _telegram_key = f"{_investigator_stage}_investigator_issued_telegram"
     _whatsapp_definition = TEMPLATE_DEFINITIONS[_whatsapp_key]

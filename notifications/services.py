@@ -573,7 +573,9 @@ def send_document_issued_notifications(
             )
 
     investigator_recipient_count = 0
-    investigator_notification_stages = {"p16", "p17", "sop02", "sop03", "p21"}
+    investigator_notification_stages = {
+        "p16", "p17", "sop02", "sop03", "p18", "p19", "p21",
+    }
     if stage_key in investigator_notification_stages:
         investigator_context_label = (
             f"{stage_label} Terbit untuk Penyidik | {spdp.letter_number}"

@@ -312,6 +312,8 @@ class CaseDeadlineReminderTests(TestCase):
             "p17": "P-17",
             "sop02": "SOP Form 2",
             "sop03": "SOP Form 3",
+            "p18": "P-18",
+            "p19": "P-19",
             "p21": "P-21",
         }
         for index, (stage_key, stage_label) in enumerate(expected_labels.items(), start=100):
@@ -341,7 +343,7 @@ class CaseDeadlineReminderTests(TestCase):
                 recipient_name=investigator.name,
                 context_label__contains="Terbit untuk Penyidik",
             ).count(),
-            4,
+            6,
         )
 
     def test_investigator_telegram_is_queued_only_when_chat_id_is_filled(self):
